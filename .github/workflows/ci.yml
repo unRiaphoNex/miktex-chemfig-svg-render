@@ -29,6 +29,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       
+      - name: Approve build scripts for esbuild
+        run: pnpm approve-builds --esbuild
+      
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       

@@ -397,6 +397,15 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
       this.registerMarkdownPostProcessor((el, ctx) => {
         if (!this._renderReady()) return;
         this.postProcessRender(el, ctx).catch((e) => console.error("[Chemfig-SVG] render:", e));
+
+        // 知识关联: 高亮化合物名称 (v15.6.0)
+        try {
+          if (this.knowledgeLinking) {
+            this.knowledgeLinking.processElement(el);
+          }
+        } catch (e) {
+          console.warn("[Chemfig-SVG] knowledge linking:", e);
+        }
       });
 
       // 编辑模式: details 中代码修改后自动同步刷新 SVG (防抖 0.5s, 仅代码变化时触发)
@@ -717,6 +726,13 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
       // 加载学习卡片 (从 IndexedDB / localStorage, 首次加载内置默认卡片)
       this.learningCards = this.loadLearningCards();
 
+      // 初始化知识关联模块 (v15.6.0)
+      if (typeof KnowledgeLinking !== "undefined") {
+        this.knowledgeLinking = new KnowledgeLinking(this);
+        this.knowledgeLinking.addCSS();
+        console.log("[Chemfig-SVG] 知识关联模块已加载");
+      }
+
       // 学习相关命令
       this.addCommand({
         id: "open-learning-stats",
@@ -756,6 +772,45 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         name: "默写练习: 分子式→命名",
         callback: () => {
           new QuizModal(this.app, this.learningCards || [], "formula_to_name").open();
+        },
+      });
+
+      // 反向合成分析命令 (v15.6.0)
+      this.addCommand({
+        id: "open-retrosynthesis",
+        name: "打开反向合成分析",
+        callback: () => {
+          if (typeof RetrosynthesisModal !== "undefined") {
+            new RetrosynthesisModal(this.app).open();
+          } else {
+            new Notice("反向合成分析模块未加载", 3000);
+          }
+        },
+      });
+
+      // 反应机理可视化命令 (v15.5.0)
+      this.addCommand({
+        id: "open-reaction-mechanism",
+        name: "打开反应机理可视化",
+        callback: () => {
+          if (typeof ReactionMechanismModal !== "undefined") {
+            new ReactionMechanismModal(this.app).open();
+          } else {
+            new Notice("反应机理模块未加载", 3000);
+          }
+        },
+      });
+
+      // 每日一题命令 (v15.5.0)
+      this.addCommand({
+        id: "open-daily-question",
+        name: "打开每日一题",
+        callback: () => {
+          if (typeof DailyQuestionModal !== "undefined") {
+            new DailyQuestionModal(this.app, this).open();
+          } else {
+            new Notice("每日一题模块未加载", 3000);
+          }
         },
       });
 

@@ -1,0 +1,48 @@
+{
+  "name": "miktex-chemfig-svg-render",
+  "version": "10.15.12",
+  "description": "Obsidian plugin for rendering chemfig/tikz/miktex/ce code blocks to SVG/PNG",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node build.js --watch",
+    "build": "node build.js",
+    "lint": "eslint src/ --ext .ts",
+    "lint:fix": "eslint src/ --ext .ts --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "test": "node tests/compile-test.js && node tests/extended-test.js && node tests/advanced-test.js && node tests/group-layout-test.js",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "obsidian",
+    "chemfig",
+    "tikz",
+    "latex",
+    "chemistry"
+  ],
+  "author": "Chemfig SVG Render",
+  "license": "MIT",
+  "dependencies": {
+    "codemirror-lang-latex": "^0.6.1",
+    "esbuild": "^0.28.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.0.0",
+    "eslint": "^10.10.0",
+    "eslint-plugin-obsidianmd": "^0.4.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.0",
+    "obsidian": "^1.4.0",
+    "prettier": "^3.9.6",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.70.0"
+  }
+}

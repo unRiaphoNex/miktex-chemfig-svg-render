@@ -893,97 +893,111 @@ class MoleculeEditorModal extends Modal {
       new Notice("分子画布初始化失败: " + e.message);
     }
 
-    // ==== 操作行 ====
-    const actionBar = mainCol.createDiv("molecule-editor-actions");
+    // ==== v15.7.0: 重构后的顶部工具栏 ====
+    const toolbarTop = mainCol.createDiv("molecule-editor-toolbar-top");
 
-    let smilesInput = "";
-    new Setting(actionBar)
-      .addText((text) =>
-        text.setPlaceholder("输入 SMILES 加载...").onChange((v) => {
-          smilesInput = v;
-        })
-      )
-      .addButton((btn) =>
-        btn.setButtonText("加载").onClick(() => {
-          if (!smilesInput.trim()) return;
-          try {
-            const mol = getOCL().Molecule.fromSmiles(smilesInput.trim());
-            this.loadMolecule(mol, "已加载: " + smilesInput.trim());
-          } catch (e) {
-            this.setStatus("SMILES 解析失败: " + e.message);
-            new Notice("SMILES 解析失败: " + e.message);
-          }
-        })
-      );
+    // 左侧: 编辑操作组
+    const editGroup = toolbarTop.createDiv("molecule-editor-tool-group");
+    editGroup.createEl("button", {
+      text: "↩️",
+      cls: "molecule-editor-tool-btn",
+    }).onclick = () => this.undo();
+    editGroup.querySelector("button").title = "撤销 (Ctrl+Z)";
 
-    new Setting(actionBar)
-      .addButton((btn) =>
-        btn
-          .setButtonText("↩️ 撤销")
-          .setTooltip("撤销上一步操作 (Ctrl+Z)")
-          .onClick(() => this.undo())
-      )
-      .addButton((btn) =>
-        btn
-          .setButtonText("↪️ 重做")
-          .setTooltip("重做撤销的操作 (Ctrl+Y)")
-          .onClick(() => this.redo())
-      )
-      .addButton((btn) =>
-        btn.setButtonText("清空画布").onClick(() => {
-          this.pushHistory();
-          if (this.editor) this.editor.clearAll();
-          this.setStatus("画布已清空");
-        })
-      )
-      .addButton((btn) =>
-        btn
-          .setButtonText("🔍 重置视图")
-          .setTooltip("重置画布缩放和位置 (Ctrl+0)")
-          .onClick(() => this.resetView())
-      )
-      .addButton((btn) =>
-        btn.setButtonText("仅保存 SMILES").onClick(() => {
-          const mol = this.getMoleculeSafe();
-          if (!mol) return;
-          try {
-            const smiles = mol.toIsomericSmiles();
-            this.onSave({ type: "smiles", value: smiles });
-            this.close();
-          } catch (e) {
-            new Notice("导出失败: " + e.message);
-          }
-        })
-      )
-      .addButton((btn) =>
-        btn
-          .setButtonText("插入结构式 (渲染)")
-          .setCta()
-          .onClick(() => {
-            const mol = this.getMoleculeSafe();
-            if (!mol) return;
-            try {
-              const smiles = mol.toIsomericSmiles();
-              const chemfig = molGenerateChemfig(mol);
-              this.onSave({ type: "chemfig", code: chemfig, smiles });
-              this.close();
-            } catch (e) {
-              new Notice("导出失败: " + e.message);
-            }
-          })
-      );
+    editGroup.createEl("button", {
+      text: "↪️",
+      cls: "molecule-editor-tool-btn",
+    }).onclick = () => this.redo();
+    editGroup.querySelectorAll("button")[1].title = "重做 (Ctrl+Y)";
 
-    // ========== v15.2.0: 更多功能入口按钮 ==========
-    const moreFuncBar = mainCol.createDiv("molecule-editor-more-func");
-    moreFuncBar.style.cssText = "margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--background-modifier-border);";
+    editGroup.createEl("button", {
+      text: "🗑️",
+      cls: "molecule-editor-tool-btn",
+    }).onclick = () => {
+      this.pushHistory();
+      if (this.editor) this.editor.clearAll();
+      this.setStatus("画布已清空");
+    };
+    editGroup.querySelectorAll("button")[2].title = "清空画布";
 
-    moreFuncBar.createEl("div", {
-      text: "🔧 更多功能",
-      cls: "molecule-editor-section-title",
+    editGroup.createEl("button", {
+      text: "🔍",
+      cls: "molecule-editor-tool-btn",
+    }).onclick = () => this.resetView();
+    editGroup.querySelectorAll("button")[3].title = "重置视图 (Ctrl+0)";
+
+    // 右侧: 主要操作按钮
+    const mainActions = toolbarTop.createDiv("molecule-editor-tool-group");
+
+    mainActions.createEl("button", {
+      text: "💾 仅保存 SMILES",
+      cls: "molecule-editor-tool-btn secondary",
+    }).onclick = () => {
+      const mol = this.getMoleculeSafe();
+      if (!mol) return;
+      try {
+        const smiles = mol.toIsomericSmiles();
+        this.onSave({ type: "smiles", value: smiles });
+        this.close();
+      } catch (e) {
+        new Notice("导出失败: " + e.message);
+      }
+    };
+
+    mainActions.createEl("button", {
+      text: "✨ 插入结构式",
+      cls: "molecule-editor-tool-btn primary",
+    }).onclick = () => {
+      const mol = this.getMoleculeSafe();
+      if (!mol) return;
+      try {
+        const smiles = mol.toIsomericSmiles();
+        const chemfig = molGenerateChemfig(mol);
+        this.onSave({ type: "chemfig", code: chemfig, smiles });
+        this.close();
+      } catch (e) {
+        new Notice("导出失败: " + e.message);
+      }
+    };
+
+    // ==== SMILES 输入栏 ====
+    const smilesBar = mainCol.createDiv("molecule-editor-smiles-bar");
+    const smilesInputEl = smilesBar.createEl("input", {
+      type: "text",
+      placeholder: "输入 SMILES 字符串加载分子...",
+      cls: "molecule-editor-smiles-input",
     });
 
-    const funcBtnRow = moreFuncBar.createDiv("molecule-editor-func-buttons");
-    funcBtnRow.style.cssText = "display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;";
+    smilesBar.createEl("button", {
+      text: "📂 加载",
+      cls: "molecule-editor-smiles-btn",
+    }).onclick = () => {
+      const val = smilesInputEl.value.trim();
+      if (!val) return;
+      try {
+        const mol = getOCL().Molecule.fromSmiles(val);
+        this.loadMolecule(mol, "已加载: " + val);
+      } catch (e) {
+        this.setStatus("SMILES 解析失败: " + e.message);
+        new Notice("SMILES 解析失败: " + e.message);
+      }
+    };
+
+    // ==== 更多功能 (折叠式) ====
+    const moreFuncWrap = mainCol.createDiv("molecule-editor-more-wrap");
+    const moreToggle = moreFuncWrap.createEl("button", {
+      text: "🔧 更多功能 ▾",
+      cls: "molecule-editor-more-toggle",
+    });
+    const moreFuncContent = moreFuncWrap.createDiv("molecule-editor-more-content");
+    moreFuncContent.style.display = "none";
+
+    let moreOpen = false;
+    moreToggle.onclick = () => {
+      moreOpen = !moreOpen;
+      moreFuncContent.style.display = moreOpen ? "block" : "none";
+      moreToggle.textContent = moreOpen ? "🔧 更多功能 ▴" : "🔧 更多功能 ▾";
+    };
 
     // 功能按钮配置
     const funcButtons = [
@@ -4607,80 +4621,80 @@ const MOLECULE_EDITOR_REFINED_CSS = `
   border-radius: 8px;
 }
 
-.molecule-editor-actions .setting-item {
-  border: none;
-  padding: 0;
-  background: transparent;
-}
+/* ========== v15.7.0: 重构后的工具栏样式 ========== */
 
-.molecule-editor-actions .setting-item-control {
+/* 顶部工具栏 */
+.molecule-editor-toolbar-top {
   display: flex;
-  gap: 6px;
+  justify-content: space-between;
   align-items: center;
+  padding: 8px 12px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  gap: 12px;
 }
 
-.molecule-editor-actions button {
-  padding: 6px 12px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
+.molecule-editor-tool-group {
+  display: flex;
   gap: 4px;
+  align-items: center;
 }
 
-.molecule-editor-actions button:hover {
-  background: var(--background-modifier-hover);
-  border-color: var(--interactive-accent);
-}
-
-.molecule-editor-actions button.is-cta {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-  font-weight: 600;
-}
-
-.molecule-editor-actions button.is-cta:hover {
-  opacity: 0.9;
-}
-
-.molecule-editor-actions input[type="text"] {
+.molecule-editor-tool-btn {
   padding: 6px 10px;
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
   background: var(--background-primary);
   color: var(--text-normal);
   font-size: 12px;
-  width: 200px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
-/* 更多功能区 */
-.molecule-editor-more-func {
-  padding: 12px;
+.molecule-editor-tool-btn:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.molecule-editor-tool-btn.primary {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+  font-weight: 600;
+}
+
+.molecule-editor-tool-btn.primary:hover {
+  opacity: 0.9;
+}
+
+.molecule-editor-tool-btn.secondary {
+  background: var(--background-primary);
+  color: var(--text-muted);
+}
+
+/* SMILES 输入栏 */
+.molecule-editor-smiles-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
   background: var(--background-secondary);
   border-radius: 8px;
 }
 
-.molecule-editor-section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+.molecule-editor-smiles-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 12px;
+  font-family: monospace;
 }
 
-.molecule-editor-func-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 8px;
-}
-
-.molecule-editor-func-buttons button {
-  padding: 8px 10px;
+.molecule-editor-smiles-btn {
+  padding: 6px 14px;
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
   background: var(--background-primary);
@@ -4688,15 +4702,40 @@ const MOLECULE_EDITOR_REFINED_CSS = `
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.molecule-editor-func-buttons button:hover {
+.molecule-editor-smiles-btn:hover {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   border-color: var(--interactive-accent);
+}
+
+/* 更多功能折叠区 */
+.molecule-editor-more-wrap {
+  padding: 8px 12px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+}
+
+.molecule-editor-more-toggle {
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.molecule-editor-more-toggle:hover {
+  color: var(--text-normal);
+}
+
+.molecule-editor-more-content {
+  padding-top: 8px;
+  border-top: 1px solid var(--background-modifier-border);
+  margin-top: 8px;
 }
 
 /* 右侧片段库 */

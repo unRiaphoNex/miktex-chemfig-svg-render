@@ -674,3 +674,211 @@ class OptimizedMolecule3DRenderer {
 // 导出全局变量
 // Molecule3DViewer, Molecule3DModal, PRESET_MOLECULES, MOL3D_CSS
 // Molecule3DCache, WebGLContextManager, DebouncedRenderer, OptimizedMolecule3DRenderer
+
+// ========== v15.8.0: 轻量级 3D 查看器 (学习自 MoleView) ==========
+// 优化: 按需加载 / 内存管理 / 性能监控 / 错误降级
+
+/**
+ * 轻量级 3D 查看器管理器
+ */
+class Lightweight3DManager {
+  static instance = null;
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new Lightweight3DManager();
+    }
+    return this.instance;
+  }
+
+  constructor() {
+    this.loadingPromise = null;
+    this.loaded = false;
+    this.viewers = new Map(); // id -> viewer
+    this.maxViewers = 3; // 最多同时 3 个查看器
+    this.performanceLog = [];
+  }
+
+  /**
+   * 按需加载 3Dmol.js (带进度回调)
+   */
+  async load3Dmol(onProgress) {
+    if (this.loaded) return true;
+    if (this.loadingPromise) return this.loadingPromise;
+
+    onProgress?.(0, "开始加载 3Dmol.js...");
+
+    this.loadingPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://3Dmol.org/build/3Dmol-min.js";
+
+      // 模拟进度 (实际进度无法获取)
+      let progress = 0;
+      const progressTimer = setInterval(() => {
+        progress += 10;
+        if (progress < 90) {
+          onProgress?.(progress, `加载中... ${progress}%`);
+        }
+      }, 200);
+
+      script.onload = () => {
+        clearInterval(progressTimer);
+        this.loaded = true;
+        onProgress?.(100, "加载完成!");
+        console.log("[3Dmol] 加载成功");
+        resolve(true);
+      };
+
+      script.onerror = () => {
+        clearInterval(progressTimer);
+        this.loadingPromise = null;
+        onProgress?.(0, "加载失败");
+        console.warn("[3Dmol] 加载失败");
+        reject(new Error("3Dmol.js 加载失败，请检查网络连接"));
+      };
+
+      document.head.appendChild(script);
+    });
+
+    return this.loadingPromise;
+  }
+
+  /**
+   * 创建查看器 (自动管理数量)
+   */
+  async createViewer(id, container, smiles, options = {}) {
+    // 如果超过最大数量，释放最旧的
+    if (this.viewers.size >= this.maxViewers) {
+      const oldestKey = this.viewers.keys().next().value;
+      this.releaseViewer(oldestKey);
+    }
+
+    try {
+      await this.load3Dmol((progress, status) => {
+        // 更新加载状态
+        const loadingEl = container.querySelector(".mol3d-loading");
+        if (loadingEl) {
+          loadingEl.textContent = status;
+        }
+      });
+
+      container.empty();
+
+      const viewer = window.$3Dmol.createViewer(container, {
+        backgroundColor: options.backgroundColor || "white",
+      });
+
+      // 加载分子
+      viewer.addModel(smiles, "smi");
+
+      // 设置样式
+      const style = options.style || "stick";
+      if (style === "stick") {
+        viewer.setStyle({}, { stick: {}, sphere: { scale: 0.3 } });
+      } else if (style === "sphere") {
+        viewer.setStyle({}, { sphere: {} });
+      } else {
+        viewer.setStyle({}, { line: {} });
+      }
+
+      viewer.zoomTo();
+      viewer.render();
+
+      this.viewers.set(id, viewer);
+
+      // 记录性能
+      this.logPerformance("create", id, smiles);
+
+      return viewer;
+    } catch (error) {
+      console.error("[3Dmol] 创建查看器失败:", error);
+      container.empty();
+      container.createDiv({
+        text: "❌ 3D 模型加载失败\n" + error.message + "\n\n请检查网络连接后重试",
+        cls: "mol3d-error",
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * 释放指定查看器
+   */
+  releaseViewer(id) {
+    const viewer = this.viewers.get(id);
+    if (viewer) {
+      try {
+        viewer.clear();
+      } catch {}
+      this.viewers.delete(id);
+      this.logPerformance("release", id);
+    }
+  }
+
+  /**
+   * 释放所有查看器
+   */
+  releaseAll() {
+    for (const [id] of this.viewers) {
+      this.releaseViewer(id);
+    }
+  }
+
+  /**
+   * 记录性能日志
+   */
+  logPerformance(action, id, smiles) {
+    const entry = {
+      timestamp: Date.now(),
+      action,
+      id,
+      smiles: smiles?.slice(0, 50),
+      activeViewers: this.viewers.size,
+    };
+    this.performanceLog.push(entry);
+
+    // 只保留最近 100 条
+    if (this.performanceLog.length > 100) {
+      this.performanceLog.shift();
+    }
+  }
+
+  /**
+   * 获取性能统计
+   */
+  getStats() {
+    return {
+      loaded: this.loaded,
+      activeViewers: this.viewers.size,
+      maxViewers: this.maxViewers,
+      totalOperations: this.performanceLog.length,
+      recentLogs: this.performanceLog.slice(-10),
+    };
+  }
+}
+
+// CSS for lightweight 3D viewer
+const LIGHTWEIGHT_3D_CSS = `
+.mol3d-loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.mol3d-error {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-error);
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+`;
+
+// 自动注入 CSS
+if (typeof document !== "undefined" && !document.getElementById("lightweight-3d-css")) {
+  const style = document.createElement("style");
+  style.id = "lightweight-3d-css";
+  style.textContent = LIGHTWEIGHT_3D_CSS;
+  document.head.appendChild(style);
+}

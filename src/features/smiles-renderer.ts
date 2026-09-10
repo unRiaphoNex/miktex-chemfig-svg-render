@@ -36,12 +36,64 @@ class SMILESRenderer {
         molecularWeight: OCL.getMolecularWeight(smiles),
       };
 
-      // 尝试获取更多性质 (如果 OCL 支持)
+      // ========== v12.5.0: 更多性质计算 ==========
+      // 氢键供体数
+      if (typeof OCL.getHBDonorCount === "function") {
+        info.hbdonors = OCL.getHBDonorCount(smiles);
+      } else if (mol && typeof mol.getAtoms === "function") {
+        // 简单估算: -OH, -NH, -NH2
+        let hbd = 0;
+        mol.getAtoms().forEach(atom => {
+          if (atom.elem === "O" || atom.elem === "N") {
+            // 检查是否有氢
+            if (atom.implicitHCount > 0) hbd++;
+          }
+        });
+        info.hbdonors = hbd;
+      }
+
+      // 氢键受体数
+      if (typeof OCL.getHBAcceptorCount === "function") {
+        info.hbacceptors = OCL.getHBAcceptorCount(smiles);
+      } else if (mol && typeof mol.getAtoms === "function") {
+        // 简单估算: O, N, S, P
+        let hba = 0;
+        mol.getAtoms().forEach(atom => {
+          if (["O", "N", "S", "P", "F", "Cl", "Br", "I"].includes(atom.elem)) {
+            hba++;
+          }
+        });
+        info.hbacceptors = hba;
+      }
+
+      // LogP
       if (typeof OCL.getLogP === "function") {
         info.logP = OCL.getLogP(smiles);
       }
+
+      // TPSA (拓扑极性表面积)
+      if (typeof OCL.getTPSA === "function") {
+        info.tpsa = OCL.getTPSA(smiles);
+      }
+
+      // 可旋转键数
+      if (typeof OCL.getRotatableBondCount === "function") {
+        info.rotatableBonds = OCL.getRotatableBondCount(smiles);
+      }
+
+      // 重原子数
       if (mol && typeof mol.getAtomCount === "function") {
         info.heavyAtomCount = mol.getAtomCount();
+      }
+
+      // 环数
+      if (mol && typeof mol.getRingCount === "function") {
+        info.ringCount = mol.getRingCount();
+      }
+
+      // 芳香环数
+      if (mol && typeof mol.getAromaticRings === "function") {
+        info.aromaticRings = mol.getAromaticRings();
       }
 
       return info;
@@ -122,28 +174,79 @@ class SMILESRenderer {
 
       // 分子信息面板
       const infoPanel = container.createDiv({ cls: "smiles-info-panel" });
+
+      // 基本信息
       infoPanel.createEl("div", {
         text: `分子式: ${info.formula || "未知"}`,
         cls: "smiles-info-item",
       });
       if (info.molecularWeight) {
         infoPanel.createEl("div", {
-          text: `分子量: ${info.molecularWeight.toFixed(2)}`,
+          text: `分子量: ${info.molecularWeight.toFixed(2)} Da`,
           cls: "smiles-info-item",
         });
       }
-      if (info.logP) {
-        infoPanel.createEl("div", {
-          text: `LogP: ${info.logP.toFixed(2)}`,
-          cls: "smiles-info-item",
-        });
+
+      // 药代动力学性质分组
+      if (info.logP || info.tpsa || info.hbdonors !== undefined || info.hbacceptors !== undefined) {
+        infoPanel.createEl("div", { text: "📊 理化性质", cls: "smiles-group-title" });
+
+        if (info.logP) {
+          infoPanel.createEl("div", {
+            text: `LogP: ${info.logP.toFixed(2)}`,
+            cls: "smiles-info-item",
+          });
+        }
+        if (info.tpsa) {
+          infoPanel.createEl("div", {
+            text: `TPSA: ${info.tpsa.toFixed(1)} Å²`,
+            cls: "smiles-info-item",
+          });
+        }
+        if (info.hbdonors !== undefined) {
+          infoPanel.createEl("div", {
+            text: `氢键供体: ${info.hbdonors}`,
+            cls: "smiles-info-item",
+          });
+        }
+        if (info.hbacceptors !== undefined) {
+          infoPanel.createEl("div", {
+            text: `氢键受体: ${info.hbacceptors}`,
+            cls: "smiles-info-item",
+          });
+        }
+        if (info.rotatableBonds !== undefined) {
+          infoPanel.createEl("div", {
+            text: `可旋转键: ${info.rotatableBonds}`,
+            cls: "smiles-info-item",
+          });
+        }
       }
-      if (info.heavyAtomCount) {
-        infoPanel.createEl("div", {
-          text: `重原子数: ${info.heavyAtomCount}`,
-          cls: "smiles-info-item",
-        });
+
+      // 结构信息分组
+      if (info.heavyAtomCount || info.ringCount || info.aromaticRings) {
+        infoPanel.createEl("div", { text: "🏗️ 结构信息", cls: "smiles-group-title" });
+
+        if (info.heavyAtomCount) {
+          infoPanel.createEl("div", {
+            text: `重原子数: ${info.heavyAtomCount}`,
+            cls: "smiles-info-item",
+          });
+        }
+        if (info.ringCount) {
+          infoPanel.createEl("div", {
+            text: `环数: ${info.ringCount}`,
+            cls: "smiles-info-item",
+          });
+        }
+        if (info.aromaticRings) {
+          infoPanel.createEl("div", {
+            text: `芳香环: ${info.aromaticRings}`,
+            cls: "smiles-info-item",
+          });
+        }
       }
+
       infoPanel.createEl("div", {
         text: `SMILES: ${smiles}`,
         cls: "smiles-info-item smiles-smiles",
@@ -232,6 +335,14 @@ const SMILES_CSS = `
 .smiles-info-panel {
   font-size: 13px;
   color: var(--text-muted);
+}
+.smiles-group-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-normal);
+  margin: 12px 0 4px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border);
 }
 .smiles-info-item {
   margin: 4px 0;

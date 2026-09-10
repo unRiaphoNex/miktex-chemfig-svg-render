@@ -1013,6 +1013,134 @@ class MoleculeEditorModal extends Modal {
           })
       );
 
+    // ========== v15.2.0: 更多功能入口按钮 ==========
+    const moreFuncBar = mainCol.createDiv("molecule-editor-more-func");
+    moreFuncBar.style.cssText = "margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--background-modifier-border);";
+
+    moreFuncBar.createEl("div", {
+      text: "🔧 更多功能",
+      cls: "molecule-editor-section-title",
+    });
+
+    const funcBtnRow = moreFuncBar.createDiv("molecule-editor-func-buttons");
+    funcBtnRow.style.cssText = "display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;";
+
+    // 功能按钮配置
+    const funcButtons = [
+      {
+        icon: "🧊",
+        name: "3D 查看器",
+        tooltip: "在 3D 模式下查看当前分子",
+        action: () => {
+          const mol = this.getMoleculeSafe();
+          if (!mol) {
+            new Notice("请先在画布上绘制分子", 2000);
+            return;
+          }
+          try {
+            const smiles = mol.toIsomericSmiles();
+            if (typeof Molecule3DModal !== "undefined") {
+              new Molecule3DModal(this.app, smiles).open();
+            }
+          } catch (e) {
+            new Notice("打开 3D 查看器失败: " + e.message, 3000);
+          }
+        },
+      },
+      {
+        icon: "⚗️",
+        name: "反应条件速查",
+        tooltip: "查询常见有机反应的条件和产物",
+        action: () => {
+          if (typeof ReactionConditionsModal !== "undefined") {
+            new ReactionConditionsModal(this.app).open();
+          } else {
+            new Notice("反应条件速查未加载", 2000);
+          }
+        },
+      },
+      {
+        icon: "🔬",
+        name: "官能团分析",
+        tooltip: "分析当前分子的官能团",
+        action: () => {
+          const mol = this.getMoleculeSafe();
+          if (!mol) {
+            new Notice("请先在画布上绘制分子", 2000);
+            return;
+          }
+          try {
+            const smiles = mol.toIsomericSmiles();
+            // 打开官能团分析
+            new Notice("SMILES: " + smiles + "\n官能团分析功能开发中...", 3000);
+          } catch (e) {
+            new Notice("分析失败: " + e.message, 3000);
+          }
+        },
+      },
+      {
+        icon: "📚",
+        name: "学习统计",
+        tooltip: "打开学习数据统计面板",
+        action: () => {
+          if (typeof LearningAnalyticsModal !== "undefined") {
+            new LearningAnalyticsModal(this.app).open();
+          } else {
+            new Notice("学习统计面板未加载", 2000);
+          }
+        },
+      },
+      {
+        icon: "🎮",
+        name: "配对游戏",
+        tooltip: "官能团配对游戏",
+        action: () => {
+          if (typeof MatchingGameModal !== "undefined") {
+            new MatchingGameModal(this.app).open();
+          } else {
+            new Notice("配对游戏未加载", 2000);
+          }
+        },
+      },
+      {
+        icon: "✏️",
+        name: "默写练习",
+        tooltip: "开始结构式默写练习",
+        action: () => {
+          if (typeof QuizModal !== "undefined") {
+            new QuizModal(this.app, "name-to-structure").open();
+          } else {
+            new Notice("默写练习未加载", 2000);
+          }
+        },
+      },
+    ];
+
+    // 创建按钮
+    funcButtons.forEach((btn) => {
+      const button = funcBtnRow.createEl("button", {
+        text: `${btn.icon} ${btn.name}`,
+        cls: "molecule-editor-func-btn",
+      });
+      button.style.cssText = `
+        padding: 6px 12px;
+        background: var(--background-secondary);
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      `;
+      button.onmouseover = () => {
+        button.style.background = "var(--background-modifier-hover)";
+      };
+      button.onmouseout = () => {
+        button.style.background = "var(--background-secondary)";
+      };
+      button.title = btn.tooltip;
+      button.onclick = btn.action;
+    });
+
     const helpEl = mainCol.createDiv("molecule-editor-help");
     helpEl.innerHTML =
       "<strong>操作提示:</strong> 工具栏选原子/键类型绘制 | 选中后 Delete 删除(拆键) | " +

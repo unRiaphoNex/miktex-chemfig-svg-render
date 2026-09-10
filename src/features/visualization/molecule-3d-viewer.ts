@@ -370,5 +370,307 @@ const MOL3D_CSS = `
 }
 `;
 
+// ========== v15.7.0: 3Dmol 性能优化 ==========
+
+/**
+ * 3D 模型缓存管理器
+ * 避免重复加载相同分子的 3D 模型
+ */
+class Molecule3DCache {
+  static instance = null;
+
+  constructor() {
+    this.cache = new Map(); // key: smiles, value: { model, timestamp }
+    this.maxCacheSize = 20; // 最多缓存 20 个模型
+    this.cacheTimeout = 30 * 60 * 1000; // 30 分钟超时
+  }
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new Molecule3DCache();
+    }
+    return this.instance;
+  }
+
+  /**
+   * 获取缓存的模型
+   */
+  get(smiles) {
+    const key = smiles.trim();
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    // 检查是否过期
+    if (Date.now() - entry.timestamp > this.cacheTimeout) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    // 更新时间戳
+    entry.timestamp = Date.now();
+    return entry.model;
+  }
+
+  /**
+   * 缓存模型
+   */
+  set(smiles, model) {
+    const key = smiles.trim();
+
+    // 如果缓存已满，删除最旧的
+    if (this.cache.size >= this.maxCacheSize) {
+      let oldestKey = null;
+      let oldestTime = Infinity;
+      for (const [k, v] of this.cache.entries()) {
+        if (v.timestamp < oldestTime) {
+          oldestTime = v.timestamp;
+          oldestKey = k;
+        }
+      }
+      if (oldestKey) this.cache.delete(oldestKey);
+    }
+
+    this.cache.set(key, {
+      model: model,
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * 清空缓存
+   */
+  clear() {
+    this.cache.clear();
+  }
+
+  /**
+   * 获取缓存统计
+   */
+  getStats() {
+    return {
+      size: this.cache.size,
+      maxSize: this.maxCacheSize,
+      keys: Array.from(this.cache.keys()),
+    };
+  }
+}
+
+/**
+ * WebGL 上下文管理器
+ * 管理活跃的 viewer 实例，及时释放不需要的 WebGL 上下文
+ */
+class WebGLContextManager {
+  static instance = null;
+
+  constructor() {
+    this.activeViewers = new Set(); // 活跃的 viewer 实例
+    this.maxConcurrentViewers = 3; // 最多同时 3 个 3D 查看器
+  }
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new WebGLContextManager();
+    }
+    return this.instance;
+  }
+
+  /**
+   * 注册新的 viewer
+   */
+  register(viewer) {
+    // 如果超过最大数量，释放最旧的
+    if (this.activeViewers.size >= this.maxConcurrentViewers) {
+      const oldestViewer = this.activeViewers.values().next().value;
+      this.release(oldestViewer);
+    }
+
+    this.activeViewers.add(viewer);
+  }
+
+  /**
+   * 释放 viewer
+   */
+  release(viewer) {
+    if (!viewer) return;
+
+    try {
+      // 停止旋转
+      if (viewer.spin) {
+        viewer.spin(false);
+      }
+
+      // 清除所有模型
+      if (viewer.clear) {
+        viewer.clear();
+      }
+
+      // 销毁 viewer
+      if (viewer.dispose) {
+        viewer.dispose();
+      }
+    } catch (e) {
+      console.warn("[3Dmol] 释放 viewer 失败:", e);
+    }
+
+    this.activeViewers.delete(viewer);
+  }
+
+  /**
+   * 释放所有 viewer
+   */
+  releaseAll() {
+    for (const viewer of this.activeViewers) {
+      this.release(viewer);
+    }
+    this.activeViewers.clear();
+  }
+
+  /**
+   * 获取活跃 viewer 数量
+   */
+  getActiveCount() {
+    return this.activeViewers.size;
+  }
+}
+
+/**
+ * 防抖重渲染工具
+ * 避免频繁重渲染导致性能问题
+ */
+class DebouncedRenderer {
+  constructor(delay = 100) {
+    this.delay = delay;
+    this.timer = null;
+  }
+
+  /**
+   * 防抖渲染
+   */
+  render(viewer, callback) {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+
+    this.timer = setTimeout(() => {
+      if (viewer && viewer.render) {
+        viewer.render();
+      }
+      if (callback) callback();
+      this.timer = null;
+    }, this.delay);
+  }
+
+  /**
+   * 立即渲染
+   */
+  renderNow(viewer, callback) {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    if (viewer && viewer.render) {
+      viewer.render();
+    }
+    if (callback) callback();
+  }
+}
+
+/**
+ * 性能优化的 3D 渲染器
+ * 集成缓存、上下文管理、防抖
+ */
+class OptimizedMolecule3DRenderer {
+  /**
+   * 渲染 3D 分子（带缓存）
+   */
+  static async renderWithCache(container, smiles, options = {}) {
+    const cache = Molecule3DCache.getInstance();
+    const contextManager = WebGLContextManager.getInstance();
+
+    // 先检查缓存
+    const cachedModel = cache.get(smiles);
+    if (cachedModel && !options.forceReload) {
+      console.log("[3Dmol] 使用缓存模型:", smiles);
+
+      // 从缓存恢复
+      container.empty();
+      const viewer = window.$3Dmol.createViewer(container, {
+        backgroundColor: options.backgroundColor || "white",
+      });
+
+      // 重新添加模型数据
+      viewer.addModel(cachedModel.sdf, "sdf");
+
+      // 设置样式
+      this.applyStyle(viewer, options.style || "stick");
+
+      viewer.zoomTo();
+      viewer.render();
+
+      // 注册到上下文管理器
+      contextManager.register(viewer);
+
+      return viewer;
+    }
+
+    // 没有缓存，重新加载
+    const viewer = await Molecule3DViewer.render3D(container, smiles, options);
+
+    if (viewer) {
+      // 缓存模型
+      try {
+        const modelData = viewer.getModel(0);
+        if (modelData) {
+          const sdf = modelData.sdf();
+          cache.set(smiles, { sdf: sdf });
+        }
+      } catch (e) {
+        console.warn("[3Dmol] 缓存模型失败:", e);
+      }
+
+      // 注册到上下文管理器
+      contextManager.register(viewer);
+    }
+
+    return viewer;
+  }
+
+  /**
+   * 应用样式
+   */
+  static applyStyle(viewer, style) {
+    if (!viewer) return;
+
+    if (style === "stick") {
+      viewer.setStyle({}, { stick: {}, sphere: { scale: 0.3 } });
+    } else if (style === "sphere") {
+      viewer.setStyle({}, { sphere: { scale: 0.8 } });
+    } else if (style === "line") {
+      viewer.setStyle({}, { line: {} });
+    }
+  }
+
+  /**
+   * 清理资源
+   */
+  static cleanup() {
+    WebGLContextManager.getInstance().releaseAll();
+    Molecule3DCache.getInstance().clear();
+    console.log("[3Dmol] 所有资源已清理");
+  }
+
+  /**
+   * 获取性能统计
+   */
+  static getPerformanceStats() {
+    return {
+      activeViewers: WebGLContextManager.getInstance().getActiveCount(),
+      cachedModels: Molecule3DCache.getInstance().getStats(),
+    };
+  }
+}
+
 // 导出全局变量
 // Molecule3DViewer, Molecule3DModal, PRESET_MOLECULES, MOL3D_CSS
+// Molecule3DCache, WebGLContextManager, DebouncedRenderer, OptimizedMolecule3DRenderer

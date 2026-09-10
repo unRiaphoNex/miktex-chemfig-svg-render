@@ -104,6 +104,8 @@ class LearningCardModal extends Modal {
     this.onReview = onReview;
     this.options = options;
     this.flipped = false;
+    this.clozeRevealed = false; // 填空卡片状态
+    this.listIndex = 0; // 列表卡片当前索引
   }
 
   async onOpen() {
@@ -111,33 +113,157 @@ class LearningCardModal extends Modal {
     contentEl.empty();
     contentEl.addClass("chemfig-learning-modal");
 
-    // 卡片容器
-    const cardContainer = contentEl.createDiv({ cls: "chemfig-learning-card" });
+    const cardType = this.card.type || "basic";
 
-    // 正面: 只显示结构式
+    // 根据卡片类型渲染
+    if (cardType === "cloze") {
+      this.renderClozeCard(contentEl);
+    } else if (cardType === "list") {
+      this.renderListCard(contentEl);
+    } else {
+      this.renderBasicCard(contentEl);
+    }
+  }
+
+  // ========== 基础卡片 ==========
+  renderBasicCard(container) {
+    const cardContainer = container.createDiv({ cls: "chemfig-learning-card" });
+
+    // 正面
     const front = cardContainer.createDiv({ cls: "chemfig-card-front" });
     front.createEl("h3", { text: this.card.name });
     front.createEl("p", { text: this.card.formula || "", cls: "chemfig-card-formula" });
+    front.createEl("div", { text: "点击卡片查看答案", cls: "chemfig-card-hint" });
 
-    // 结构式预览区
-    const previewArea = front.createDiv({ cls: "chemfig-card-preview" });
-    previewArea.createEl("div", { text: "点击卡片查看答案", cls: "chemfig-card-hint" });
+    // 背面
+    const back = cardContainer.createDiv({ cls: "chemfig-card-back" });
+    back.createEl("h3", { text: this.card.name });
+    if (this.card.englishName) {
+      back.createEl("p", { text: this.card.englishName, cls: "chemfig-card-formula" });
+    }
+    back.createEl("p", { text: `分子式: ${this.card.formula || "未知"}` });
+    back.createEl("p", { text: `分类: ${this.card.category || "未分类"}` });
+    if (this.card.usage) back.createEl("p", { text: `用途: ${this.card.usage}` });
+    if (this.card.smiles) back.createEl("p", { text: `SMILES: ${this.card.smiles}` });
 
-    // 点击翻转
+    // ========== v11.9.0: FSRS 参数显示 ==========
+    if (this.card.state) {
+      const state = this.card.state;
+      if (state.stability || state.difficulty || state.retrievability) {
+        const paramsDiv = back.createDiv({ cls: "chemfig-fsrs-params" });
+        paramsDiv.createEl("hr");
+        paramsDiv.createEl("p", { text: "📊 FSRS 参数:", cls: "fsrs-params-title" });
+
+        if (state.stability) {
+          paramsDiv.createEl("p", {
+            text: `稳定性 (S): ${state.stability.toFixed(1)} 天`,
+            cls: "fsrs-param",
+          });
+        }
+        if (state.difficulty) {
+          paramsDiv.createEl("p", {
+            text: `难度 (D): ${state.difficulty.toFixed(1)} / 10`,
+            cls: "fsrs-param",
+          });
+        }
+        if (state.retrievability) {
+          const pct = (state.retrievability * 100).toFixed(1);
+          paramsDiv.createEl("p", {
+            text: `可回忆性 (R): ${pct}%`,
+            cls: "fsrs-param",
+          });
+        }
+        if (state.due) {
+          const dueDate = new Date(state.due).toLocaleDateString();
+          paramsDiv.createEl("p", {
+            text: `下次复习: ${dueDate}`,
+            cls: "fsrs-param",
+          });
+        }
+      }
+    }
+
     cardContainer.onclick = () => {
       this.flipped = !this.flipped;
-      this.renderCard(cardContainer);
+      cardContainer.classList.toggle("flipped", this.flipped);
     };
 
-    this.renderCard(cardContainer);
+    this.renderReviewButtons(container);
+  }
 
-    // 底部评分按钮
-    const btnContainer = contentEl.createDiv({ cls: "chemfig-card-buttons" });
+  // ========== 填空卡片 ==========
+  renderClozeCard(container) {
+    const cardContainer = container.createDiv({ cls: "chemfig-learning-card" });
+
+    const front = cardContainer.createDiv({ cls: "chemfig-card-front" });
+    front.createEl("h3", { text: this.card.name });
+
+    const clozeText = this.card.clozeText || "";
+    const displayText = clozeText.replace(/\{\{.*?\}\}/g, "_____");
+    front.createEl("p", { text: displayText, cls: "chemfig-cloze-text" });
+    front.createEl("div", { text: "点击显示答案", cls: "chemfig-card-hint" });
+
+    const back = cardContainer.createDiv({ cls: "chemfig-card-back" });
+    back.createEl("h3", { text: this.card.name });
+    const fullText = clozeText.replace(/\{\{(.*?)\}\}/g, "[$1]");
+    back.createEl("p", { text: fullText, cls: "chemfig-cloze-text" });
+
+    cardContainer.onclick = () => {
+      this.clozeRevealed = !this.clozeRevealed;
+      cardContainer.classList.toggle("flipped", this.clozeRevealed);
+    };
+
+    this.renderReviewButtons(container);
+  }
+
+  // ========== 列表卡片 ==========
+  renderListCard(container) {
+    const cardContainer = container.createDiv({ cls: "chemfig-learning-card" });
+    cardContainer.style.minHeight = "250px";
+
+    cardContainer.createEl("h3", { text: this.card.name });
+
+    const items = this.card.listItems || [];
+    const listContainer = cardContainer.createDiv({ cls: "chemfig-list-items" });
+
+    this.listItemEls = items.map((item, idx) => {
+      const itemEl = listContainer.createDiv({
+        cls: "chemfig-list-item",
+        text: `• ${item}`,
+      });
+      itemEl.style.opacity = idx === 0 ? "1" : "0.3";
+      return itemEl;
+    });
+
+    cardContainer.onclick = () => {
+      if (this.listIndex < this.listItemEls.length - 1) {
+        this.listIndex++;
+        this.listItemEls.forEach((el, idx) => {
+          el.style.opacity = idx <= this.listIndex ? "1" : "0.3";
+        });
+      } else {
+        this.flipped = true;
+        cardContainer.classList.add("flipped");
+      }
+    };
+
+    const back = cardContainer.createDiv({ cls: "chemfig-card-back" });
+    back.createEl("h3", { text: this.card.name });
+    items.forEach((item) => {
+      back.createEl("p", { text: `• ${item}` });
+    });
+
+    this.renderReviewButtons(container);
+  }
+
+  // 渲染评分按钮
+  renderReviewButtons(container) {
+    const btnContainer = container.createDiv({ cls: "chemfig-card-buttons" });
     const buttons = [
-      { quality: 1, label: "😫 忘记了", desc: "1天" },
-      { quality: 2, label: "😐 困难", desc: "3天" },
-      { quality: 3, label: "😊 好", desc: "7天" },
-      { quality: 4, label: "😎 容易", desc: "15天" },
+      { quality: 1, label: "😫 忘记了" },
+      { quality: 2, label: "😐 困难" },
+      { quality: 3, label: "😊 好" },
+      { quality: 4, label: "😎 容易" },
     ];
 
     buttons.forEach((btn) => {
@@ -154,35 +280,9 @@ class LearningCardModal extends Modal {
   }
 
   renderCard(container) {
-    const front = container.querySelector(".chemfig-card-front");
-    if (!front) return;
-
-    const previewArea = front.querySelector(".chemfig-card-preview");
-    const hint = front.querySelector(".chemfig-card-hint");
-
-    if (this.flipped) {
-      // 背面: 显示详细信息
-      if (hint) hint.remove();
-      previewArea.empty();
-
-      // 显示 chemfig 代码 (简化版)
-      previewArea.createEl("pre", {
-        text: this.card.chemfigCode || "暂无代码",
-        cls: "chemfig-card-code",
-      });
-
-      // 详细信息
-      const details = container.createDiv({ cls: "chemfig-card-details" });
-      details.createEl("p", { text: `分子式: ${this.card.formula || "未知"}` });
-      details.createEl("p", { text: `分类: ${this.card.category || "未分类"}` });
-      if (this.card.usage) details.createEl("p", { text: `用途: ${this.card.usage}` });
-      if (this.card.smiles) details.createEl("p", { text: `SMILES: ${this.card.smiles}` });
-    } else {
-      // 正面: 只显示名称
-      if (details) details.remove();
-      previewArea.empty();
-      previewArea.createEl("div", { text: "点击卡片查看答案", cls: "chemfig-card-hint" });
-    }
+    const cardEl = container.querySelector(".chemfig-learning-card");
+    if (!cardEl) return;
+    cardEl.classList.toggle("flipped", this.flipped);
   }
 
   async onClose() {
@@ -233,6 +333,45 @@ class LearningStatsModal extends Modal {
       statEl.createEl("div", { text: item.label, cls: "chemfig-stat-label" });
     });
 
+    // 复习日历热力图 (最近 12 周)
+    contentEl.createEl("h3", { text: "📅 最近复习情况" });
+    const heatmap = this.renderReviewHeatmap(contentEl);
+
+    // ========== v11.4.0: 今日学习目标进度 ==========
+    contentEl.createEl("h3", { text: "🎯 今日学习目标" });
+
+    // 获取今日复习数量
+    const today = new Date().toISOString().split("T")[0];
+    const history = JSON.parse(
+      localStorage.getItem("chemfig-review-history") || "{}"
+    );
+    const todayCount = history[today] || 0;
+
+    // 获取目标 (默认 10)
+    const dailyGoal = this.plugin.settings?.dailyReviewLimit || 10;
+    const progress = Math.min(todayCount / dailyGoal, 1);
+
+    const goalEl = contentEl.createDiv({ cls: "chemfig-goal-container" });
+
+    // 进度条
+    const progressBar = goalEl.createDiv({ cls: "chemfig-progress-bar" });
+    const progressFill = progressBar.createDiv({ cls: "chemfig-progress-fill" });
+    progressFill.style.width = `${progress * 100}%`;
+
+    // 进度文字
+    goalEl.createEl("p", {
+      text: `今日已复习 ${todayCount} / ${dailyGoal} 张卡片 (${Math.round(progress * 100)}%)`,
+      cls: "chemfig-goal-text",
+    });
+
+    // 完成提示
+    if (progress >= 1) {
+      goalEl.createEl("p", {
+        text: "🎉 今日目标已完成! 太棒了!",
+        cls: "chemfig-goal-complete",
+      });
+    }
+
     // 今日学习按钮
     const btnContainer = contentEl.createDiv({ cls: "chemfig-stats-buttons" });
     const startBtn = btnContainer.createEl("button", {
@@ -243,6 +382,131 @@ class LearningStatsModal extends Modal {
       this.close();
       this.plugin.startReviewSession();
     };
+
+    // 薄弱卡片复习按钮
+    const weakBtn = btnContainer.createEl("button", {
+      text: "📝 复习薄弱卡片",
+      cls: "chemfig-action-btn",
+    });
+    weakBtn.style.marginLeft = "8px";
+    weakBtn.onclick = () => {
+      this.close();
+      this.plugin.startWeakCardsReview();
+    };
+
+    // ========== v11.4.0: 每日一题 ==========
+    const dailyCard = this.plugin.getDailyCard();
+    if (dailyCard) {
+      contentEl.createEl("h3", { text: "🌟 今日推荐化合物" });
+
+      const dailyEl = contentEl.createDiv({ cls: "chemfig-daily-card" });
+      dailyEl.createEl("h4", { text: dailyCard.name });
+      dailyEl.createEl("p", {
+        text: `分子式: ${dailyCard.formula || "未知"}`,
+        cls: "chemfig-card-formula",
+      });
+      if (dailyCard.category) {
+        dailyEl.createEl("p", { text: `分类: ${dailyCard.category}` });
+      }
+
+      // 点击查看详情
+      dailyEl.style.cursor = "pointer";
+      dailyEl.onclick = () => {
+        this.close();
+        this.plugin.showDailyCard();
+      };
+    }
+
+    // ========== v11.3.0: 分类筛选复习 ==========
+    contentEl.createEl("h3", { text: "🏷️ 按分类复习" });
+
+    // 统计所有分类 (cards 变量已在前面声明过)
+    const categories = {};
+    cards.forEach((card) => {
+      const cat = card.category || "未分类";
+      if (!categories[cat]) {
+        categories[cat] = { total: 0, due: 0 };
+      }
+      categories[cat].total++;
+      if ((card.state?.due || card.state?.nextReview || 0) <= now) {
+        categories[cat].due++;
+      }
+    });
+
+    // 分类列表
+    const categoryList = contentEl.createDiv({ cls: "chemfig-category-list" });
+
+    Object.entries(categories).forEach(([cat, data]) => {
+      const catEl = categoryList.createDiv({ cls: "chemfig-category-item" });
+
+      catEl.createSpan({ text: cat, cls: "chemfig-category-name" });
+      catEl.createSpan({
+        text: `${data.due} 待复习 / ${data.total} 总`,
+        cls: "chemfig-category-count",
+      });
+
+      // 点击开始该分类的复习
+      catEl.onclick = () => {
+        this.close();
+        this.plugin.startReviewSession(cat);
+      };
+    });
+  }
+
+  /**
+   * 渲染复习日历热力图
+   */
+  renderReviewHeatmap(container) {
+    // 从 localStorage 获取复习历史
+    const history = JSON.parse(
+      localStorage.getItem("chemfig-review-history") || "{}"
+    );
+
+    const heatmapEl = container.createDiv({ cls: "chemfig-heatmap" });
+
+    // 生成最近 12 周的格子
+    const today = new Date();
+    const weeks = 12;
+    const days = weeks * 7;
+
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split("T")[0];
+      const count = history[dateStr] || 0;
+
+      const cell = heatmapEl.createDiv({ cls: "chemfig-heatmap-cell" });
+      cell.setAttribute("data-date", dateStr);
+      cell.setAttribute("data-count", String(count));
+
+      // 根据复习数量设置颜色深浅
+      if (count === 0) {
+        cell.addClass("level-0");
+      } else if (count <= 3) {
+        cell.addClass("level-1");
+      } else if (count <= 7) {
+        cell.addClass("level-2");
+      } else if (count <= 15) {
+        cell.addClass("level-3");
+      } else {
+        cell.addClass("level-4");
+      }
+
+      // 工具提示
+      cell.title = `${dateStr}: 复习 ${count} 张卡片`;
+    }
+
+    // 图例
+    const legend = container.createDiv({ cls: "chemfig-heatmap-legend" });
+    legend.createSpan({ text: "少 " });
+    ["level-0", "level-1", "level-2", "level-3", "level-4"].forEach((level) => {
+      legend.createSpan({ cls: `chemfig-heatmap-cell ${level}` });
+    });
+    legend.createSpan({ text: " 多" });
+  }
+
+  async onClose() {
+    this.contentEl.empty();
   }
 }
 
@@ -250,6 +514,7 @@ class LearningStatsModal extends Modal {
 const LEARNING_CSS = `
 .chemfig-learning-modal {
   max-width: 600px;
+  perspective: 1000px;
 }
 .chemfig-learning-card {
   background: var(--background-secondary);
@@ -257,17 +522,34 @@ const LEARNING_CSS = `
   padding: 32px;
   margin-bottom: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.6s, box-shadow 0.3s ease;
   min-height: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  transform-style: preserve-3d;
+  position: relative;
 }
 .chemfig-learning-card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.chemfig-learning-card.flipped {
+  transform: rotateY(180deg);
+}
+.chemfig-card-front,
+.chemfig-card-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  width: 100%;
+}
+.chemfig-card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 32px;
+  transform: rotateY(180deg);
 }
 .chemfig-card-front h3 {
   margin: 0 0 8px 0;
@@ -326,6 +608,10 @@ const LEARNING_CSS = `
 .chemfig-card-review-btn:hover {
   background: var(--interactive-hover);
   border-color: var(--interactive-accent);
+  transform: translateY(-2px);
+}
+.chemfig-card-review-btn:active {
+  transform: translateY(0);
 }
 .chemfig-stats-modal {
   max-width: 500px;
@@ -341,6 +627,10 @@ const LEARNING_CSS = `
   padding: 16px;
   background: var(--background-secondary);
   border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+.chemfig-stat-item:hover {
+  transform: translateY(-2px);
 }
 .chemfig-stat-icon {
   font-size: 24px;
@@ -359,6 +649,356 @@ const LEARNING_CSS = `
 .chemfig-stats-buttons {
   margin-top: 20px;
   text-align: center;
+}
+.chemfig-action-btn {
+  padding: 10px 20px;
+  background: var(--interactive-accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.chemfig-action-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+// 热力图样式
+.chemfig-heatmap {
+  display: grid;
+  grid-template-columns: repeat(24, 12px);
+  gap: 3px;
+  margin: 16px 0;
+  justify-content: center;
+}
+.chemfig-heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  transition: transform 0.15s ease;
+}
+.chemfig-heatmap-cell:hover {
+  transform: scale(1.2);
+}
+.chemfig-heatmap-cell.level-0 {
+  background: var(--background-modifier-border);
+}
+.chemfig-heatmap-cell.level-1 {
+  background: #9be9a8;
+}
+.chemfig-heatmap-cell.level-2 {
+  background: #40c463;
+}
+.chemfig-heatmap-cell.level-3 {
+  background: #30a14e;
+}
+.chemfig-heatmap-cell.level-4 {
+  background: #216e39;
+}
+.chemfig-heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.chemfig-heatmap-legend .chemfig-heatmap-cell {
+  width: 10px;
+  height: 10px;
+}
+
+// 分类列表样式
+.chemfig-category-list {
+  margin: 12px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.chemfig-category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  margin: 4px 0;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.chemfig-category-item:hover {
+  background: var(--background-modifier-hover);
+  transform: translateX(4px);
+}
+.chemfig-category-name {
+  font-weight: 500;
+  color: var(--text-normal);
+}
+.chemfig-category-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+// 每日一题卡片样式
+.chemfig-daily-card {
+  padding: 16px;
+  background: linear-gradient(135deg, var(--background-secondary) 0%, var(--background-modifier-hover) 100%);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid var(--background-modifier-border);
+}
+.chemfig-daily-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--interactive-accent);
+}
+.chemfig-daily-card h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: var(--interactive-accent);
+}
+.chemfig-daily-card p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+// 学习目标进度条样式
+.chemfig-goal-container {
+  margin: 12px 0 20px 0;
+}
+.chemfig-progress-bar {
+  width: 100%;
+  height: 20px;
+  background: var(--background-modifier-border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.chemfig-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--interactive-accent) 0%, #4ade80 100%);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+.chemfig-goal-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-normal);
+  text-align: center;
+}
+.chemfig-goal-complete {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  color: #22c55e;
+  text-align: center;
+  font-weight: 500;
+}
+
+// 多卡片类型样式
+.chemfig-cloze-text {
+  font-size: 16px;
+  line-height: 1.8;
+  margin: 16px 0;
+  color: var(--text-normal);
+}
+.chemfig-cloze-answer {
+  background: var(--background-modifier-error);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-error);
+  font-weight: 500;
+}
+.chemfig-list-items {
+  width: 100%;
+  text-align: left;
+  margin: 16px 0;
+}
+.chemfig-list-item {
+  padding: 8px 0;
+  font-size: 15px;
+  transition: opacity 0.3s ease;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.chemfig-list-item:last-child {
+  border-bottom: none;
+}
+
+// 反应条件速查样式
+.chemfig-reaction-modal {
+  max-width: 700px;
+}
+.chemfig-modal-desc {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.chemfig-search-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.chemfig-search-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+.chemfig-reaction-results {
+  max-height: 500px;
+  overflow-y: auto;
+}
+.chemfig-reaction-card {
+  padding: 16px;
+  margin: 8px 0;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  border-left: 3px solid var(--interactive-accent);
+  transition: all 0.2s ease;
+}
+.chemfig-reaction-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.chemfig-reaction-card h4 {
+  margin: 0 0 12px 0;
+  color: var(--interactive-accent);
+  font-size: 16px;
+}
+.chemfig-reaction-info p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.chemfig-reaction-notes {
+  margin-top: 8px !important;
+  color: #f59e0b !important;
+  font-size: 13px !important;
+}
+.chemfig-reaction-example {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-normal);
+  font-style: italic;
+}
+.chemfig-no-result {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px;
+  font-size: 14px;
+}
+
+// 配对游戏样式
+.chemfig-matching-modal {
+  max-width: 600px;
+}
+.chemfig-game-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.game-score {
+  color: var(--interactive-accent);
+  font-weight: 600;
+}
+.game-mistakes {
+  color: #ef4444;
+}
+.chemfig-game-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+.game-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.game-col h4 {
+  text-align: center;
+  margin: 0 0 8px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.game-btn {
+  padding: 12px;
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.game-btn:hover:not(:disabled) {
+  border-color: var(--interactive-accent);
+  transform: translateY(-2px);
+}
+.game-btn.selected {
+  border-color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+.game-btn.correct {
+  border-color: #22c55e;
+  background: #22c55e20;
+  color: #22c55e;
+}
+.game-btn.wrong {
+  border-color: #ef4444;
+  background: #ef444420;
+  color: #ef4444;
+}
+.game-btn:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+.game-result {
+  text-align: center;
+  padding: 32px;
+}
+.game-result h3 {
+  font-size: 24px;
+  margin: 0 0 16px 0;
+}
+.game-result p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+.game-rating {
+  font-size: 18px !important;
+  color: var(--interactive-accent);
+  font-weight: 500;
+  margin: 16px 0 !important;
+}
+// FSRS 参数样式
+.chemfig-fsrs-params {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+.fsrs-params-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 8px 0;
+  color: var(--text-normal);
+}
+.fsrs-param {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 4px 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--interactive-accent);
 }
 `;
 
@@ -787,6 +1427,84 @@ const QUIZ_CSS = `
 }
 `;
 
+// ========== v11.9.0: 从 Markdown 文本解析卡片 ==========
+/**
+ * 从 Markdown 文本解析卡片
+ * 支持格式:
+ * 1. Question::Answer (单行基础卡片)
+ * 2. Question:::Answer (反向卡片)
+ * 3. Question\n?\nAnswer (多行卡片)
+ */
+function parseCardsFromMarkdown(text) {
+  const cards = [];
+  const lines = text.split("\n");
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    // 跳过空行和注释
+    if (!line || line.startsWith("//") || line.startsWith("#")) {
+      i++;
+      continue;
+    }
+
+    // 格式 2: Question:::Answer (反向卡片)
+    if (line.includes(":::")) {
+      const parts = line.split(":::").map(s => s.trim());
+      if (parts.length >= 2 && parts[0] && parts[1]) {
+        cards.push({
+          name: parts[0],
+          formula: parts[1],
+          type: "reverse",
+          category: "imported",
+          id: "import_" + cards.length,
+        });
+      }
+      i++;
+      continue;
+    }
+
+    // 格式 1: Question::Answer
+    if (line.includes("::")) {
+      const parts = line.split("::").map(s => s.trim());
+      if (parts.length >= 2 && parts[0] && parts[1]) {
+        cards.push({
+          name: parts[0],
+          formula: parts[1],
+          type: "basic",
+          category: "imported",
+          id: "import_" + cards.length,
+        });
+      }
+      i++;
+      continue;
+    }
+
+    // 格式 3: 多行卡片 (Question\n?\nAnswer)
+    if (i + 2 < lines.length && lines[i + 1].trim() === "?") {
+      const question = line;
+      const answer = lines[i + 2].trim();
+      if (question && answer) {
+        cards.push({
+          name: question,
+          formula: answer,
+          type: "multi",
+          category: "imported",
+          id: "import_" + cards.length,
+        });
+      }
+      i += 3;
+      continue;
+    }
+
+    i++;
+  }
+
+  return cards;
+}
+
 // 导出全局变量 (合并到 main.js)
 // LearningCardModal, LearningStatsModal, SM2Algorithm, LEARNING_CSS, DEFAULT_LEARNING_CARDS
 // QuizModal, QUIZ_CSS
+// parseCardsFromMarkdown

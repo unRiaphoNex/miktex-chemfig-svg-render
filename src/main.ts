@@ -812,6 +812,93 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // ========== v11.4.0: 新增学习命令 ==========
+      this.addCommand({
+        id: "show-daily-card",
+        name: "每日一题: 查看今日推荐化合物",
+        callback: () => this.showDailyCard(),
+      });
+
+      this.addCommand({
+        id: "start-weak-review",
+        name: "复习薄弱卡片 (错题本)",
+        callback: () => this.startWeakCardsReview(),
+      });
+
+      // ========== v11.6.0: 反应条件速查 ==========
+      this.addCommand({
+        id: "reaction-conditions-search",
+        name: "反应条件速查: 查询常见有机反应",
+        callback: () => {
+          if (typeof ReactionConditionsModal !== "undefined") {
+            new ReactionConditionsModal(this.app).open();
+          }
+        },
+      });
+
+      // ========== v11.7.0: 数据导出/导入 ==========
+      this.addCommand({
+        id: "export-learning-data",
+        name: "学习模块: 导出学习数据备份",
+        callback: () => this.exportLearningData(),
+      });
+
+      this.addCommand({
+        id: "import-learning-data",
+        name: "学习模块: 导入学习数据备份",
+        callback: () => this.importLearningData(),
+      });
+
+      // ========== v11.8.0: 配对游戏 ==========
+      this.addCommand({
+        id: "matching-game",
+        name: "官能团配对游戏",
+        callback: () => {
+          if (typeof MatchingGameModal !== "undefined") {
+            new MatchingGameModal(this.app).open();
+          }
+        },
+      });
+
+      // ========== v11.9.0: 从笔记导入卡片 ==========
+      this.addCommand({
+        id: "import-cards-from-note",
+        name: "学习模块: 从当前笔记导入卡片",
+        callback: async () => {
+          const activeFile = this.app.workspace.getActiveFile();
+          if (!activeFile) {
+            new Notice("请先打开一个笔记", 2000);
+            return;
+          }
+
+          const text = await this.app.vault.read(activeFile);
+          if (typeof parseCardsFromMarkdown !== "function") {
+            new Notice("卡片解析功能未加载", 2000);
+            return;
+          }
+
+          const cards = parseCardsFromMarkdown(text);
+          if (cards.length === 0) {
+            new Notice("未在笔记中找到卡片格式", 2000);
+            return;
+          }
+
+          // 初始化每张卡片的状态
+          cards.forEach(card => {
+            card.state = SM2Algorithm.defaultState();
+          });
+
+          // 合并到现有卡片
+          const existingIds = new Set((this.learningCards || []).map(c => c.id));
+          const newCards = cards.filter(c => !existingIds.has(c.id));
+
+          this.learningCards = [...(this.learningCards || []), ...newCards];
+          this.saveLearningCards();
+
+          new Notice(`✅ 成功导入 ${newCards.length} 张卡片`, 3000);
+        },
+      });
+
       this.addCommand({
         id: "update-card-db",
         name: "更新化合物数据库",
@@ -825,6 +912,24 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         setTimeout(() => {
           this.updateService.checkForUpdates(false);
         }, 3000);
+      }
+
+      // ========== v11.2.0: SMILES 纯前端渲染 ==========
+      if (typeof SMILES_CSS !== "undefined" && SMILES_CSS) {
+        const smilesStyleEl = document.createElement("style");
+        smilesStyleEl.id = "chemfig-smiles-css";
+        smilesStyleEl.textContent = SMILES_CSS;
+        document.head.appendChild(smilesStyleEl);
+      }
+
+      // 注册 SMILES 代码块处理器
+      if (typeof registerSMILESProcessor === "function") {
+        registerSMILESProcessor(this);
+      }
+
+      // 注册 IUPAC 转换命令
+      if (typeof registerIUPACCommands === "function") {
+        registerIUPACCommands(this);
       }
 
       console.log("[Chemfig-SVG] 学习模块已加载 (" + (this.learningCards?.length || 0) + " 张卡片)");
@@ -1622,17 +1727,255 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     }
   }
 
-  // 开始复习会话
-  startReviewSession() {
-    const now = Date.now();
-    const dueCards = (this.learningCards || []).filter(
-      (c) => (c.state?.nextReview || 0) <= now
+  // 记录复习历史 (用于热力图)
+  recordReviewHistory() {
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const history = JSON.parse(
+        localStorage.getItem("chemfig-review-history") || "{}"
+      );
+      history[today] = (history[today] || 0) + 1;
+      localStorage.setItem("chemfig-review-history", JSON.stringify(history));
+    } catch (e) {
+      console.warn("[Chemfig-SVG] 复习历史记录失败:", e.message);
+    }
+  }
+
+  // 添加到薄弱卡片列表
+  addToWeakCards(cardId) {
+    try {
+      const weakCards = JSON.parse(
+        localStorage.getItem("chemfig-weak-cards") || "[]"
+      );
+      if (!weakCards.includes(cardId)) {
+        weakCards.push(cardId);
+        localStorage.setItem("chemfig-weak-cards", JSON.stringify(weakCards));
+      }
+    } catch (e) {
+      console.warn("[Chemfig-SVG] 薄弱卡片记录失败:", e.message);
+    }
+  }
+
+  // 开始薄弱卡片复习
+  startWeakCardsReview() {
+    try {
+      const weakCardIds = JSON.parse(
+        localStorage.getItem("chemfig-weak-cards") || "[]"
+      );
+
+      if (weakCardIds.length === 0) {
+        new Notice("🎉 没有薄弱卡片! 继续保持!", 3000);
+        return;
+      }
+
+      // 筛选出薄弱卡片
+      const weakCards = (this.learningCards || []).filter((c) =>
+        weakCardIds.includes(c.id)
+      );
+
+      if (weakCards.length === 0) {
+        new Notice("薄弱卡片列表为空", 2000);
+        return;
+      }
+
+      // 打乱顺序
+      const shuffled = weakCards.sort(() => Math.random() - 0.5);
+      let idx = 0;
+      let cleared = 0;
+
+      const showNext = () => {
+        if (idx >= shuffled.length) {
+          // 复习完成，清除答对的薄弱卡片
+          const remaining = JSON.parse(
+            localStorage.getItem("chemfig-weak-cards") || "[]"
+          );
+          const newWeak = remaining.filter((id) => {
+            const card = shuffled.find((c) => c.id === id);
+            return card && card._justCleared !== true;
+          });
+          localStorage.setItem("chemfig-weak-cards", JSON.stringify(newWeak));
+
+          new Notice(
+            `✅ 薄弱卡片复习完成! 答对了 ${cleared} / ${shuffled.length} 张`,
+            3000
+          );
+          return;
+        }
+        const card = shuffled[idx];
+        idx++;
+
+        const modal = new LearningCardModal(
+          this.app,
+          card,
+          (quality) => {
+            // 答对了 (质量分 >= 3) 就从薄弱列表中移除
+            if (quality >= 3) {
+              card._justCleared = true;
+              cleared++;
+            }
+            setTimeout(showNext, 300);
+          }
+        );
+        modal.open();
+      };
+
+      showNext();
+    } catch (e) {
+      console.error("[Chemfig-SVG] 薄弱卡片复习失败:", e);
+    }
+  }
+
+  // ========== v11.4.0: 每日一题 ==========
+  getDailyCard() {
+    const cards = this.learningCards || [];
+    if (cards.length === 0) return null;
+
+    // 根据日期选择卡片 (同一天显示同一张)
+    const today = new Date().toISOString().split("T")[0];
+    const dayOfYear = Math.floor(
+      (new Date(today) - new Date(new Date(today).getFullYear(), 0, 0)) /
+        86400000
     );
 
-    if (dueCards.length === 0) {
-      new Notice("🎉 今日复习已完成! 暂无待复习卡片", 3000);
+    // 用日期作为种子选择卡片
+    const index = dayOfYear % cards.length;
+    return cards[index];
+  }
+
+  // 显示每日一题
+  showDailyCard() {
+    const card = this.getDailyCard();
+    if (!card) {
+      new Notice("暂无学习卡片", 2000);
       return;
     }
+
+    const modal = new LearningCardModal(this.app, card, () => {});
+    modal.open();
+  }
+
+  // ========== v11.7.0: 学习数据导出/导入 ==========
+  async exportLearningData() {
+    try {
+      const data = {
+        version: "1.0",
+        exportedAt: new Date().toISOString(),
+        cards: this.learningCards || [],
+        reviewHistory: JSON.parse(
+          localStorage.getItem("chemfig-review-history") || "{}"
+        ),
+        weakCards: JSON.parse(
+          localStorage.getItem("chemfig-weak-cards") || "[]"
+        ),
+        settings: this.settings || {},
+      };
+
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+
+      // 创建下载链接
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `chemfig-learning-backup-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      new Notice("✅ 学习数据已导出", 3000);
+    } catch (e) {
+      console.error("[Chemfig-SVG] 导出失败:", e);
+      new Notice("❌ 导出失败: " + e.message, 3000);
+    }
+  }
+
+  async importLearningData() {
+    try {
+      // 创建文件选择器
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        // 验证数据格式
+        if (!data.cards) {
+          new Notice("❌ 无效的备份文件", 3000);
+          return;
+        }
+
+        // 确认导入
+        const confirmed = window.confirm(
+          `将导入 ${data.cards.length} 张卡片，是否覆盖现有数据？\n\n(点击确定覆盖，取消则合并)`
+        );
+
+        if (confirmed) {
+          // 覆盖导入
+          this.learningCards = data.cards;
+          this.saveLearningCards();
+        } else {
+          // 合并导入 (按 id 去重)
+          const existingIds = new Set((this.learningCards || []).map((c) => c.id));
+          const newCards = data.cards.filter((c) => !existingIds.has(c.id));
+          this.learningCards = [...(this.learningCards || []), ...newCards];
+          this.saveLearningCards();
+          new Notice(`✅ 合并导入 ${newCards.length} 张新卡片`, 3000);
+          return;
+        }
+
+        // 导入其他数据
+        if (data.reviewHistory) {
+          localStorage.setItem(
+            "chemfig-review-history",
+            JSON.stringify(data.reviewHistory)
+          );
+        }
+        if (data.weakCards) {
+          localStorage.setItem(
+            "chemfig-weak-cards",
+            JSON.stringify(data.weakCards)
+          );
+        }
+
+        new Notice("✅ 学习数据导入成功", 3000);
+      };
+
+      input.click();
+    } catch (e) {
+      console.error("[Chemfig-SVG] 导入失败:", e);
+      new Notice("❌ 导入失败: " + e.message, 3000);
+    }
+  }
+
+  // 开始复习会话
+  startReviewSession(categoryFilter) {
+    const now = Date.now();
+    // 支持 FSRS 和 SM-2 两种字段名
+    let dueCards = (this.learningCards || []).filter(
+      (c) => (c.state?.due || c.state?.nextReview || 0) <= now
+    );
+
+    // 如果指定了分类筛选
+    if (categoryFilter) {
+      dueCards = dueCards.filter((c) => c.category === categoryFilter);
+    }
+
+    if (dueCards.length === 0) {
+      new Notice(
+        `🎉 ${categoryFilter ? "[" + categoryFilter + "] " : ""}今日复习已完成! 暂无待复习卡片`,
+        3000
+      );
+      return;
+    }
+
+    // 获取使用的算法和模式 (默认 SM-2, 可在设置中切换)
+    const reviewMode = this.settings?.reviewMode || "adaptive"; // adaptive / fixed
+    const algorithm = this.settings?.spacedRepetitionAlgorithm || "sm2";
+    const fixedInterval = this.settings?.fixedIntervalDays || 3; // 固定间隔天数
 
     // 打乱顺序
     const shuffled = dueCards.sort(() => Math.random() - 0.5);
@@ -1650,9 +1993,34 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         this.app,
         card,
         (quality) => {
-          // 更新学习状态
-          card.state = SM2Algorithm.review(card.state, quality);
+          // 根据模式选择复习逻辑
+          if (reviewMode === "fixed") {
+            // 固定间隔模式: 简单逻辑
+            // 记住了 → X 天后复习; 忘记了 → 明天复习
+            const intervalDays = quality >= 3 ? fixedInterval : 1;
+            card.state = card.state || {};
+            card.state.nextReview = Date.now() + intervalDays * 86400000;
+            card.state.status = "learning";
+          } else if (algorithm === "fsrs" && typeof FSRSScheduler !== "undefined") {
+            // FSRS 算法
+            const fsrsRating =
+              quality <= 2 ? "again" : quality === 3 ? "hard" : quality === 4 ? "good" : "easy";
+            card.state = FSRSScheduler.review(card.state, fsrsRating);
+          } else {
+            // SM-2 算法
+            card.state = SM2Algorithm.review(card.state, quality);
+          }
+
           this.saveLearningCards();
+
+          // 记录复习历史 (用于热力图)
+          this.recordReviewHistory();
+
+          // 记录错题 (质量分 <= 2 标记为薄弱)
+          if (quality <= 2) {
+            this.addToWeakCards(card.id);
+          }
+
           // 显示下一张
           setTimeout(showNext, 300);
         }

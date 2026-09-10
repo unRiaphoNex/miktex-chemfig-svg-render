@@ -33,6 +33,11 @@ const FILES = [
   "ui/group-layout.ts",               // 组分调整模态框
   "ui/sidebar.ts",                    // 左右侧边栏视图
   "features/learning.ts",             // 学习辅助模块 (卡片 + 间隔重复 + 默写)
+  "features/fsrs-algorithm.ts",       // FSRS 间隔重复算法
+  "features/smiles-renderer.ts",      // SMILES 纯前端渲染
+  "features/reaction-conditions.ts", // 反应条件速查
+  "features/matching-game.ts",        // 官能团配对游戏
+  "features/iupac-converter.ts",      // IUPAC 名称转 SMILES
   "features/update-service.ts",       // 在线更新服务
   "integrations/ocl-tooltips.ts",     // OpenChemLib 工具栏图标 -> 工具名映射
   "integrations/ocl.bundle.js",       // OpenChemLib (IIFE 全局, 生成产物, 原样拷贝)

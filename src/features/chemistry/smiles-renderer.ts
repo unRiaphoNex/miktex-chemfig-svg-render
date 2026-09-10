@@ -289,20 +289,27 @@ class SMILESRenderer {
 function registerSMILESProcessor(plugin) {
   if (!plugin.registerMarkdownCodeBlockProcessor) return;
 
-  plugin.registerMarkdownCodeBlockProcessor(
-    "smiles",
-    (source, el, ctx) => {
-      const smiles = source.trim();
-      SMILESRenderer.renderToContainer(el, smiles);
-    }
-  );
+  // 先尝试注册 smiles 代码块处理器 (如果已存在则跳过, 不阻止插件加载)
+  try {
+    plugin.registerMarkdownCodeBlockProcessor(
+      "smiles",
+      (source, el, ctx) => {
+        const smiles = source.trim();
+        SMILESRenderer.renderToContainer(el, smiles);
+      }
+    );
+    console.log("[Chemfig-SVG] smiles 代码块处理器已注册");
+  } catch (e) {
+    console.warn("[Chemfig-SVG] smiles 代码块处理器已存在 (可能由其他插件注册), 跳过注册:", e.message);
+  }
 
   // ========== v11.9.0: 内联 SMILES 渲染 ==========
+  // postprocessor 可以注册多个, 不会冲突
   plugin.registerMarkdownPostProcessor((el, ctx) => {
     SMILESRenderer.renderInline(el);
   });
 
-  console.log("[Chemfig-SVG] SMILES 代码块处理器已注册 (代码块 + 内联)");
+  console.log("[Chemfig-SVG] SMILES 内联渲染已注册");
 }
 
 // ========== SMILES CSS ==========

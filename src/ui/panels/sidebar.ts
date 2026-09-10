@@ -33,6 +33,34 @@ class ChemfigLeftSidebarView extends ItemView {
     header.createEl("h3", { text: "🧪 Chemfig 操作面板" });
     header.createEl("p", { text: "快速插入化学式模板", cls: "chemfig-sidebar-subtitle" });
 
+    // v15.3.0: 快捷功能按钮组
+    const quickActions = contentEl.createDiv({ cls: "chemfig-sidebar-quick-actions" });
+
+    const actionButtons = [
+      { icon: "🎨", label: "分子编辑器", cmd: "open-molecule-editor" },
+      { icon: "🧊", label: "3D 查看器", cmd: "open-3d-viewer" },
+      { icon: "🔬", label: "官能团分析", cmd: "analyze-functional-groups" },
+      { icon: "⚗️", label: "反应条件", cmd: "open-reaction-conditions" },
+      { icon: "✏️", label: "默写练习", cmd: "start-quiz-structure-to-name" },
+      { icon: "📊", label: "学习统计", cmd: "show-learning-stats" },
+    ];
+
+    for (const btn of actionButtons) {
+      const btnEl = quickActions.createEl("button", {
+        text: `${btn.icon} ${btn.label}`,
+        cls: "chemfig-quick-action-btn",
+      });
+      btnEl.onclick = () => {
+        // 执行对应命令
+        this.plugin.app.commands.executeCommandById(
+          `miktex-chemfig-svg-render:${btn.cmd}`
+        ).catch((e) => {
+          console.warn(`执行命令 ${btn.cmd} 失败:`, e);
+          new Notice(`打开 ${btn.label} 失败`, 2000);
+        });
+      };
+    }
+
     // 搜索框
     const searchContainer = contentEl.createDiv({ cls: "chemfig-sidebar-search" });
     const searchInput = searchContainer.createEl("input", {
@@ -401,6 +429,19 @@ class ChemfigRightSidebarView extends ItemView {
       cls: "chemfig-sidebar-action-btn",
     });
     insertBtn.onclick = () => this.doInsert();
+
+    // v15.3.0: 新增功能按钮
+    const copyBtn = btnContainer.createEl("button", {
+      text: "📋 复制代码",
+      cls: "chemfig-sidebar-action-btn",
+    });
+    copyBtn.onclick = () => {
+      const code = this.codeTextarea.value;
+      if (code) {
+        navigator.clipboard.writeText(code);
+        new Notice("代码已复制到剪贴板", 1500);
+      }
+    };
 
     // v10.11.0: 组分调整按钮
     const groupBtn = btnContainer.createEl("button", {

@@ -983,6 +983,12 @@ class MoleculeEditorModal extends Modal {
         })
       )
       .addButton((btn) =>
+        btn
+          .setButtonText("🔍 重置视图")
+          .setTooltip("重置画布缩放和位置 (Ctrl+0)")
+          .onClick(() => this.resetView())
+      )
+      .addButton((btn) =>
         btn.setButtonText("仅保存 SMILES").onClick(() => {
           const mol = this.getMoleculeSafe();
           if (!mol) return;
@@ -2315,6 +2321,28 @@ class MoleculeEditorModal extends Modal {
 
   // v2.0 迭代: 模态框级键盘快捷键 (Ctrl/Cmd+Z 撤销, Ctrl+Y / Ctrl+Shift+Z 重做)。
   // 仅在焦点不在输入/下拉/文本域时生效, 避免干扰 SMILES / SMARTS 输入;
+  // v15.3.0: 重置视图 - 缩放和位置
+  resetView() {
+    const mol = this.getMoleculeSafeQuiet();
+    if (!mol || !this.editor) return;
+    try {
+      // 重置缩放为 1.0
+      mol.zoomAndRotateInit(0, 0);
+      mol.zoomAndRotate(1.0, 0, false);
+      // 居中
+      const canvas = this.editorContainer.querySelector("canvas");
+      if (canvas) {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        mol.translate({ x: 0, y: 0 });
+      }
+      this.redraw();
+      this.setStatus("视图已重置");
+    } catch (e) {
+      console.error("重置视图失败:", e);
+    }
+  }
+
   // 不接管 Delete/Ctrl+C/Ctrl+V, 由 OCL CanvasEditor 原生键盘处理(焦点在画布时)。
   setupKeyboardShortcuts() {
     const el = this.contentEl;
@@ -2326,6 +2354,15 @@ class MoleculeEditorModal extends Modal {
     };
     const onKey = (e) => {
       if (isTyping(e.target)) return;
+
+      // Ctrl+0 = 重置视图
+      if ((e.ctrlKey || e.metaKey) && (e.key === "0" || e.key === "=")) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.resetView();
+        return;
+      }
+
       if (!(e.ctrlKey || e.metaKey)) return;
       const k = (e.key || "").toLowerCase();
       if (k === "z" && !e.shiftKey) {
@@ -2340,6 +2377,12 @@ class MoleculeEditorModal extends Modal {
         e.preventDefault();
         e.stopPropagation();
         this.redo();
+      } else if (k === "s") {
+        // Ctrl+S = 保存
+        e.preventDefault();
+        e.stopPropagation();
+        const saveBtn = this.contentEl.querySelector("button.mod-cta");
+        if (saveBtn) saveBtn.click();
       }
     };
     el.addEventListener("keydown", onKey);
@@ -3101,7 +3144,76 @@ class MoleculeEditorModal extends Modal {
       new Notice("设置分子失败: " + e.message);
       return;
     }
-    if (statusMsg) this.setStatus(statusMsg);
+
+    // v15.3.0: 增强状态栏 - 显示分子详细信息
+    try {
+      const atomCount = mol.getAllAtoms();
+      const bondCount = mol.getAllBonds();
+      const smiles = mol.toCanonicalSmiles();
+
+      let infoMsg = statusMsg || "";
+      if (atomCount > 0) {
+        const parts = [
+          `原子: ${atomCount}`,
+          `键: ${bondCount}`,
+        ];
+
+        // 估算分子式
+        const formula = this.estimateFormulaFromMol(mol);
+        if (formula) {
+          parts.push(`分子式: ${formula}`);
+        }
+
+        infoMsg = infoMsg ? `${infoMsg} | ${parts.join(" | ")}` : parts.join(" | ");
+      }
+
+      this.setStatus(infoMsg);
+    } catch (e) {
+      if (statusMsg) this.setStatus(statusMsg);
+    }
+  }
+
+  // v15.3.0: 从分子对象估算分子式
+  estimateFormulaFromMol(mol) {
+    try {
+      const counts = {};
+      const atomCount = mol.getAllAtoms();
+      for (let i = 0; i < atomCount; i++) {
+        const elem = mol.getAtomicNo(i);
+        const sym = this.atomicNoToSymbol(elem);
+        counts[sym] = (counts[sym] || 0) + 1;
+      }
+
+      // 按 Hill 系统排序: C, H, 然后字母序
+      let formula = "";
+      if (counts["C"]) {
+        formula += counts["C"] > 1 ? `C${counts["C"]}` : "C";
+        delete counts["C"];
+      }
+      if (counts["H"]) {
+        formula += counts["H"] > 1 ? `H${counts["H"]}` : "H";
+        delete counts["H"];
+      }
+      const sortedKeys = Object.keys(counts).sort();
+      for (const key of sortedKeys) {
+        formula += counts[key] > 1 ? `${key}${counts[key]}` : key;
+      }
+
+      return formula || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // v15.3.0: 原子序数转元素符号
+  atomicNoToSymbol(no) {
+    const map = {
+      1: "H", 2: "He", 3: "Li", 4: "Be", 5: "B", 6: "C", 7: "N", 8: "O",
+      9: "F", 10: "Ne", 11: "Na", 12: "Mg", 13: "Al", 14: "Si", 15: "P",
+      16: "S", 17: "Cl", 18: "Ar", 19: "K", 20: "Ca", 26: "Fe", 29: "Cu",
+      30: "Zn", 35: "Br", 47: "Ag", 53: "I", 79: "Au", 80: "Hg",
+    };
+    return map[no] || `X${no}`;
   }
 
   // 画布手势：按住右键拖动 = 平移；滚轮 = 以光标为中心缩放。

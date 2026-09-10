@@ -1777,6 +1777,246 @@ function parseCardsFromMarkdown(text) {
 
 // 导出全局变量 (合并到 main.js)
 // LearningCardModal, LearningStatsModal, SM2Algorithm, LEARNING_CSS, DEFAULT_LEARNING_CARDS
+
+// ========== 官能团配对游戏 (v15.5.0) ==========
+class FunctionalGroupMatchingGameModal extends Modal {
+  constructor(app) {
+    super(app);
+    this.score = 0;
+    this.matched = 0;
+    this.total = 10;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("fg-matching-game-modal");
+
+    contentEl.createEl("h2", { text: "🎮 官能团配对游戏" });
+    contentEl.createEl("p", {
+      text: "将官能团名称与对应的结构进行配对",
+      cls: "fg-matching-desc",
+    });
+
+    // 分数显示
+    this.scoreEl = contentEl.createDiv({ cls: "fg-matching-score" });
+    this.updateScore();
+
+    // 游戏区域
+    this.gameEl = contentEl.createDiv({ cls: "fg-matching-game" });
+
+    // 开始游戏
+    this.startRound();
+
+    this.addCSS();
+  }
+
+  startRound() {
+    this.gameEl.empty();
+    this.selectedLeft = null;
+    this.selectedRight = null;
+
+    // 官能团数据
+    const groups = [
+      { name: "羟基", pattern: "-OH", example: "乙醇" },
+      { name: "醛基", pattern: "-CHO", example: "甲醛" },
+      { name: "酮羰基", pattern: "C=O", example: "丙酮" },
+      { name: "羧基", pattern: "-COOH", example: "乙酸" },
+      { name: "氨基", pattern: "-NH₂", example: "甲胺" },
+      { name: "酯基", pattern: "-COOR", example: "乙酸乙酯" },
+      { name: "醚键", pattern: "C-O-C", example: "乙醚" },
+      { name: "苯环", pattern: "C₆H₅-", example: "苯" },
+    ];
+
+    // 随机选 4 对
+    const shuffled = [...groups].sort(() => Math.random() - 0.5).slice(0, 4);
+
+    // 左列: 名称
+    const leftCol = this.gameEl.createDiv({ cls: "fg-col" });
+    leftCol.createEl("h4", { text: "官能团名称" });
+    shuffled.forEach((g) => {
+      const btn = leftCol.createEl("button", {
+        text: g.name,
+        cls: "fg-item left",
+      });
+      btn.dataset.name = g.name;
+      btn.onclick = () => this.selectItem(btn, "left");
+    });
+
+    // 右列: 结构 (打乱顺序)
+    const rightCol = this.gameEl.createDiv({ cls: "fg-col" });
+    rightCol.createEl("h4", { text: "结构特征" });
+    const shuffledRight = [...shuffled].sort(() => Math.random() - 0.5);
+    shuffledRight.forEach((g) => {
+      const btn = rightCol.createEl("button", {
+        text: g.pattern,
+        cls: "fg-item right",
+      });
+      btn.dataset.name = g.name;
+      btn.onclick = () => this.selectItem(btn, "right");
+    });
+
+    this.currentPairs = shuffled;
+  }
+
+  selectItem(btn, side) {
+    // 取消之前的选中
+    this.gameEl.querySelectorAll(".fg-item.selected").forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+
+    if (side === "left") {
+      this.selectedLeft = btn;
+    } else {
+      this.selectedRight = btn;
+    }
+
+    // 两边都选了, 检查配对
+    if (this.selectedLeft && this.selectedRight) {
+      setTimeout(() => this.checkMatch(), 300);
+    }
+  }
+
+  checkMatch() {
+    const leftName = this.selectedLeft.dataset.name;
+    const rightName = this.selectedRight.dataset.name;
+
+    if (leftName === rightName) {
+      // 配对成功
+      this.selectedLeft.classList.add("correct");
+      this.selectedRight.classList.add("correct");
+      this.score += 10;
+      this.matched++;
+      new Notice("✅ 配对正确!", 1500);
+
+      // 禁用已配对的按钮
+      setTimeout(() => {
+        if (this.selectedLeft) this.selectedLeft.disabled = true;
+        if (this.selectedRight) this.selectedRight.disabled = true;
+        this.selectedLeft = null;
+        this.selectedRight = null;
+
+        // 检查是否全部配对完成
+        if (this.matched >= this.total) {
+          this.showFinalResult();
+        }
+      }, 500);
+    } else {
+      // 配对失败
+      this.selectedLeft.classList.add("wrong");
+      this.selectedRight.classList.add("wrong");
+      this.score = Math.max(0, this.score - 2);
+      new Notice("❌ 配对错误", 1500);
+
+      setTimeout(() => {
+        if (this.selectedLeft) this.selectedLeft.classList.remove("wrong", "selected");
+        if (this.selectedRight) this.selectedRight.classList.remove("wrong", "selected");
+        this.selectedLeft = null;
+        this.selectedRight = null;
+      }, 800);
+    }
+
+    this.updateScore();
+  }
+
+  updateScore() {
+    if (this.scoreEl) {
+      this.scoreEl.textContent = `得分: ${this.score} | 已配对: ${this.matched} / ${this.total}`;
+    }
+  }
+
+  showFinalResult() {
+    this.gameEl.empty();
+    this.gameEl.createEl("h3", { text: "🎉 恭喜完成!" });
+    this.gameEl.createEl("p", { text: `最终得分: ${this.score}` });
+
+    const restartBtn = this.gameEl.createEl("button", {
+      text: "再来一局",
+      cls: "fg-matching-restart",
+    });
+    restartBtn.onclick = () => {
+      this.score = 0;
+      this.matched = 0;
+      this.updateScore();
+      this.startRound();
+    };
+  }
+
+  addCSS() {
+    if (document.getElementById("fg-matching-game-css")) return;
+    const style = document.createElement("style");
+    style.id = "fg-matching-game-css";
+    style.textContent = `
+      .fg-matching-game-modal .fg-matching-desc {
+        color: var(--text-muted);
+        margin-bottom: 15px;
+      }
+      .fg-matching-game-modal .fg-matching-score {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: var(--interactive-accent);
+      }
+      .fg-matching-game-modal .fg-matching-game {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 20px;
+      }
+      .fg-matching-game-modal .fg-col h4 {
+        text-align: center;
+        margin-bottom: 10px;
+        color: var(--text-muted);
+      }
+      .fg-matching-game-modal .fg-item {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border: 2px solid var(--background-modifier-border);
+        border-radius: 8px;
+        background: var(--background-primary);
+        color: var(--text-normal);
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+        transition: all 0.2s;
+      }
+      .fg-matching-game-modal .fg-item:hover {
+        border-color: var(--interactive-accent);
+        transform: translateY(-2px);
+      }
+      .fg-matching-game-modal .fg-item.selected {
+        border-color: var(--interactive-accent);
+        background: var(--background-modifier-hover);
+      }
+      .fg-matching-game-modal .fg-item.correct {
+        border-color: #4caf50;
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .fg-matching-game-modal .fg-item.wrong {
+        border-color: #f44336;
+        background: #ffebee;
+        color: #c62828;
+      }
+      .fg-matching-game-modal .fg-item:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .fg-matching-game-modal .fg-matching-restart {
+        margin-top: 20px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        background: var(--interactive-accent);
+        color: var(--text-on-accent);
+        cursor: pointer;
+        font-size: 14px;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
 // QuizModal, QUIZ_CSS
 // parseCardsFromMarkdown
 

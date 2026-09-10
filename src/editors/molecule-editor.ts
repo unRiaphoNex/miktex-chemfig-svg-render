@@ -4743,13 +4743,95 @@ const MOLECULE_EDITOR_REFINED_CSS = `
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 0;
+  min-width: 280px;
+  max-height: 800px;
+  overflow-y: auto;
 }
 
-.molecule-editor-sidebar > div {
+.molecule-editor-sidebar > div,
+.molecule-editor-sidebar > input,
+.molecule-editor-sidebar > details {
   background: var(--background-secondary);
   border-radius: 8px;
   padding: 12px;
+  margin-bottom: 8px;
+}
+
+.molecule-editor-sidebar .molecule-lib-search {
+  padding: 8px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 12px;
+}
+
+/* ========== v15.7.0: 轮盘导航效果 (参考 Ketcher/Marvin) ========== */
+
+.molecule-editor-category-wheel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.molecule-editor-wheel-item {
+  padding: 8px 4px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  text-align: center;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.molecule-editor-wheel-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--interactive-accent);
+}
+
+.molecule-editor-wheel-item.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* 片段卡片网格 */
+.molecule-editor-fragment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.molecule-editor-fragment-card {
+  padding: 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.molecule-editor-fragment-card:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+  transform: scale(1.02);
+}
+
+.molecule-editor-fragment-card img,
+.molecule-editor-fragment-card svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.molecule-editor-fragment-card .fragment-name {
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--text-muted);
 }
 
 /* OCL 工具栏美化 */

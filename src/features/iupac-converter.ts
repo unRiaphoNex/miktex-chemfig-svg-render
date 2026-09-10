@@ -1,8 +1,43 @@
-// ========== IUPAC 名称转 SMILES (v11.9.0) ==========
-// 内置常见化合物名称映射 + 简单解析器
+// ========== IUPAC 名称转 SMILES (v13.0.0) ==========
+// 内置常见化合物名称映射 + 官能团识别
 // 完整功能需要 OPSIN 库, 此处先实现内置映射
 
-// 常见化合物名称 → SMILES 映射
+// ========== 官能团识别规则 ==========
+const FUNCTIONAL_GROUP_PATTERNS = [
+  { pattern: /-OH|O[H1]/g, name: "羟基 (Hydroxyl)", type: "含氧" },
+  { pattern: /C\(=O\)O|COOH/g, name: "羧基 (Carboxyl)", type: "含氧" },
+  { pattern: /C\(=O\)/g, name: "羰基 (Carbonyl)", type: "含氧" },
+  { pattern: /C\(=O\)OC/g, name: "酯基 (Ester)", type: "含氧" },
+  { pattern: /C-O-C/g, name: "醚键 (Ether)", type: "含氧" },
+  { pattern: /-NH2|N[H2]/g, name: "氨基 (Amino)", type: "含氮" },
+  { pattern: /-N<|N\(/g, name: "取代胺 (Amine)", type: "含氮" },
+  { pattern: /C#N|CN/g, name: "氰基 (Nitrile)", type: "含氮" },
+  { pattern: /NO2|N\(=O\)=O/g, name: "硝基 (Nitro)", type: "含氮" },
+  { pattern: /Cl|Br|I|F/g, name: "卤素 (Halogen)", type: "卤族" },
+  { pattern: /C=C/g, name: "双键 (Alkene)", type: "不饱和" },
+  { pattern: /C#C/g, name: "三键 (Alkyne)", type: "不饱和" },
+  { pattern: /c1ccccc1|c1ccc.*cc1/g, name: "芳香环 (Aromatic)", type: "芳香" },
+];
+
+/**
+ * 从 SMILES 识别官能团
+ * @param {string} smiles - SMILES 字符串
+ * @returns {Array} 官能团列表
+ */
+function identifyFunctionalGroups(smiles) {
+  if (!smiles) return [];
+
+  const groups = [];
+  FUNCTIONAL_GROUP_PATTERNS.forEach(({ pattern, name, type }) => {
+    if (pattern.test(smiles)) {
+      groups.push({ name, type });
+    }
+  });
+
+  return groups;
+}
+
+// ========== 常见化合物名称 → SMILES 映射 ==========
 const NAME_TO_SMILES = {
   // 烷烃
   "甲烷": "C",
@@ -160,6 +195,15 @@ class IUPACToSMILES {
     }
 
     return null;
+  }
+
+  /**
+   * 从 SMILES 识别官能团
+   * @param {string} smiles - SMILES 字符串
+   * @returns {Array} 官能团列表
+   */
+  static analyzeFunctionalGroups(smiles) {
+    return identifyFunctionalGroups(smiles);
   }
 
   /**

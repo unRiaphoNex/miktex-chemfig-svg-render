@@ -925,6 +925,31 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // ========== v13.0.0: 官能团分析 ==========
+      this.addCommand({
+        id: "analyze-functional-groups",
+        name: "官能团分析: 从 SMILES 识别官能团",
+        callback: async () => {
+          const { value: smiles } = await this.app.vault.manager?.prompt({
+            prompt: "输入 SMILES 字符串:",
+            placeholder: "CC(=O)Oc1ccccc1C(=O)O",
+          }) || {};
+
+          if (!smiles || typeof IUPACToSMILES === "undefined") return;
+
+          const groups = IUPACToSMILES.analyzeFunctionalGroups(smiles.trim());
+
+          if (groups.length === 0) {
+            new Notice("未识别到常见官能团", 3000);
+            return;
+          }
+
+          // 显示结果
+          const groupNames = groups.map(g => `• ${g.name} (${g.type})`).join("\n");
+          new Notice(`识别到 ${groups.length} 个官能团:\n${groupNames}`, 5000);
+        },
+      });
+
       this.addCommand({
         id: "update-card-db",
         name: "更新化合物数据库",

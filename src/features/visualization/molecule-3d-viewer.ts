@@ -166,6 +166,7 @@ class Molecule3DModal extends Modal {
     this.options = options;
     this.viewer = null;
     this.currentStyle = "stick";
+    this.autoRotate = false;
   }
 
   async onOpen() {
@@ -212,6 +213,31 @@ class Molecule3DModal extends Modal {
       cls: "mol3d-tool-btn",
     });
     exportBtn.onclick = () => this.exportPNG();
+
+    // v15.3.0: 新增自动旋转按钮
+    const rotateBtn = toolbar.createEl("button", {
+      text: "🔄 自动旋转",
+      cls: "mol3d-tool-btn",
+    });
+    rotateBtn.onclick = () => {
+      this.autoRotate = !this.autoRotate;
+      rotateBtn.classList.toggle("active", this.autoRotate);
+      if (this.viewer) {
+        this.viewer.spin(this.autoRotate, 0.5);
+      }
+    };
+
+    // v15.3.0: 重置视图按钮
+    const resetBtn = toolbar.createEl("button", {
+      text: "📐 重置视图",
+      cls: "mol3d-tool-btn",
+    });
+    resetBtn.onclick = () => {
+      if (this.viewer) {
+        this.viewer.zoomTo();
+        this.viewer.render();
+      }
+    };
 
     // 3D 画布
     const canvas = contentEl.createDiv({ cls: "mol3d-canvas" });

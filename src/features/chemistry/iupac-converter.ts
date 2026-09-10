@@ -605,3 +605,193 @@ class FunctionalGroupAnalysisModal extends Modal {
 
 // 导出
 // NAME_TO_SMILES, IUPACToSMILES, registerIUPACCommands
+
+// ========== 化合物数据库查询模态框 (v15.3.0) ==========
+class CompoundDatabaseModal extends Modal {
+  constructor(app) {
+    super(app);
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("compound-db-modal");
+
+    contentEl.createEl("h2", { text: "📚 化合物数据库查询" });
+    contentEl.createEl("p", {
+      text: `内置 ${Object.keys(NAME_TO_SMILES).length} 种常用化合物，支持名称/SMILES搜索`,
+      cls: "compound-db-desc",
+    });
+
+    // 搜索框
+    const searchContainer = contentEl.createDiv({ cls: "compound-db-search" });
+    const searchInput = searchContainer.createEl("input", {
+      type: "text",
+      placeholder: "搜索化合物名/SMILES...",
+      cls: "compound-db-search-input",
+    });
+
+    // 搜索类型切换
+    const typeBar = contentEl.createDiv({ cls: "compound-db-type-bar" });
+    const types = [
+      { id: "all", name: "全部" },
+      { id: "drug", name: "药物" },
+      { id: "amino", name: "氨基酸" },
+      { id: "vitamin", name: "维生素" },
+      { id: "sugar", name: "糖类" },
+    ];
+
+    this.currentType = "all";
+    types.forEach((t) => {
+      const btn = typeBar.createEl("button", {
+        text: t.name,
+        cls: "compound-db-type-btn" + (t.id === this.currentType ? " active" : ""),
+      });
+      btn.onclick = () => {
+        this.currentType = t.id;
+        typeBar.querySelectorAll(".compound-db-type-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        this.renderResults(searchInput.value);
+      };
+    });
+
+    // 结果列表
+    const resultsDiv = contentEl.createDiv({ cls: "compound-db-results" });
+
+    // 初始显示全部
+    this.renderResults("");
+
+    // 搜索事件
+    searchInput.addEventListener("input", (e) => {
+      this.renderResults(e.target.value);
+    });
+
+    this.addCSS();
+  }
+
+  renderResults(query) {
+    const resultsDiv = this.contentEl.querySelector(".compound-db-results");
+    if (!resultsDiv) return;
+
+    resultsDiv.empty();
+    const q = (query || "").toLowerCase().trim();
+
+    // 过滤结果
+    let entries = Object.entries(NAME_TO_SMILES);
+
+    // 按类型过滤
+    if (this.currentType !== "all") {
+      const typeMap = {
+        drug: ["布洛芬", "阿司匹林", "咖啡因", "阿莫西林", "青霉素", "紫杉醇", "雌二醇", "睾酮", "孕酮", "扑热息痛", "萘普生", "双氯芬酸", "吲哚美辛", "华法林", "硝苯地平", "硝酸甘油", "安定", "苯巴比妥", "顺铂"],
+        amino: ["甘氨酸", "丙氨酸", "缬氨酸", "亮氨酸", "异亮氨酸", "苯丙氨酸", "酪氨酸", "色氨酸", "丝氨酸", "苏氨酸", "半胱氨酸", "甲硫氨酸", "天冬氨酸", "谷氨酸", "赖氨酸", "精氨酸", "组氨酸"],
+        vitamin: ["维生素A", "维生素C", "维生素D", "维生素E", "维生素B1", "维生素B2", "维生素B6"],
+        sugar: ["葡萄糖", "果糖", "蔗糖", "麦芽糖", "淀粉"],
+      };
+      if (typeMap[this.currentType]) {
+        entries = entries.filter(([name]) => typeMap[this.currentType].includes(name));
+      }
+    }
+
+    // 按搜索词过滤
+    if (q) {
+      entries = entries.filter(([name, smiles]) => {
+        return (
+          name.toLowerCase().includes(q) ||
+          smiles.toLowerCase().includes(q)
+        );
+      });
+    }
+
+    if (entries.length === 0) {
+      resultsDiv.createEl("p", {
+        text: "未找到匹配的化合物",
+        cls: "compound-db-empty",
+      });
+      return;
+    }
+
+    resultsDiv.createEl("p", {
+      text: `找到 ${entries.length} 个化合物:`,
+      cls: "compound-db-count",
+    });
+
+    const list = resultsDiv.createDiv({ cls: "compound-db-list" });
+
+    entries.slice(0, 50).forEach(([name, smiles]) => {
+      const item = list.createDiv({ cls: "compound-db-item" });
+
+      const infoDiv = item.createDiv({ cls: "compound-db-info" });
+      infoDiv.createEl("div", { text: name, cls: "compound-db-name" });
+      infoDiv.createEl("code", { text: smiles, cls: "compound-db-smiles" });
+
+      const btnDiv = item.createDiv({ cls: "compound-db-actions" });
+
+      const copyBtn = btnDiv.createEl("button", { text: "复制", cls: "compound-db-btn" });
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(smiles);
+        new Notice("SMILES 已复制", 1500);
+      };
+
+      const analyzeBtn = btnDiv.createEl("button", { text: "分析", cls: "compound-db-btn" });
+      analyzeBtn.onclick = () => {
+        new FunctionalGroupAnalysisModal(this.app, smiles).open();
+      };
+    });
+
+    if (entries.length > 50) {
+      resultsDiv.createEl("p", {
+        text: `... 还有 ${entries.length - 50} 个结果，请输入更精确的搜索词`,
+        cls: "compound-db-more",
+      });
+    }
+  }
+
+  addCSS() {
+    if (document.getElementById("compound-db-css")) return;
+    const style = document.createElement("style");
+    style.id = "compound-db-css";
+    style.textContent = `
+      .compound-db-modal .compound-db-desc { color: var(--text-muted); margin-bottom: 15px; }
+      .compound-db-modal .compound-db-search { margin-bottom: 10px; }
+      .compound-db-modal .compound-db-search-input {
+        width: 100%; padding: 8px 12px;
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 6px; background: var(--background-primary);
+        color: var(--text-normal);
+      }
+      .compound-db-modal .compound-db-type-bar {
+        display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px;
+      }
+      .compound-db-modal .compound-db-type-btn {
+        padding: 4px 10px; border: 1px solid var(--background-modifier-border);
+        border-radius: 15px; background: var(--background-primary);
+        color: var(--text-muted); cursor: pointer; font-size: 12px;
+      }
+      .compound-db-modal .compound-db-type-btn.active {
+        background: var(--interactive-accent); color: var(--text-on-accent);
+        border-color: var(--interactive-accent);
+      }
+      .compound-db-modal .compound-db-count { color: var(--text-muted); font-size: 13px; margin-bottom: 10px; }
+      .compound-db-modal .compound-db-list { max-height: 500px; overflow-y: auto; }
+      .compound-db-modal .compound-db-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px; border-bottom: 1px solid var(--background-modifier-border);
+      }
+      .compound-db-modal .compound-db-item:hover { background: var(--background-modifier-hover); }
+      .compound-db-modal .compound-db-name { font-weight: 500; margin-bottom: 2px; }
+      .compound-db-modal .compound-db-smiles { font-size: 11px; color: var(--text-muted); font-family: monospace; }
+      .compound-db-modal .compound-db-actions { display: flex; gap: 8px; }
+      .compound-db-modal .compound-db-btn {
+        padding: 4px 10px; border: 1px solid var(--background-modifier-border);
+        border-radius: 4px; background: var(--background-primary);
+        color: var(--text-normal); cursor: pointer; font-size: 12px;
+      }
+      .compound-db-modal .compound-db-btn:hover {
+        background: var(--interactive-accent); color: var(--text-on-accent);
+      }
+      .compound-db-modal .compound-db-empty { text-align: center; color: var(--text-muted); padding: 30px; }
+      .compound-db-modal .compound-db-more { color: var(--text-muted); font-size: 12px; margin-top: 10px; }
+    `;
+    document.head.appendChild(style);
+  }
+}

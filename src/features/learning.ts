@@ -1508,3 +1508,238 @@ function parseCardsFromMarkdown(text) {
 // LearningCardModal, LearningStatsModal, SM2Algorithm, LEARNING_CSS, DEFAULT_LEARNING_CARDS
 // QuizModal, QUIZ_CSS
 // parseCardsFromMarkdown
+
+// ========== v14.5.0: 学习数据统计面板 ==========
+
+/**
+ * 学习数据统计模态框
+ */
+class LearningAnalyticsModal extends Modal {
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+
+    contentEl.createEl("h2", { text: "📊 学习数据分析" });
+
+    const cards = this.plugin.learningCards || [];
+
+    if (cards.length === 0) {
+      contentEl.createEl("p", { text: "暂无学习数据" });
+      return;
+    }
+
+    // 统计基本信息
+    const totalCards = cards.length;
+    const newCards = cards.filter(c => c.state?.reps === 0).length;
+    const learningCards = cards.filter(c => c.state?.reps > 0 && c.state?.reps < 3).length;
+    const reviewCards = cards.filter(c => c.state?.reps >= 3).length;
+    const lapses = cards.reduce((sum, c) => sum + (c.state?.lapses || 0), 0);
+
+    // 总复习次数
+    const totalReps = cards.reduce((sum, c) => sum + (c.state?.reps || 0), 0);
+
+    // 今日复习数量
+    const today = new Date().toDateString();
+    const todayReviews = cards.filter(c => {
+      if (!c.state?.lastReview) return false;
+      return new Date(c.state.lastReview).toDateString() === today;
+    }).length;
+
+    // ========== 总览卡片 ==========
+    const overview = contentEl.createDiv({ cls: "analytics-overview" });
+
+    this.createStatCard(overview, "总卡片数", totalCards, "📚");
+    this.createStatCard(overview, "新卡片", newCards, "🆕");
+    this.createStatCard(overview, "学习中", learningCards, "📖");
+    this.createStatCard(overview, "复习中", reviewCards, "✅");
+    this.createStatCard(overview, "今日复习", todayReviews, "📅");
+    this.createStatCard(overview, "总复习次数", totalReps, "🔄");
+    this.createStatCard(overview, "遗忘次数", lapses, "😅");
+
+    // ========== 掌握度分析 ==========
+    contentEl.createEl("h3", { text: "🎯 掌握度分析" });
+
+    // 按难度统计
+    const easyCards = cards.filter(c => c.state?.difficulty <= 3).length;
+    const normalCards = cards.filter(c => c.state?.difficulty > 3 && c.state?.difficulty <= 7).length;
+    const hardCards = cards.filter(c => c.state?.difficulty > 7).length;
+
+    const masteryDiv = contentEl.createDiv({ cls: "analytics-mastery" });
+    this.createMasteryBar(masteryDiv, "简单", easyCards, totalCards, "#22c55e");
+    this.createMasteryBar(masteryDiv, "中等", normalCards, totalCards, "#eab308");
+    this.createMasteryBar(masteryDiv, "困难", hardCards, totalCards, "#ef4444");
+
+    // ========== 薄弱点分析 ==========
+    contentEl.createEl("h3", { text: "⚠️ 薄弱点分析" });
+
+    // 找出遗忘次数最多的卡片
+    const weakCards = cards
+      .filter(c => (c.state?.lapses || 0) > 0)
+      .sort((a, b) => (b.state?.lapses || 0) - (a.state?.lapses || 0))
+      .slice(0, 5);
+
+    if (weakCards.length === 0) {
+      contentEl.createEl("p", { text: "🎉 太棒了！没有薄弱卡片！" });
+    } else {
+      const weakList = contentEl.createDiv({ cls: "analytics-weak-list" });
+      weakCards.forEach(card => {
+        const item = weakList.createDiv({ cls: "weak-item" });
+        item.createEl("span", { text: card.front, cls: "weak-name" });
+        item.createEl("span", {
+          text: `遗忘 ${card.state?.lapses} 次`,
+          cls: "weak-count",
+        });
+      });
+    }
+
+    // ========== 复习趋势 ==========
+    contentEl.createEl("h3", { text: "📈 复习趋势 (最近7天)" });
+
+    const trendDiv = contentEl.createDiv({ cls: "analytics-trend" });
+
+    // 模拟最近7天的复习数据
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dayStr = date.toDateString().slice(4, 10);
+
+      // 统计当天复习的卡片数
+      const count = cards.filter(c => {
+        if (!c.state?.lastReview) return false;
+        return new Date(c.state.lastReview).toDateString() === date.toDateString();
+      }).length;
+
+      days.push({ day: dayStr, count });
+    }
+
+    const maxCount = Math.max(...days.map(d => d.count), 1);
+
+    days.forEach(({ day, count }) => {
+      const barItem = trendDiv.createDiv({ cls: "trend-bar-item" });
+      barItem.createEl("div", { text: day, cls: "trend-day" });
+
+      const barContainer = barItem.createDiv({ cls: "trend-bar-container" });
+      const barHeight = (count / maxCount) * 60;
+      barContainer.createDiv({
+        cls: "trend-bar",
+        attr: { style: `height: ${barHeight}px;` },
+      });
+
+      barItem.createEl("div", { text: count, cls: "trend-count" });
+    });
+  }
+
+  createStatCard(parent, label, value, icon) {
+    const card = parent.createDiv({ cls: "analytics-stat-card" });
+    card.createEl("div", { text: icon, cls: "stat-icon" });
+    card.createEl("div", { text: String(value), cls: "stat-value" });
+    card.createEl("div", { text: label, cls: "stat-label" });
+  }
+
+  createMasteryBar(parent, label, count, total, color) {
+    const row = parent.createDiv({ cls: "mastery-row" });
+    row.createEl("div", { text: label, cls: "mastery-label" });
+
+    const barContainer = row.createDiv({ cls: "mastery-bar-container" });
+    const percent = total > 0 ? (count / total) * 100 : 0;
+
+    barContainer.createDiv({
+      cls: "mastery-bar",
+      attr: {
+        style: `width: ${percent}%; background: ${color};`,
+      },
+    });
+
+    row.createEl("div", { text: `${count} (${percent.toFixed(0)}%)`, cls: "mastery-count" });
+  }
+
+  async onClose() {
+    this.contentEl.empty();
+  }
+}
+
+// 统计面板 CSS
+const ANALYTICS_CSS = `
+.analytics-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.analytics-stat-card {
+  text-align: center;
+  padding: 16px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+}
+.stat-icon { font-size: 24px; margin-bottom: 8px; }
+.stat-value { font-size: 24px; font-weight: 700; color: var(--interactive-accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.analytics-mastery { margin: 12px 0; }
+.mastery-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+.mastery-label { width: 40px; font-size: 13px; }
+.mastery-bar-container {
+  flex: 1;
+  height: 20px;
+  background: var(--background-modifier-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.mastery-bar { height: 100%; transition: width 0.3s ease; }
+.mastery-count { width: 80px; font-size: 12px; color: var(--text-muted); }
+
+.analytics-weak-list { margin: 12px 0; }
+.weak-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  margin: 4px 0;
+  background: var(--background-secondary);
+  border-radius: 6px;
+}
+.weak-name { font-weight: 500; }
+.weak-count { color: #ef4444; font-size: 13px; }
+
+.analytics-trend {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 100px;
+  margin: 16px 0;
+  padding: 0 12px;
+}
+.trend-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.trend-bar-container {
+  width: 24px;
+  height: 60px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--background-modifier-border);
+  border-radius: 4px 4px 0 0;
+}
+.trend-bar {
+  width: 100%;
+  background: var(--interactive-accent);
+  border-radius: 4px 4px 0 0;
+  min-height: 2px;
+}
+.trend-day { font-size: 11px; color: var(--text-muted); }
+.trend-count { font-size: 11px; font-weight: 600; }
+`;

@@ -254,10 +254,95 @@ class ChemfigSettingTab extends PluginSettingTab {
         })
       );
 
+    // ========== v11.2.0: 学习模块设置 ==========
+    containerEl.createEl("h3", { text: "学习模块设置" });
+
+    // 间隔重复算法选择
+    new Setting(containerEl)
+      .setName("间隔重复模式")
+      .setDesc("选择复习调度模式 (固定间隔简单/自适应精准)")
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("adaptive", "自适应模式 (SM-2/FSRS 算法)")
+          .addOption("fixed", "固定间隔模式 (简单直接)")
+          .setValue(this.plugin.settings?.reviewMode || "adaptive")
+          .onChange(async (value) => {
+            if (!this.plugin.settings) this.plugin.settings = {};
+            this.plugin.settings.reviewMode = value;
+            await this.plugin.saveData({ reviewMode: value });
+            new Notice(`已切换到 ${value === "fixed" ? "固定间隔" : "自适应"} 模式`, 2000);
+          })
+      );
+
+    // 固定间隔天数
+    new Setting(containerEl)
+      .setName("固定间隔天数")
+      .setDesc("固定间隔模式下，记住后多少天复习一次")
+      .addText((text) =>
+        text
+          .setPlaceholder("3")
+          .setValue(String(this.plugin.settings?.fixedIntervalDays || 3))
+          .onChange(async (value) => {
+            const days = parseInt(value) || 3;
+            if (!this.plugin.settings) this.plugin.settings = {};
+            this.plugin.settings.fixedIntervalDays = days;
+            await this.plugin.saveData({ fixedIntervalDays: days });
+          })
+      );
+
+    // 间隔重复算法选择
+    new Setting(containerEl)
+      .setName("自适应算法")
+      .setDesc("自适应模式下使用的算法 (FSRS 更精准, SM-2 更经典)")
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("sm2", "SM-2 (经典 Anki 算法)")
+          .addOption("fsrs", "FSRS (现代算法, 更精准)")
+          .setValue(this.plugin.settings?.spacedRepetitionAlgorithm || "sm2")
+          .onChange(async (value) => {
+            if (!this.plugin.settings) this.plugin.settings = {};
+            this.plugin.settings.spacedRepetitionAlgorithm = value;
+            await this.plugin.saveData({ spacedRepetitionAlgorithm: value });
+            new Notice(`已切换到 ${value === "fsrs" ? "FSRS" : "SM-2"} 算法`, 2000);
+          })
+      );
+
+    // 每日复习限额
+    new Setting(containerEl)
+      .setName("每日复习限额")
+      .setDesc("每日最多复习的新卡片数量 (0 = 无限制)")
+      .addText((text) =>
+        text
+          .setPlaceholder("10")
+          .setValue(String(this.plugin.settings?.dailyReviewLimit || 10))
+          .onChange(async (value) => {
+            const limit = parseInt(value) || 10;
+            if (!this.plugin.settings) this.plugin.settings = {};
+            this.plugin.settings.dailyReviewLimit = limit;
+            await this.plugin.saveData({ dailyReviewLimit: limit });
+          })
+      );
+
+    // 目标保留率 (仅 FSRS)
+    new Setting(containerEl)
+      .setName("目标保留率 (FSRS)")
+      .setDesc("期望的卡片记忆保留率 (越高复习越频繁, 推荐 0.9)")
+      .addSlider((slider) =>
+        slider
+          .setLimits(0.7, 0.98, 0.05)
+          .setValue(this.plugin.settings?.targetRetention || 0.9)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            if (!this.plugin.settings) this.plugin.settings = {};
+            this.plugin.settings.targetRetention = value;
+            await this.plugin.saveData({ targetRetention: value });
+          })
+      );
+
     // 关于信息
     containerEl.createEl("hr");
     containerEl.createEl("p", { text: "编译依赖: MiKTeX (latex + dvisvgm)" });
     containerEl.createEl("p", { text: "编译链路: latex → DVI → dvisvgm --no-fonts" });
-    containerEl.createEl("p", { text: "支持模式: chem / tikz / miktex" });
+    containerEl.createEl("p", { text: "支持模式: chem / tikz / miktex / smiles" });
   }
 }

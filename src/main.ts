@@ -950,6 +950,19 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // ========== v14.5.0: 学习数据分析 ==========
+      this.addCommand({
+        id: "show-learning-analytics",
+        name: "学习模块: 学习数据分析",
+        callback: () => {
+          if (typeof LearningAnalyticsModal === "undefined") {
+            new Notice("学习数据分析模块未加载", 2000);
+            return;
+          }
+          new LearningAnalyticsModal(this.app, this).open();
+        },
+      });
+
       this.addCommand({
         id: "update-card-db",
         name: "更新化合物数据库",

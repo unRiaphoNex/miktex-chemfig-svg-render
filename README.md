@@ -1,145 +1,102 @@
-# MiKTeX Chemfig SVG Render
+# MikTeX Chemfig SVG Renderer
 
-An Obsidian plugin that renders chemfig/tikz/miktex/ce code blocks to SVG/PNG using local MiKTeX installation.
+Obsidian 插件：chem/tikz/miktex/ce/smiles 五种模式自动编译为 SVG/PNG，定位为**药物化学学习辅助工具**。
 
-## Features
+## ✨ 核心功能
 
-- **4 rendering modes**: chem (chemfig shorthand), tikz (full syntax), miktex (complete LaTeX), ce (mhchem equations)
-- **Local compilation**: Uses MiKTeX (latex → DVI → dvisvgm) for high-quality vector output
-- **PNG export**: Converts SVG to PNG for better cross-platform compatibility
-- **Molecule editor**: Interactive fragment library with 200+ pre-loaded structures
-- **Learning tools**: Flashcards, spaced repetition, quiz mode, daily challenge
-- **Component layout**: Visual arrangement of reaction components
-- **Sidebar integration**: Left sidebar (template library) + right sidebar (component editor)
-- **CM6 support**: CodeMirror 6 live preview with LaTeX syntax highlighting
+### 🎨 化学渲染
+- **五种渲染模式**: chem (chemfig) / tikz / miktex / ce / smiles
+- **自动编译**: 代码块修改后自动重新编译
+- **SVG/PNG 双输出**: 笔记中显示 PNG，SVG 存储在后端文件夹
+- **3D 分子查看**: 基于 3Dmol.js 的交互式 3D 分子模型
 
-## Requirements
+### 🧪 分子编辑
+- **分子编辑器**: 组分调整、原子键连接、官能团添加
+- **SMILES 渲染**: 纯前端 SMILES → SVG 渲染
+- **官能团分析**: 自动识别 13 种常见官能团
+- **IUPAC 转换**: 化合物名称 ↔ SMILES 双向转换
 
-- **Obsidian** v1.0+
-- **MiKTeX** installed locally (Windows)
-  - Default path: `D:\MiKTeX\miktex\bin\x64\`
-  - Required packages: chemfig, tikz, mhchem, dvisvgm
+### 📚 学习辅助
+- **间隔重复卡片**: FSRS v6 算法 + SM-2 双引擎
+- **默写练习**: 3 种模式（结构→命名、命名→结构、分子式→命名）
+- **反应条件速查**: 30+ 常见有机反应数据库
+- **配对游戏**: 官能团配对练习
+- **学习数据分析**: 掌握度统计、薄弱点分析、复习趋势
 
-## Installation
+### 🛠️ 开发工具
+- **侧边栏**: 左侧模板库 + 右侧编辑器
+- **右键菜单**: 快速编辑、查看源码、SVG/PNG 切换
+- **代码块命名**: `% NAME: 反应名称` 持久绑定
+- **视图切换定位**: 阅读/编辑模式间自动定位代码块
 
-### From Obsidian Community Plugin
-1. Settings → Community plugins → Browse
-2. Search for "MiKTeX Chemfig SVG Render"
-3. Install and enable
+## 📋 系统要求
 
-### Manual Installation
-1. Download `main.js`, `manifest.json`, `styles.css`
-2. Copy to `<vault>/.obsidian/plugins/miktex-chemfig-svg-render/`
-3. Reload Obsidian and enable the plugin
+- **Obsidian**: v1.0.0+
+- **MiKTeX**: 安装并配置 `latex` + `dvisvgm`
+- **编译链路**: `latex → DVI → dvisvgm --no-fonts`
 
-## Usage
+## 🚀 快速开始
 
-### Code Blocks
+### 安装 MiKTeX
+1. 下载并安装 [MiKTeX](https://miktex.org/download)
+2. 确保 `latex` 和 `dvisvgm` 在系统 PATH 中
 
+### 安装插件
+1. 将插件文件夹复制到 `.obsidian/plugins/miktex-chemfig-svg-render/`
+2. 在 Obsidian 设置中启用插件
+
+### 使用方法
+创建 chemfig 代码块：
+~~~markdown
 ```chem
+% NAME: 苯环
 \chemfig{*6(-=-=-=)}
 ```
+~~~
 
-```tikz
-\usepackage{chemfig}
-\begin{document}
-\chemfig{H_3C-C(=O)-OH}
-\end{document}
-```
+## 📖 命令列表
 
-```ce
-\ce{A + B -> C}
-```
+| 命令 | 说明 |
+|------|------|
+| `3D 分子查看器` | 打开 3D 分子查看器 |
+| `官能团分析` | 从 SMILES 识别官能团 |
+| `学习模块: 学习数据分析` | 打开学习统计面板 |
+| `反应条件速查` | 查看常见有机反应 |
+| `配对游戏` | 官能团配对练习 |
 
-### Naming Convention
-
-Add a name comment at the first line:
-```
-% NAME: 苯环结构
-\chemfig{*6(-=-=-=)}
-```
-
-Or use strict naming:
-```
-%% name: benzene_ring
-\chemfig{*6(-=-=-=)}
-```
-
-## Development
-
-### Setup
-```bash
-npm install
-```
-
-### Build
-```bash
-npm run build
-```
-
-### Watch mode
-```bash
-npm run dev
-```
-
-### Lint
-```bash
-npm run lint
-npm run lint:fix
-```
-
-### Format
-```bash
-npm run format
-```
-
-### Test
-```bash
-npm test
-```
-
-## Project Structure
+## 🏗️ 项目结构
 
 ```
-├── src/
-│   ├── core/           # Core compilation logic
-│   │   ├── compiler.ts
-│   │   ├── parser.ts
-│   │   ├── converter.ts
-│   │   └── svg-utils.ts
-│   ├── state/          # State management
-│   │   ├── SettingsManager.ts
-│   │   └── EnvironmentManager.ts
-│   ├── ui/             # UI components
-│   │   └── TemplateBrowser.ts
-│   ├── main.ts         # Plugin entry
-│   ├── molecule-editor.ts
-│   ├── cm6.ts
-│   ├── sidebar.ts
-│   ├── group-layout.ts
-│   └── ...
-├── tests/              # Test files
-├── .github/
-│   └── workflows/
-│       └── ci.yml      # GitHub Actions CI
-├── build.js            # Build script (esbuild + merge)
-├── manifest.json       # Obsidian plugin manifest
-├── styles.css          # Plugin styles
-├── tsconfig.json       # TypeScript config
-├── eslint.config.mjs   # ESLint 9 config
-└── .prettierrc.json    # Prettier config
+src/
+├── core/              # 核心编译逻辑
+│   ├── compiler.ts    # LaTeX 编译器
+│   ├── parser.ts      # 代码块解析
+│   └── converter.ts   # 格式转换
+├── features/         # 功能模块
+│   ├── learning.ts    # 学习卡片
+│   ├── fsrs-algorithm.ts  # FSRS 算法
+│   ├── smiles-renderer.ts # SMILES 渲染
+│   ├── molecule-3d-viewer.ts # 3D 查看器
+│   └── reaction-conditions.ts # 反应条件
+├── ui/               # UI 组件
+│   ├── sidebar.ts     # 侧边栏
+│   ├── settings.ts    # 设置面板
+│   └── editor.ts       # 编辑器
+└── integrations/     # 第三方集成
+    ├── ocl.bundle.js  # OpenChemLib
+    └── excalidraw-integration.ts # Excalidraw
 ```
 
-## Technology Stack
+## 📊 版本历史
 
-- **TypeScript** (strict mode)
-- **esbuild** (build)
-- **CodeMirror 6** (editor)
-- **OpenChemLib** (SMILES rendering)
-- **ESLint 9** (code quality)
-- **Prettier** (code formatting)
-- **GitHub Actions** (CI/CD)
+- **v15.0.0**: 架构现代化、学习数据分析
+- **v14.5.0**: 学习数据统计面板
+- **v14.0.0**: 扩展反应条件数据库
+- **v13.5.0**: FSRS v6 算法升级
+- **v13.0.0**: 官能团分析功能
+- **v12.5.0**: 分子性质面板增强
+- **v12.0.0**: 3D 分子可视化
 
-## License
+## 📄 License
 
 MIT

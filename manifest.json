@@ -1,9 +1,9 @@
 {
   "id": "miktex-chemfig-svg-render",
   "name": "MikTeX Chemfig SVG Renderer",
-  "version": "10.16.0",
+  "version": "15.0.0",
   "minAppVersion": "1.0.0",
-  "description": "chem/tikz/miktex/ce/smiles 五种模式渲染结构式。侧边栏双向编辑、分子画布、化学式搜索、右键编辑、实时预览、组分调整、学习辅助（翻转卡片/标签筛选/进度追踪）。依赖MikTeX(latex+dvisvgm)。",
+  "description": "chem/tikz/miktex/ce/smiles 五种模式渲染结构式。侧边栏双向编辑、分子画布、3D分子查看、官能团分析、FSRS间隔重复学习、反应条件速查、配对游戏、学习数据分析。依赖MikTeX(latex+dvisvgm)。",
   "author": "unRia",
   "isDesktopOnly": true
 }

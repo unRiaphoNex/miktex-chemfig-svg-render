@@ -834,6 +834,63 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // ========== v15.1.0: 补充功能入口 ==========
+      // 打开组分调整模态框 (空模板)
+      this.addCommand({
+        id: "open-group-layout-editor",
+        name: "组分调整编辑器 (空模板)",
+        callback: () => {
+          if (typeof GroupLayoutModal !== "undefined") {
+            new GroupLayoutModal(this.app, "", null).open();
+          } else {
+            new Notice("组分调整编辑器未加载", 2000);
+          }
+        },
+      });
+
+      // 打开模板浏览器
+      this.addCommand({
+        id: "open-template-browser",
+        name: "模板浏览器 (浏览全部模板)",
+        callback: () => {
+          if (this.templateBrowser) {
+            this.templateBrowser.show();
+          }
+        },
+      });
+
+      // 打开空白结构式编辑器
+      this.addCommand({
+        id: "open-blank-structure-editor",
+        name: "空白结构式编辑器 (新建)",
+        callback: () => {
+          const activeFile = this.app.workspace.getActiveFile();
+          const editor = this.app.workspace.activeEditor?.editor;
+          if (activeFile && editor) {
+            // 在当前位置插入空代码块并打开编辑器
+            const pos = editor.getCursor();
+            editor.replaceRange("```chem\n\n```\n", pos);
+            this.openEditorModal(activeFile, editor, pos.line);
+          } else {
+            new Notice("请先打开一个笔记", 2000);
+          }
+        },
+      });
+
+      // 3D 分子查看器 (空 SMILES)
+      this.addCommand({
+        id: "open-3d-viewer-blank",
+        name: "3D 分子查看器 (输入 SMILES)",
+        callback: () => {
+          if (typeof Molecule3DModal !== "undefined") {
+            const smiles = prompt("请输入 SMILES 结构:", "");
+            if (smiles && smiles.trim()) {
+              new Molecule3DModal(this.app, smiles.trim()).open();
+            }
+          }
+        },
+      });
+
       // ========== v11.9.0: 从笔记导入卡片 ==========
       this.addCommand({
         id: "import-cards-from-note",

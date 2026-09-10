@@ -90,6 +90,147 @@ class SM2Algorithm {
   }
 }
 
+// ========== FSRS 间隔重复算法 (v15.3.0) ==========
+// 学习自 open-spaced-repetition/fsrs4anki
+// 比 SM-2 更精准的记忆调度算法
+class FsrsAlgorithm {
+  /**
+   * FSRS 默认参数 (简化版)
+   */
+  static defaultWeights = [
+    0.4072, 1.1829, 3.1262, 1.4954, 0.8814,
+    0.0422, 1.5542, 0.1364, 1.0503, 0.0208,
+    0.0115, 0.2194, 0.152, 1.3167, 0.002,
+    1.0921, 0.0, 0.3158, 0.2303,
+  ];
+
+  /**
+   * 计算遗忘概率
+   * @param {number} elapsedDays - 经过天数
+   * @param {number} stability - 记忆稳定性
+   * @returns {number} 遗忘概率 (0-1)
+   */
+  static forgettingProbability(elapsedDays, stability) {
+    if (stability <= 0) return 1;
+    return Math.pow(1 + elapsedDays / (9 * stability), -1);
+  }
+
+  /**
+   * 更新记忆稳定性
+   * @param {number} stability - 当前稳定性
+   * @param {number} difficulty - 难度
+   * @param {boolean} recall - 是否回忆成功
+   * @param {number} elapsedDays - 经过天数
+   * @returns {number} 新的稳定性
+   */
+  static updateStability(stability, difficulty, recall, elapsedDays) {
+    const w = this.defaultWeights;
+    if (recall) {
+      // 回忆成功
+      return (
+        stability *
+        (1 + Math.exp(w[4]) *
+          (11 - difficulty) *
+          Math.pow(stability, -w[5]) *
+          (Math.exp((1 - elapsedDays / stability) * w[6]) - 1))
+      );
+    } else {
+      // 回忆失败
+      return w[17] * Math.pow(difficulty, -w[18]) * (Math.pow(stability + 1, w[15]) - 1) * Math.exp(-w[16] * elapsedDays / stability);
+    }
+  }
+
+  /**
+   * 更新难度
+   * @param {number} difficulty - 当前难度
+   * @param {boolean} recall - 是否回忆成功
+   * @returns {number} 新的难度
+   */
+  static updateDifficulty(difficulty, recall) {
+    const w = this.defaultWeights;
+    const newDifficulty = difficulty + (recall ? 0 : w[7]);
+    return Math.min(10, Math.max(1, newDifficulty));
+  }
+
+  /**
+   * 计算下次复习间隔
+   * @param {number} stability - 记忆稳定性
+   * @param {number} desiredRetrievability - 期望回忆率 (默认 0.9)
+   * @returns {number} 间隔 (天)
+   */
+  static nextInterval(stability, desiredRetrievability = 0.9) {
+    return Math.round(
+      9 * stability * (1 / desiredRetrievability - 1)
+    );
+  }
+
+  /**
+   * FSRS 复习调度
+   * @param {LearningState} state - 当前状态
+   * @param {number} quality - 评分 (1-4): 1=忘记, 2=困难, 3=好, 4=简单
+   * @returns {LearningState} 新的学习状态
+   */
+  static review(state, quality) {
+    const now = Date.now();
+    const w = this.defaultWeights;
+
+    // 初始化难度和稳定性
+    let difficulty = state.difficulty || 5;
+    let stability = state.stability || 0;
+
+    const elapsedDays = state.lastReview
+      ? (now - state.lastReview) / (24 * 60 * 60 * 1000)
+      : 0;
+
+    const recall = quality >= 2;
+
+    if (state.repetitions === 0) {
+      // 新卡片
+      difficulty = w[0] - w[1] * (quality - 3);
+      stability = w[2];
+    } else {
+      // 复习过的卡片
+      difficulty = this.updateDifficulty(difficulty, recall);
+      stability = this.updateStability(stability, difficulty, recall, elapsedDays);
+    }
+
+    // 确保难度在 1-10 之间
+    difficulty = Math.min(10, Math.max(1, difficulty));
+    stability = Math.max(0.1, stability);
+
+    // 计算下次间隔
+    const interval = this.nextInterval(stability);
+
+    return {
+      repetitions: state.repetitions + (recall ? 1 : 0),
+      interval: interval,
+      stability: stability,
+      difficulty: difficulty,
+      nextReview: now + interval * 24 * 60 * 60 * 1000,
+      lastReview: now,
+      status: state.repetitions >= 3 ? "known" : "learning",
+      algorithm: "fsrs",
+    };
+  }
+
+  /**
+   * 获取默认状态
+   * @returns {Object}
+   */
+  static defaultState() {
+    return {
+      repetitions: 0,
+      interval: 0,
+      stability: 0,
+      difficulty: 5,
+      nextReview: Date.now(),
+      lastReview: 0,
+      status: "new",
+      algorithm: "fsrs",
+    };
+  }
+}
+
 // ========== 学习卡片模态框 ==========
 class LearningCardModal extends Modal {
   /**
@@ -1083,6 +1224,136 @@ const DEFAULT_LEARNING_CARDS = [
     usage: "烟草成瘾成分",
     source: "吡啶类生物碱",
     chemfigCode: "\\chemfig{N(-[:30]CH_3)(-[:-30]CCCC)-pyridine}",
+  },
+  {
+    name: "吗啡",
+    englishName: "Morphine",
+    formula: "C17H19NO3",
+    category: "阿片类生物碱",
+    smiles: "CN1CCC23C4C1CC5=C2C(=C(C=C5)O)OC3C(C4O)O",
+    usage: "强效镇痛药",
+    source: "阿片类生物碱",
+    chemfigCode: "\\chemfig{*6(-=-(-OH)=-(O-)=-)}",
+  },
+  {
+    name: "咖啡因",
+    englishName: "Caffeine",
+    formula: "C8H10N4O2",
+    category: "黄嘌呤类生物碱",
+    smiles: "CN1C=NC2=C1C(=O)N(C)C(=O)N2C",
+    usage: "中枢兴奋, 提神醒脑",
+    source: "黄嘌呤类",
+    chemfigCode: "\\chemfig{N(-[:30]CH_3)(-[:-30]C=O)-purine}",
+  },
+  {
+    name: "葡萄糖",
+    englishName: "Glucose",
+    formula: "C6H12O6",
+    category: "单糖",
+    smiles: "OC[C@H]1OC(O)[C@@H](O)[C@H](O)[C@H]1O",
+    usage: "主要能源物质",
+    source: "己醛糖",
+    chemfigCode: "\\chemfig{HOCH_2-CH(OH)-CH(OH)-CH(OH)-CH(OH)-CHO}",
+  },
+  {
+    name: "果糖",
+    englishName: "Fructose",
+    formula: "C6H12O6",
+    category: "单糖",
+    smiles: "OCC[C@H](O)[C@@H](O)C(=O)CO",
+    usage: "最甜的天然糖",
+    source: "己酮糖",
+    chemfigCode: "\\chemfig{HOCH_2-CO-CH(OH)-CH(OH)-CH(OH)-CH_2OH}",
+  },
+  {
+    name: "维生素C",
+    englishName: "Vitamin C",
+    formula: "C6H8O6",
+    category: "维生素",
+    smiles: "OCC1OC(C(O)C1O)O",
+    usage: "抗氧化, 胶原蛋白合成",
+    source: "抗坏血酸",
+    chemfigCode: "\\chemfig{HOCH_2-C(OH)=C(OH)-CO-O-CH(OH)-}",
+  },
+  {
+    name: "胆固醇",
+    englishName: "Cholesterol",
+    formula: "C27H46O",
+    category: "甾体化合物",
+    smiles: "C[C@H](CCCC(C)C)[C@H]1CC[C@@]2C3=CC[C@H]4C[C@@H](O)CC[C@]4(C)C3CC[C@]12C",
+    usage: "细胞膜成分, 合成激素前体",
+    source: "甾体醇类",
+    chemfigCode: "\\chemfig{steroid*4(-OH)}",
+  },
+  {
+    name: "雌二醇",
+    englishName: "Estradiol",
+    formula: "C18H24O2",
+    category: "甾体激素",
+    smiles: "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)C=C[C@]34C)[C@@H]1CC[C@@H]2O",
+    usage: "雌性激素",
+    source: "甾体雌激素",
+    chemfigCode: "\\chemfig{steroid*3(-OH)(=O)}",
+  },
+  {
+    name: "睾酮",
+    englishName: "Testosterone",
+    formula: "C19H28O2",
+    category: "甾体激素",
+    smiles: "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@]34C)[C@@H]1CC[C@@H]2O",
+    usage: "雄性激素, 促进肌肉生长",
+    source: "甾体雄激素",
+    chemfigCode: "\\chemfig{steroid*3(-OH)(=O)(CH_3)}",
+  },
+  {
+    name: "阿司匹林",
+    englishName: "Aspirin",
+    formula: "C9H8O4",
+    category: "解热镇痛药",
+    smiles: "CC(=O)Oc1ccccc1C(=O)O",
+    usage: "解热镇痛, 抗血小板聚集",
+    source: "水杨酸类",
+    chemfigCode: "\\chemfig{*6(-=-(-OAc)=-(COOH)=-)}",
+  },
+  {
+    name: "苯",
+    englishName: "Benzene",
+    formula: "C6H6",
+    category: "芳烃",
+    smiles: "c1ccccc1",
+    usage: "有机溶剂, 合成原料",
+    source: "芳香烃",
+    chemfigCode: "\\chemfig{*6(-=-=-=)}",
+  },
+  {
+    name: "乙醇",
+    englishName: "Ethanol",
+    formula: "C2H6O",
+    category: "醇类",
+    smiles: "CCO",
+    usage: "酒类饮品, 消毒剂, 溶剂",
+    source: "伯醇",
+    chemfigCode: "\\chemfig{CH_3CH_2OH}",
+  },
+  {
+    name: "甲醛",
+    englishName: "Formaldehyde",
+    formula: "CH2O",
+    category: "醛类",
+    smiles: "C=O",
+    usage: "防腐剂, 合成树脂",
+    source: "脂肪醛",
+    chemfigCode: "\\chemfig{H_2C=O}",
+  },
+  {
+    name: "乙酸",
+    englishName: "Acetic acid",
+    formula: "C2H4O2",
+    category: "羧酸",
+    smiles: "CC(=O)O",
+    usage: "食醋主要成分, 溶剂",
+    source: "脂肪酸",
+    chemfigCode: "\\chemfig{CH_3COOH}",
   },
 ];
 

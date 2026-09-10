@@ -4273,3 +4273,235 @@ class GamifiedStatsModal extends Modal {
     this.contentEl.empty();
   }
 }
+
+// ========== v15.9.0: 学习路径规划 (前置知识解锁) ==========
+class LearningPathSystem {
+  static STAGES = [
+    {
+      id: "basics",
+      name: "基础阶段",
+      description: "掌握有机化学基础官能团",
+      icon: "🌱",
+      required: 0,
+      nextStage: "intermediate",
+      cards: ["甲烷", "乙烷", "丙烷", "甲醇", "乙醇", "甲醛", "乙醛", "丙酮"],
+    },
+    {
+      id: "intermediate",
+      name: "进阶阶段",
+      description: "掌握常见芳香族和羧酸",
+      icon: "📚",
+      required: 8,
+      nextStage: "advanced",
+      prerequisites: ["basics"],
+      cards: ["苯", "甲苯", "苯酚", "苯甲酸", "乙酸", "丙酸", "苯胺", "硝基苯"],
+    },
+    {
+      id: "advanced",
+      name: "高级阶段",
+      description: "掌握药物和复杂化合物",
+      icon: "🎓",
+      required: 16,
+      nextStage: "expert",
+      prerequisites: ["intermediate"],
+      cards: ["阿司匹林", "对乙酰氨基酚", "布洛芬", "青霉素", "咖啡因", "尼古丁", "葡萄糖", "蔗糖"],
+    },
+    {
+      id: "expert",
+      name: "专家阶段",
+      description: "攻克复杂天然产物",
+      icon: "👨‍🔬",
+      required: 24,
+      nextStage: null,
+      prerequisites: ["advanced"],
+      cards: ["吗啡", "可卡因", "紫杉醇", "青蒿素", "胆固醇", "肾上腺素", "血清素", "多巴胺"],
+    },
+  ];
+
+  static getCurrentStage(masteredCount) {
+    for (let i = this.STAGES.length - 1; i >= 0; i--) {
+      const stage = this.STAGES[i];
+      if (masteredCount >= stage.required) {
+        return stage;
+      }
+    }
+    return this.STAGES[0];
+  }
+
+  static isStageUnlocked(stageId, masteredCount) {
+    const stage = this.STAGES.find((s) => s.id === stageId);
+    if (!stage) return false;
+    return masteredCount >= stage.required;
+  }
+
+  static getNextRecommendation(masteredCards, allCards) {
+    const currentStage = this.getCurrentStage(masteredCards.length);
+    const masteredSet = new Set(masteredCards.map((c) => c.name));
+
+    const availableCards = allCards.filter(
+      (c) => currentStage.cards.includes(c.name) && !masteredSet.has(c.name)
+    );
+
+    if (availableCards.length > 0) {
+      return {
+        type: "current_stage",
+        stage: currentStage.name,
+        cards: availableCards.slice(0, 5),
+      };
+    }
+
+    if (currentStage.nextStage) {
+      const nextStage = this.STAGES.find((s) => s.id === currentStage.nextStage);
+      return {
+        type: "next_stage_locked",
+        stage: nextStage.name,
+        required: nextStage.required,
+        current: masteredCards.length,
+        remaining: nextStage.required - masteredCards.length,
+      };
+    }
+
+    return {
+      type: "all_completed",
+      stage: "全部完成！",
+    };
+  }
+}
+
+class LearningPathModal extends Modal {
+  constructor(app, masteredCards, allCards) {
+    super(app);
+    this.masteredCards = masteredCards || [];
+    this.allCards = allCards || [];
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("learning-path-modal");
+
+    contentEl.createEl("h2", { text: "🗺️ 学习路径" });
+
+    const currentStage = LearningPathSystem.getCurrentStage(this.masteredCards.length);
+    contentEl.createEl("div", {
+      text: `当前阶段: ${currentStage.icon} ${currentStage.name} (${this.masteredCards.length} 个已掌握)`,
+      cls: "path-current-stage",
+    });
+
+    const progressContainer = contentEl.createDiv("path-progress");
+    for (const stage of LearningPathSystem.STAGES) {
+      const isUnlocked = LearningPathSystem.isStageUnlocked(stage.id, this.masteredCards.length);
+      const isCurrent = stage.id === currentStage.id;
+
+      const stageItem = progressContainer.createDiv("path-stage-item");
+      stageItem.classList.toggle("unlocked", isUnlocked);
+      stageItem.classList.toggle("current", isCurrent);
+
+      stageItem.createEl("div", {
+        text: isUnlocked ? stage.icon : "🔒",
+        cls: "path-stage-icon",
+      });
+
+      stageItem.createEl("div", {
+        text: stage.name,
+        cls: "path-stage-name",
+      });
+
+      stageItem.createEl("div", {
+        text: isUnlocked ? `${stage.cards.length} 个化合物` : `需要 ${stage.required} 个已掌握`,
+        cls: "path-stage-desc",
+      });
+    }
+
+    const recommendation = LearningPathSystem.getNextRecommendation(
+      this.masteredCards,
+      this.allCards
+    );
+
+    contentEl.createEl("h3", { text: "🎯 推荐下一步" });
+
+    if (recommendation.type === "current_stage") {
+      contentEl.createEl("p", {
+        text: `继续学习 ${recommendation.stage} 的化合物:`,
+        cls: "recommendation-hint",
+      });
+      const recList = contentEl.createDiv("recommendation-list");
+      for (const card of recommendation.cards) {
+        const item = recList.createDiv("recommendation-item");
+        item.createEl("span", { text: card.name, cls: "rec-name" });
+        item.createEl("span", { text: card.formula, cls: "rec-formula" });
+      }
+    } else if (recommendation.type === "next_stage_locked") {
+      contentEl.createDiv({
+        text: `🔒 ${recommendation.stage} 未解锁\n还需要掌握 ${recommendation.remaining} 个化合物 (当前 ${recommendation.current}/${recommendation.required})`,
+        cls: "recommendation-locked",
+      });
+    } else {
+      contentEl.createDiv({
+        text: "🎉 恭喜！所有阶段都已完成！",
+        cls: "recommendation-complete",
+      });
+    }
+
+    const style = document.createElement("style");
+    style.textContent = `
+      .learning-path-modal h2 { margin: 0 0 12px 0; }
+      .path-current-stage {
+        padding: 12px;
+        background: var(--background-secondary);
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-weight: 600;
+      }
+      .path-progress {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .path-stage-item {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid var(--background-modifier-border);
+        border-radius: 8px;
+        text-align: center;
+        opacity: 0.5;
+      }
+      .path-stage-item.unlocked { opacity: 1; }
+      .path-stage-item.current {
+        border-color: var(--interactive-accent);
+        background: var(--background-modifier-hover);
+      }
+      .path-stage-icon { font-size: 24px; margin-bottom: 4px; }
+      .path-stage-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+      .path-stage-desc { font-size: 11px; color: var(--text-muted); }
+      .recommendation-hint { color: var(--text-muted); margin: 8px 0; }
+      .recommendation-list { display: flex; flex-direction: column; gap: 8px; }
+      .recommendation-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        background: var(--background-secondary);
+        border-radius: 6px;
+      }
+      .rec-name { font-weight: 500; }
+      .rec-formula { color: var(--text-muted); font-family: monospace; }
+      .recommendation-locked {
+        padding: 16px;
+        text-align: center;
+        color: var(--text-muted);
+        white-space: pre-wrap;
+      }
+      .recommendation-complete {
+        padding: 20px;
+        text-align: center;
+        font-size: 16px;
+        color: var(--interactive-accent);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  onClose() {
+    this.contentEl.empty();
+  }
+}

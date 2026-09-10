@@ -387,6 +387,91 @@ class ChemfigRightSidebarView extends ItemView {
       };
     }
 
+    // ========== v15.6.0: 学习模块快捷入口 ==========
+    const learningSection = contentEl.createDiv({ cls: "chemfig-sidebar-learning-section" });
+    learningSection.createEl("div", {
+      cls: "chemfig-sidebar-section-title",
+      text: "📚 学习模块",
+    });
+
+    const learningGrid = learningSection.createDiv({ cls: "chemfig-sidebar-learning-grid" });
+
+    // 学习卡片按钮
+    const cardsBtn = learningGrid.createEl("button", {
+      text: "卡片",
+      cls: "chemfig-sidebar-learning-btn",
+    });
+    cardsBtn.title = "打开学习卡片";
+    cardsBtn.onclick = () => {
+      if (this.plugin.learningCards?.length > 0) {
+        new LearningCardModal(this.app, this.plugin.learningCards[0], () => {}).open();
+      } else {
+        new Notice("学习卡片未加载", 2000);
+      }
+    };
+
+    // 默写练习按钮
+    const quizBtn = learningGrid.createEl("button", {
+      text: "默写",
+      cls: "chemfig-sidebar-learning-btn",
+    });
+    quizBtn.title = "打开默写练习";
+    quizBtn.onclick = () => {
+      new QuizModal(this.app, this.plugin.learningCards || [], "structure_to_name").open();
+    };
+
+    // 每日一题按钮
+    const dailyBtn = learningGrid.createEl("button", {
+      text: "每日",
+      cls: "chemfig-sidebar-learning-btn",
+    });
+    dailyBtn.title = "打开每日一题";
+    dailyBtn.onclick = () => {
+      if (typeof DailyQuestionModal !== "undefined") {
+        new DailyQuestionModal(this.app, this.plugin).open();
+      } else {
+        new Notice("每日一题模块未加载", 2000);
+      }
+    };
+
+    // 反应机理按钮
+    const mechBtn = learningGrid.createEl("button", {
+      text: "机理",
+      cls: "chemfig-sidebar-learning-btn",
+    });
+    mechBtn.title = "打开反应机理可视化";
+    mechBtn.onclick = () => {
+      if (typeof ReactionMechanismModal !== "undefined") {
+        new ReactionMechanismModal(this.app).open();
+      } else {
+        new Notice("反应机理模块未加载", 2000);
+      }
+    };
+
+    // 反向合成按钮
+    const retroBtn = learningGrid.createEl("button", {
+      text: "合成",
+      cls: "chemfig-sidebar-learning-btn",
+    });
+    retroBtn.title = "打开反向合成分析";
+    retroBtn.onclick = () => {
+      if (typeof RetrosynthesisModal !== "undefined") {
+        new RetrosynthesisModal(this.app).open();
+      } else {
+        new Notice("反向合成模块未加载", 2000);
+      }
+    };
+
+    // 学习统计按钮
+    const statsBtn = learningGrid.createEl("button", {
+      text: "统计",
+      cls: "chemfig-sidebar-learning-btn",
+    });
+    statsBtn.title = "打开学习统计";
+    statsBtn.onclick = () => {
+      new LearningStatsModal(this.app, this.plugin).open();
+    };
+
     // 代码编辑区
     const codeContainer = contentEl.createDiv({ cls: "chemfig-sidebar-code-container" });
     const codeLabel = codeContainer.createEl("div", {
@@ -972,6 +1057,42 @@ const SIDEBAR_CSS = `
   color: white;
   border-color: var(--interactive-accent);
 }
+
+/* ========== v15.6.0: 学习模块快捷入口样式 ========== */
+.chemfig-sidebar-learning-section {
+  margin-bottom: 12px;
+  padding: 8px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+}
+.chemfig-sidebar-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.chemfig-sidebar-learning-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.chemfig-sidebar-learning-btn {
+  padding: 6px 4px;
+  font-size: 11px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.chemfig-sidebar-learning-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
 .chemfig-sidebar-label {
   font-size: 12px;
   font-weight: 600;

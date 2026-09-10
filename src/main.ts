@@ -390,34 +390,8 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         console.error("[Chemfig-SVG] registerMarkdownCodeBlockProcessor 注册失败:", e);
       }
 
-      // smiles 代码块 (OpenChemLib 前端即时渲染, v10.15.0)
-      try {
-        if (typeof this.registerMarkdownCodeBlockProcessor === "function") {
-          this.registerMarkdownCodeBlockProcessor("smiles", (source, el, ctx) => {
-            const smiles = stripSmilesMetas(source);
-            if (!smiles) {
-              el.createEl("div", { text: "[smiles] 空内容", cls: "chemfig-hint" });
-              return;
-            }
-            try {
-              const wrapper = el.createDiv("smiles-render-wrapper");
-              wrapper.style.cssText = "text-align:center;margin:0.8em 0;";
-              wrapper.innerHTML = renderSmilesSvg(smiles);
-              const svg = wrapper.querySelector("svg");
-              if (svg) {
-                svg.setAttribute("title", "smiles 结构式（右键可编辑/复制）");
-                svg.style.cursor = "context-menu";
-              }
-              this.bindSmilesContextMenu(wrapper, smiles);
-            } catch (e) {
-              el.createEl("div", { text: "[smiles] 解析失败: " + e.message, cls: "chemfig-hint" });
-            }
-          });
-          console.log("[Chemfig-SVG] smiles 代码块已注册");
-        }
-      } catch (e) {
-        console.error("[Chemfig-SVG] smiles 代码块注册失败:", e);
-      }
+      // smiles 代码块已在 smiles-renderer.ts 的 registerSMILESProcessor 中注册
+      // (避免重复注册: Code block postprocessor for language smiles is already registered)
 
       // 阅读模式渲染 (内联SVG, 修复路径问题) - 保留用于处理 ![[png]] 嵌入和旧格式
       this.registerMarkdownPostProcessor((el, ctx) => {

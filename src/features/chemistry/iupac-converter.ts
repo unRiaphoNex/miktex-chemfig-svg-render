@@ -2,21 +2,48 @@
 // 内置常见化合物名称映射 + 官能团识别
 // 完整功能需要 OPSIN 库, 此处先实现内置映射
 
-// ========== 官能团识别规则 ==========
+// ========== 官能团识别规则 (v15.3.0 扩展) ==========
 const FUNCTIONAL_GROUP_PATTERNS = [
-  { pattern: /-OH|O[H1]/g, name: "羟基 (Hydroxyl)", type: "含氧" },
+  // 含氧官能团
+  { pattern: /(?<![cC])O[H1](?![a-zA-Z])/g, name: "醇羟基 (Alcohol)", type: "含氧" },
+  { pattern: /O[cC]/g, name: "酚羟基 (Phenol)", type: "含氧" },
   { pattern: /C\(=O\)O|COOH/g, name: "羧基 (Carboxyl)", type: "含氧" },
-  { pattern: /C\(=O\)/g, name: "羰基 (Carbonyl)", type: "含氧" },
-  { pattern: /C\(=O\)OC/g, name: "酯基 (Ester)", type: "含氧" },
-  { pattern: /C-O-C/g, name: "醚键 (Ether)", type: "含氧" },
-  { pattern: /-NH2|N[H2]/g, name: "氨基 (Amino)", type: "含氮" },
-  { pattern: /-N<|N\(/g, name: "取代胺 (Amine)", type: "含氮" },
-  { pattern: /C#N|CN/g, name: "氰基 (Nitrile)", type: "含氮" },
-  { pattern: /NO2|N\(=O\)=O/g, name: "硝基 (Nitro)", type: "含氮" },
-  { pattern: /Cl|Br|I|F/g, name: "卤素 (Halogen)", type: "卤族" },
-  { pattern: /C=C/g, name: "双键 (Alkene)", type: "不饱和" },
-  { pattern: /C#C/g, name: "三键 (Alkyne)", type: "不饱和" },
-  { pattern: /c1ccccc1|c1ccc.*cc1/g, name: "芳香环 (Aromatic)", type: "芳香" },
+  { pattern: /C\(=O\)OC|C(=O)O/g, name: "酯基 (Ester)", type: "含氧" },
+  { pattern: /C\(=O\)H|O=CH/g, name: "醛基 (Aldehyde)", type: "含氧" },
+  { pattern: /C\(=O\)(?![OH])/g, name: "酮羰基 (Ketone)", type: "含氧" },
+  { pattern: /C-O-C|COC/g, name: "醚键 (Ether)", type: "含氧" },
+  { pattern: /S=O|S\(=O\)/g, name: "亚砜/砜 (Sulfoxide/Sulfone)", type: "含硫" },
+  { pattern: /SH|S[H1]/g, name: "巯基 (Thiol)", type: "含硫" },
+
+  // 含氮官能团
+  { pattern: /(?<![cC])N[H2](?![a-zA-Z])/g, name: "伯胺 (Primary Amine)", type: "含氮" },
+  { pattern: /N[H1](?![a-zA-Z])/g, name: "仲胺 (Secondary Amine)", type: "含氮" },
+  { pattern: /N(?![a-zA-Z])(?![H1])/g, name: "叔胺 (Tertiary Amine)", type: "含氮" },
+  { pattern: /C#N/g, name: "氰基 (Nitrile)", type: "含氮" },
+  { pattern: /NO2|N\(=O\)=O|\[N\+\]\(=O\)/g, name: "硝基 (Nitro)", type: "含氮" },
+  { pattern: /N\(=O\)/g, name: "亚硝基 (Nitroso)", type: "含氮" },
+  { pattern: /N=C|C=N/g, name: "亚胺 (Imine)", type: "含氮" },
+  { pattern: /N\(C=O\)|C(=O)N/g, name: "酰胺 (Amide)", type: "含氮" },
+  { pattern: /N#C/g, name: "异氰酸酯 (Isocyanate)", type: "含氮" },
+
+  // 卤族
+  { pattern: /Cl/g, name: "氯 (Chloro)", type: "卤族" },
+  { pattern: /Br/g, name: "溴 (Bromo)", type: "卤族" },
+  { pattern: /I/g, name: "碘 (Iodo)", type: "卤族" },
+  { pattern: /F/g, name: "氟 (Fluoro)", type: "卤族" },
+
+  // 不饱和键
+  { pattern: /C=C/g, name: "碳碳双键 (Alkene)", type: "不饱和" },
+  { pattern: /C#C/g, name: "碳碳三键 (Alkyne)", type: "不饱和" },
+
+  // 芳香环
+  { pattern: /c1ccccc1|c1ccc.*cc1/g, name: "苯环 (Benzene Ring)", type: "芳香" },
+  { pattern: /c1ccncc1|n1ccccc1/g, name: "含氮杂环 (N-Heterocycle)", type: "杂环" },
+  { pattern: /c1ccoc1|c1ccsc1/g, name: "含氧/硫杂环 (O/S-Heterocycle)", type: "杂环" },
+
+  // 其他
+  { pattern: /P=O|P\(=O\)/g, name: "磷酸酯 (Phosphate)", type: "含磷" },
+  { pattern: /N=N/g, name: "偶氮基 (Azo)", type: "含氮" },
 ];
 
 /**
@@ -372,10 +399,22 @@ class FunctionalGroupAnalysisModal extends Modal {
 
     // 分子式估算
     const formula = this.estimateFormula(this.smiles);
-    if (formula) {
+    const mw = this.estimateMolecularWeight(this.smiles);
+    const unsat = this.estimateUnsaturation(this.smiles);
+
+    if (formula || mw) {
       const formulaDiv = contentEl.createDiv({ cls: "fg-formula" });
-      formulaDiv.createEl("h3", { text: "📊 分子式估算" });
-      formulaDiv.createEl("p", { text: `分子式: ${formula}` });
+      formulaDiv.createEl("h3", { text: "📊 分子信息" });
+
+      if (formula) {
+        formulaDiv.createEl("p", { text: `分子式: ${formula}` });
+      }
+      if (mw) {
+        formulaDiv.createEl("p", { text: `分子量: ${mw}` });
+      }
+      if (unsat > 0) {
+        formulaDiv.createEl("p", { text: `不饱和度: ${unsat}` });
+      }
     }
 
     // 常见反应提示
@@ -432,6 +471,26 @@ class FunctionalGroupAnalysisModal extends Modal {
     if (counts.F > 0) formula += `F${counts.F}`;
 
     return formula || null;
+  }
+
+  // v15.3.0: 计算分子量
+  estimateMolecularWeight(smiles) {
+    const counts = { C: 12.01, H: 1.008, O: 16.00, N: 14.01, S: 32.07, Cl: 35.45, Br: 79.90, F: 19.00, I: 126.90, P: 30.97 };
+    const elementCounts = {};
+
+    const elements = smiles.match(/[A-Z][a-z]?/g) || [];
+    elements.forEach((el) => {
+      elementCounts[el] = (elementCounts[el] || 0) + 1;
+    });
+
+    let total = 0;
+    for (const [el, count] of Object.entries(elementCounts)) {
+      if (counts[el]) {
+        total += counts[el] * count;
+      }
+    }
+
+    return total > 0 ? total.toFixed(2) + " g/mol" : null;
   }
 
   estimateUnsaturation(smiles) {

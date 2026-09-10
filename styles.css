@@ -2520,3 +2520,225 @@
   transform: translateY(0);
   box-shadow: none;
 }
+
+/* ========== v15.8.0: 高级动画效果 (学习自 Xtend UI / UI FX Kit) ========== */
+
+/* 卡片翻转动画 (学习自 Carden) */
+.chemfig-flashcard {
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.chemfig-flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.chemfig-flashcard.flipped .chemfig-flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.chemfig-flashcard-front,
+.chemfig-flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.chemfig-flashcard-front {
+  background: var(--background-secondary);
+  border: 2px solid var(--background-modifier-border);
+}
+
+.chemfig-flashcard-back {
+  background: var(--background-secondary);
+  border: 2px solid var(--interactive-accent);
+  transform: rotateY(180deg);
+}
+
+/* 按钮悬停效果增强 */
+.chemfig-btn-enhanced {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chemfig-btn-enhanced::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.chemfig-btn-enhanced:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.chemfig-btn-enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chemfig-btn-enhanced:active {
+  transform: translateY(0);
+}
+
+/* 模态框过渡动画增强 */
+.chemfig-modal-enhanced {
+  animation: chemfig-modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes chemfig-modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 片段卡片入场动画 */
+.chemfig-fragment-card-enter {
+  animation: chemfig-card-fade-in-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes chemfig-card-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 加载动画 (学习自 UI FX Kit) */
+.chemfig-loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.chemfig-loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  animation: chemfig-bounce 1.4s ease-in-out infinite both;
+}
+
+.chemfig-loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.chemfig-loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes chemfig-bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* 进度条动画 */
+.chemfig-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--background-modifier-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.chemfig-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--interactive-accent), var(--interactive-accent-hover));
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.chemfig-progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: chemfig-progress-shine 1.5s infinite;
+}
+
+@keyframes chemfig-progress-shine {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* 悬停发光效果 */
+.chemfig-glow-hover {
+  transition: all 0.3s ease;
+}
+
+.chemfig-glow-hover:hover {
+  box-shadow: 0 0 20px rgba(var(--interactive-accent-rgb, 99, 102, 241), 0.3);
+}
+
+/* 呼吸动画 (用于重要提示) */
+.chemfig-breathe {
+  animation: chemfig-breathe 2s ease-in-out infinite;
+}
+
+@keyframes chemfig-breathe {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* 滚动淡入效果 */
+.chemfig-scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.chemfig-scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -483,9 +483,12 @@ class LearningStatsModal extends Modal {
 
     // 获取今日复习数量
     const today = new Date().toISOString().split("T")[0];
-    const history = JSON.parse(
-      localStorage.getItem("chemfig-review-history") || "{}"
-    );
+    // chemfig-review-history 损坏时不应让整个学习统计面板打不开
+    const parsedHistory = readLocalStorageJson("chemfig-review-history", {});
+    const history =
+      parsedHistory && typeof parsedHistory === "object" && !Array.isArray(parsedHistory)
+        ? parsedHistory
+        : {};
     const todayCount = history[today] || 0;
 
     // 获取目标 (默认 10)
@@ -599,9 +602,13 @@ class LearningStatsModal extends Modal {
    */
   renderReviewHeatmap(container) {
     // 从 localStorage 获取复习历史
-    const history = JSON.parse(
-      localStorage.getItem("chemfig-review-history") || "{}"
-    );
+    // 本方法在 onOpen 中先于其它逻辑被调用, 一旦 chemfig-review-history 被写坏,
+    // 整个学习统计面板会在打开时直接抛错 (此前无任何保护)。
+    const parsedHistory = readLocalStorageJson("chemfig-review-history", {});
+    const history =
+      parsedHistory && typeof parsedHistory === "object" && !Array.isArray(parsedHistory)
+        ? parsedHistory
+        : {};
 
     const heatmapEl = container.createDiv({ cls: "chemfig-heatmap" });
 
@@ -3662,5 +3669,333 @@ class ReactionMechanismModal extends Modal {
       }
     `;
     document.head.appendChild(style);
+  }
+}
+
+// ========== v15.8.0: 成就系统 (学习自 Carden) ==========
+class AchievementSystem {
+  static ACHIEVEMENTS = [
+    {
+      id: "first_card",
+      name: "初出茅庐",
+      description: "完成第一张学习卡片",
+      icon: "🌱",
+      condition: (stats) => stats.totalCards >= 1,
+    },
+    {
+      id: "cards_10",
+      name: "小有所成",
+      description: "掌握 10 个化合物",
+      icon: "📚",
+      condition: (stats) => stats.masteredCards >= 10,
+    },
+    {
+      id: "cards_50",
+      name: "学富五车",
+      description: "掌握 50 个化合物",
+      icon: "🎓",
+      condition: (stats) => stats.masteredCards >= 50,
+    },
+    {
+      id: "cards_100",
+      name: "化学大师",
+      description: "掌握 100 个化合物",
+      icon: "👨‍🔬",
+      condition: (stats) => stats.masteredCards >= 100,
+    },
+    {
+      id: "streak_7",
+      name: "七日坚持",
+      description: "连续学习 7 天",
+      icon: "🔥",
+      condition: (stats) => stats.currentStreak >= 7,
+    },
+    {
+      id: "streak_30",
+      name: "月度达人",
+      description: "连续学习 30 天",
+      icon: "🏆",
+      condition: (stats) => stats.currentStreak >= 30,
+    },
+    {
+      id: "perfect_10",
+      name: "十全十美",
+      description: "连续答对 10 题",
+      icon: "💯",
+      condition: (stats) => stats.perfectStreak >= 10,
+    },
+    {
+      id: "quiz_100",
+      name: "百题斩",
+      description: "完成 100 道默写题",
+      icon: "⚔️",
+      condition: (stats) => stats.totalQuizAttempts >= 100,
+    },
+  ];
+
+  static getUnlockedAchievements(stats, unlockedIds) {
+    return this.ACHIEVEMENTS.filter((a) => {
+      if (unlockedIds.has(a.id)) return true;
+      try {
+        return a.condition(stats);
+      } catch {
+        return false;
+      }
+    });
+  }
+
+  static getNewlyUnlocked(stats, unlockedIds) {
+    const newOnes = [];
+    for (const achievement of this.ACHIEVEMENTS) {
+      if (unlockedIds.has(achievement.id)) continue;
+      try {
+        if (achievement.condition(stats)) {
+          newOnes.push(achievement);
+          unlockedIds.add(achievement.id);
+        }
+      } catch {}
+    }
+    return newOnes;
+  }
+}
+
+// ========== 成就展示模态框 ==========
+class AchievementModal extends Modal {
+  constructor(app, stats, unlockedIds) {
+    super(app);
+    this.stats = stats;
+    this.unlockedIds = unlockedIds;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("achievement-modal");
+
+    contentEl.createEl("h2", { text: "🏆 成就系统" });
+    contentEl.createEl("p", {
+      text: `已解锁 ${this.unlockedIds.size} / ${AchievementSystem.ACHIEVEMENTS.length} 个成就`,
+      cls: "achievement-subtitle",
+    });
+
+    const grid = contentEl.createDiv("achievement-grid");
+
+    for (const achievement of AchievementSystem.ACHIEVEMENTS) {
+      const isUnlocked = this.unlockedIds.has(achievement.id);
+      const card = grid.createDiv("achievement-card");
+      card.classList.toggle("unlocked", isUnlocked);
+
+      card.createEl("div", {
+        text: achievement.icon,
+        cls: "achievement-icon",
+      });
+
+      card.createEl("div", {
+        text: achievement.name,
+        cls: "achievement-name",
+      });
+
+      card.createEl("div", {
+        text: achievement.description,
+        cls: "achievement-desc",
+      });
+
+      if (!isUnlocked) {
+        card.classList.add("locked");
+        card.querySelector(".achievement-icon").textContent = "🔒";
+      }
+    }
+
+    // CSS
+    const style = document.createElement("style");
+    style.textContent = `
+      .achievement-modal h2 {
+        margin: 0 0 8px 0;
+      }
+      .achievement-subtitle {
+        color: var(--text-muted);
+        margin: 0 0 20px 0;
+      }
+      .achievement-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      .achievement-card {
+        padding: 16px;
+        border: 2px solid var(--background-modifier-border);
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s;
+      }
+      .achievement-card.unlocked {
+        border-color: var(--interactive-accent);
+        background: var(--background-modifier-hover);
+      }
+      .achievement-card.locked {
+        opacity: 0.5;
+      }
+      .achievement-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+      }
+      .achievement-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .achievement-desc {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  onClose() {
+    this.contentEl.empty();
+  }
+}
+
+// ========== v15.8.0: 游戏化学习统计面板 (学习自 Carden) ==========
+class GamifiedStatsModal extends Modal {
+  constructor(app, stats) {
+    super(app);
+    this.stats = stats || {
+      totalCards: 0,
+      masteredCards: 0,
+      currentStreak: 0,
+      perfectStreak: 0,
+      totalQuizAttempts: 0,
+    };
+    this.unlockedAchievements = new Set();
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("gamified-stats-modal");
+
+    contentEl.createEl("h2", { text: "📊 学习数据面板" });
+
+    // 积分系统
+    const pointsCard = contentEl.createDiv("stats-points-card");
+    const totalPoints = this.stats.masteredCards * 10 + this.stats.currentStreak * 5;
+    pointsCard.createEl("div", {
+      text: "⭐ 总积分",
+      cls: "points-label",
+    });
+    pointsCard.createEl("div", {
+      text: totalPoints.toString(),
+      cls: "points-value",
+    });
+    pointsCard.createEl("div", {
+      text: "掌握化合物 +10 | 连续学习 +5/天",
+      cls: "points-hint",
+    });
+
+    // 统计网格
+    const statsGrid = contentEl.createDiv("stats-grid");
+
+    const statsItems = [
+      { icon: "📚", label: "已学卡片", value: this.stats.totalCards },
+      { icon: "✅", label: "已掌握", value: this.stats.masteredCards },
+      { icon: "🔥", label: "连续学习", value: this.stats.currentStreak + " 天" },
+      { icon: "💯", label: "完美连胜", value: this.stats.perfectStreak },
+      { icon: "⚔️", label: "答题总数", value: this.stats.totalQuizAttempts },
+      {
+        icon: "🏆",
+        label: "成就",
+        value: `${this.unlockedAchievements.size} / ${AchievementSystem.ACHIEVEMENTS.length}`,
+      },
+    ];
+
+    for (const item of statsItems) {
+      const card = statsGrid.createDiv("stats-item-card");
+      card.createEl("div", { text: item.icon, cls: "stats-icon" });
+      card.createEl("div", { text: item.label, cls: "stats-label" });
+      card.createEl("div", { text: item.value, cls: "stats-value" });
+    }
+
+    // 成就按钮
+    const achievementBtn = contentEl.createEl("button", {
+      text: "🏆 查看成就",
+      cls: "achievement-btn",
+    });
+    achievementBtn.onclick = () => {
+      new AchievementModal(this.app, this.stats, this.unlockedAchievements).open();
+    };
+
+    // CSS
+    const style = document.createElement("style");
+    style.textContent = `
+      .gamified-stats-modal h2 {
+        margin: 0 0 16px 0;
+      }
+      .stats-points-card {
+        padding: 20px;
+        background: linear-gradient(135deg, var(--interactive-accent), var(--interactive-accent-hover));
+        border-radius: 12px;
+        text-align: center;
+        color: var(--text-on-accent);
+        margin-bottom: 16px;
+      }
+      .points-label {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+      .points-value {
+        font-size: 36px;
+        font-weight: 700;
+        margin: 8px 0;
+      }
+      .points-hint {
+        font-size: 11px;
+        opacity: 0.8;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .stats-item-card {
+        padding: 16px;
+        background: var(--background-secondary);
+        border-radius: 8px;
+        text-align: center;
+      }
+      .stats-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      .stats-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      .stats-value {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .achievement-btn {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 8px;
+        background: var(--background-secondary);
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+      }
+      .achievement-btn:hover {
+        background: var(--background-modifier-hover);
+        border-color: var(--interactive-accent);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  onClose() {
+    this.contentEl.empty();
   }
 }

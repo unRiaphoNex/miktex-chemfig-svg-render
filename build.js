@@ -14,33 +14,35 @@ const OUTPUT = path.join(__dirname, "main.js");
 
 // 合并顺序 (依赖关系)。.ts 走 esbuild 转译; .js (如 ocl.bundle.js 生成产物) 原样拷贝。
 const FILES = [
-  "header.ts",                  // 文件头注释
-  "core/templates.ts",          // 模板库定义 (TPL_*, MODES)
-  "core/parser.ts",             // 代码解析 (parseGroups, extractReactionInfo, getHash等)
-  "core/converter.ts",          // 模式转换与代码清理 (convertCode, cleanBody等)
-  "core/svg-utils.ts",          // SVG处理工具 (mergeSvgs, ensureSvgNamespace)
-  "core/compiler.ts",           // 编译逻辑 (buildTex, svgToPng, checkCommandExists)
-  "constants.ts",               // 工具类与正则常量 (PerfMonitor, UI, VirtualList等)
-  "state/SettingsManager.ts",   // 设置管理器
-  "state/EnvironmentManager.ts",// 编译环境管理器
-  "ui/TemplateBrowser.ts",      // 模板浏览器
-  "cache.ts",                   // LRU缓存、编译队列、性能报告
-  "cm6.ts",                     // CM6 Live Preview (实验性)
-  "settings.ts",                // 设置面板 (ChemfigSettingTab)
-  "excalidraw-integration.ts",  // Excalidraw 深度集成
-  "library.ts",                 // 结构式库
-  "editor.ts",                  // 编辑器模态框
-  "group-layout.ts",            // 组分调整模态框
-  "sidebar.ts",                 // 左右侧边栏视图
-  "ocl-tooltips.ts",            // OpenChemLib 工具栏图标 -> 工具名映射
-  "ocl.bundle.js",              // OpenChemLib (IIFE 全局, 生成产物, 原样拷贝)
-  "chemfig-parser.ts",          // 手写 chemfig → 分子图 解析器
-  "molecule-editor.ts",         // 分子画布编辑器
-  "latex-sanitizer.ts",         // LaTeX 输入清洗 (安全层)
-  "temp-file-helper.ts",        // local 模式进程/临时文件管控
-  "cache-manager.ts",           // SHA256 源码缓存管理器
-  "bridge-client.ts",           // 桥接服务 HTTP 客户端
-  "main.ts",                    // 主入口 (插件类)
+  "utils/header.ts",                  // 文件头注释
+  "core/templates.ts",                // 模板库定义 (TPL_*, MODES)
+  "core/parser.ts",                   // 代码解析 (parseGroups, extractReactionInfo, getHash等)
+  "core/converter.ts",                // 模式转换与代码清理 (convertCode, cleanBody等)
+  "core/svg-utils.ts",                // SVG处理工具 (mergeSvgs, ensureSvgNamespace)
+  "core/compiler.ts",                 // 编译逻辑 (buildTex, svgToPng, checkCommandExists)
+  "utils/constants.ts",               // 工具类与正则常量 (PerfMonitor, UI, VirtualList等)
+  "state/SettingsManager.ts",        // 设置管理器
+  "state/EnvironmentManager.ts",      // 编译环境管理器
+  "ui/TemplateBrowser.ts",            // 模板浏览器
+  "services/cache.ts",                // LRU缓存、编译队列、性能报告
+  "editors/cm6.ts",                   // CM6 Live Preview (实验性)
+  "ui/settings.ts",                  // 设置面板 (ChemfigSettingTab)
+  "integrations/excalidraw-integration.ts", // Excalidraw 深度集成
+  "library.ts",                       // 结构式库 (暂留在根目录, 待后续迁移)
+  "ui/editor.ts",                     // 编辑器模态框
+  "ui/group-layout.ts",               // 组分调整模态框
+  "ui/sidebar.ts",                    // 左右侧边栏视图
+  "features/learning.ts",             // 学习辅助模块 (卡片 + 间隔重复 + 默写)
+  "features/update-service.ts",       // 在线更新服务
+  "integrations/ocl-tooltips.ts",     // OpenChemLib 工具栏图标 -> 工具名映射
+  "integrations/ocl.bundle.js",       // OpenChemLib (IIFE 全局, 生成产物, 原样拷贝)
+  "editors/chemfig-parser.ts",        // 手写 chemfig → 分子图 解析器
+  "editors/molecule-editor.ts",       // 分子画布编辑器
+  "utils/latex-sanitizer.ts",         // LaTeX 输入清洗 (安全层)
+  "services/temp-file-helper.ts",     // local 模式进程/临时文件管控
+  "services/cache-manager.ts",        // SHA256 源码缓存管理器
+  "services/bridge-client.ts",        // 桥接服务 HTTP 客户端
+  "main.ts",                          // 主入口 (插件类)
 ];
 
 function buildOnce() {

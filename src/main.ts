@@ -731,6 +731,104 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         }
       }
 
+      // ========== v11.0.0: 学习辅助模块 ==========
+      // 注入学习模块 CSS
+      if (typeof LEARNING_CSS !== "undefined" && LEARNING_CSS) {
+        const styleEl = document.createElement("style");
+        styleEl.id = "chemfig-learning-css";
+        styleEl.textContent = LEARNING_CSS;
+        document.head.appendChild(styleEl);
+      }
+
+      // 加载学习卡片 (从 IndexedDB / localStorage, 首次加载内置默认卡片)
+      this.learningCards = this.loadLearningCards();
+
+      // 学习相关命令
+      this.addCommand({
+        id: "open-learning-stats",
+        name: "打开学习统计面板",
+        callback: () => {
+          new LearningStatsModal(this.app, this).open();
+        },
+      });
+
+      this.addCommand({
+        id: "start-review-session",
+        name: "开始今日复习",
+        callback: () => {
+          this.startReviewSession();
+        },
+      });
+
+      // 默写练习命令
+      this.addCommand({
+        id: "quiz-structure-to-name",
+        name: "默写练习: 结构→命名",
+        callback: () => {
+          new QuizModal(this.app, this.learningCards || [], "structure_to_name").open();
+        },
+      });
+
+      this.addCommand({
+        id: "quiz-name-to-structure",
+        name: "默写练习: 命名→结构",
+        callback: () => {
+          new QuizModal(this.app, this.learningCards || [], "name_to_structure").open();
+        },
+      });
+
+      this.addCommand({
+        id: "quiz-formula-to-name",
+        name: "默写练习: 分子式→命名",
+        callback: () => {
+          new QuizModal(this.app, this.learningCards || [], "formula_to_name").open();
+        },
+      });
+
+      // 追加默写练习 CSS
+      if (typeof QUIZ_CSS !== "undefined" && QUIZ_CSS) {
+        const quizStyleEl = document.createElement("style");
+        quizStyleEl.id = "chemfig-quiz-css";
+        quizStyleEl.textContent = QUIZ_CSS;
+        document.head.appendChild(quizStyleEl);
+      }
+
+      // ========== v11.1.0: 在线更新服务 ==========
+      if (typeof UPDATE_CSS !== "undefined" && UPDATE_CSS) {
+        const updateStyleEl = document.createElement("style");
+        updateStyleEl.id = "chemfig-update-css";
+        updateStyleEl.textContent = UPDATE_CSS;
+        document.head.appendChild(updateStyleEl);
+      }
+
+      this.updateService = new UpdateService(this);
+
+      // 更新相关命令
+      this.addCommand({
+        id: "check-for-updates",
+        name: "检查数据库更新",
+        callback: () => {
+          this.updateService.checkForUpdates(true);
+        },
+      });
+
+      this.addCommand({
+        id: "update-card-db",
+        name: "更新化合物数据库",
+        callback: () => {
+          this.updateService.updateCardDb();
+        },
+      });
+
+      // 启动时自动检查更新 (如果超过24小时)
+      if (this.updateService.shouldCheckUpdate()) {
+        setTimeout(() => {
+          this.updateService.checkForUpdates(false);
+        }, 3000);
+      }
+
+      console.log("[Chemfig-SVG] 学习模块已加载 (" + (this.learningCards?.length || 0) + " 张卡片)");
+
       // 注册设置面板
       this.addSettingTab(new ChemfigSettingTab(this.app, this));
       console.log("[Chemfig-SVG v10.15] 加载完成");
@@ -1487,6 +1585,82 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     } catch (e) {
       console.warn("[Chemfig-SVG] 侧边栏视图注册失败:", e.message);
     }
+  }
+
+  // ========== v11.0.0: 学习辅助方法 ==========
+
+  // 加载学习卡片 (从 localStorage, 首次加载内置默认卡片)
+  loadLearningCards() {
+    try {
+      const data = localStorage.getItem("chemfig-learning-cards");
+      if (data) {
+        return JSON.parse(data);
+      }
+      // 首次加载: 使用内置默认卡片
+      if (typeof DEFAULT_LEARNING_CARDS !== "undefined") {
+        const cards = DEFAULT_LEARNING_CARDS.map((c, i) => ({
+          ...c,
+          id: "default_" + i,
+          state: SM2Algorithm.defaultState(),
+        }));
+        this.saveLearningCards(cards);
+        return cards;
+      }
+      return [];
+    } catch (e) {
+      console.warn("[Chemfig-SVG] 学习卡片加载失败:", e.message);
+      return [];
+    }
+  }
+
+  // 保存学习卡片
+  saveLearningCards(cards) {
+    try {
+      localStorage.setItem("chemfig-learning-cards", JSON.stringify(cards || this.learningCards));
+    } catch (e) {
+      console.warn("[Chemfig-SVG] 学习卡片保存失败:", e.message);
+    }
+  }
+
+  // 开始复习会话
+  startReviewSession() {
+    const now = Date.now();
+    const dueCards = (this.learningCards || []).filter(
+      (c) => (c.state?.nextReview || 0) <= now
+    );
+
+    if (dueCards.length === 0) {
+      new Notice("🎉 今日复习已完成! 暂无待复习卡片", 3000);
+      return;
+    }
+
+    // 打乱顺序
+    const shuffled = dueCards.sort(() => Math.random() - 0.5);
+    let idx = 0;
+
+    const showNext = () => {
+      if (idx >= shuffled.length) {
+        new Notice("✅ 复习完成! 共复习 " + shuffled.length + " 张卡片", 3000);
+        return;
+      }
+      const card = shuffled[idx];
+      idx++;
+
+      const modal = new LearningCardModal(
+        this.app,
+        card,
+        (quality) => {
+          // 更新学习状态
+          card.state = SM2Algorithm.review(card.state, quality);
+          this.saveLearningCards();
+          // 显示下一张
+          setTimeout(showNext, 300);
+        }
+      );
+      modal.open();
+    };
+
+    showNext();
   }
 
   async openLeftSidebar() {

@@ -2456,3 +2456,31 @@
   color: var(--interactive-accent);
   border-bottom-color: var(--interactive-accent);
 }
+
+/* ========== v12.0.0: 预设化合物列表 ========== */
+.preset-molecules-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 12px;
+}
+.preset-molecule-item {
+  padding: 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.preset-molecule-item:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+.preset-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.preset-smiles {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: monospace;
+}

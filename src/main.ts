@@ -899,6 +899,32 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // ========== v12.0.0: 3D 分子查看器 ==========
+      this.addCommand({
+        id: "view-molecule-3d",
+        name: "3D 分子查看器",
+        callback: async () => {
+          if (typeof Molecule3DModal === "undefined") {
+            new Notice("3D 查看器未加载", 2000);
+            return;
+          }
+
+          // 弹出选择预设化合物或输入 SMILES
+          const { value: smiles } = await this.app.vault.manager?.prompt({
+            prompt: "输入 SMILES 或选择预设:",
+            placeholder: "c1ccccc1",
+          }) || {};
+
+          if (!smiles) {
+            // 显示预设列表
+            this.showPresetMolecules();
+            return;
+          }
+
+          new Molecule3DModal(this.app, smiles.trim()).open();
+        },
+      });
+
       this.addCommand({
         id: "update-card-db",
         name: "更新化合物数据库",
@@ -1851,6 +1877,33 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     }
 
     const modal = new LearningCardModal(this.app, card, () => {});
+    modal.open();
+  }
+
+  // ========== v12.0.0: 显示预设化合物列表 ==========
+  showPresetMolecules() {
+    if (typeof PRESET_MOLECULES === "undefined") return;
+
+    // 创建选择模态框
+    const modal = new Modal(this.app);
+    modal.titleEl.setText("选择预设化合物");
+
+    const container = modal.contentEl;
+    container.empty();
+
+    const list = container.createDiv({ cls: "preset-molecules-list" });
+
+    PRESET_MOLECULES.forEach((mol) => {
+      const item = list.createDiv({ cls: "preset-molecule-item" });
+      item.createEl("div", { text: mol.name, cls: "preset-name" });
+      item.createEl("code", { text: mol.smiles, cls: "preset-smiles" });
+
+      item.onclick = () => {
+        modal.close();
+        new Molecule3DModal(this.app, mol.smiles).open();
+      };
+    });
+
     modal.open();
   }
 

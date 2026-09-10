@@ -36,6 +36,8 @@ const FILES = [
   "features/learning/learning.ts",    // 学习辅助模块 (卡片 + 间隔重复 + 默写)
   "features/learning/fsrs-algorithm.ts", // FSRS 间隔重复算法
   "features/learning/matching-game.ts", // 官能团配对游戏
+  "features/learning/knowledge-linking.ts", // 知识关联 (v15.6.0)
+  "features/learning/retrosynthesis.ts", // 反向合成分析 (v15.6.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

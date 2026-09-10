@@ -231,6 +231,191 @@ class FsrsAlgorithm {
   }
 }
 
+// ========== v15.8.0: 完整 FSRS v6 算法 (学习自 FSRS 学习平台) ==========
+// 参考: https://github.com/open-spaced-repetition/fsrs.js
+class FsrsV6Algorithm {
+  /**
+   * FSRS v6 默认参数 (19 个权重)
+   */
+  static weights = [
+    0.4072, 1.1829, 3.1262, 1.4954, 0.8814,
+    0.0422, 1.5542, 0.1364, 1.0503, 0.0208,
+    0.0115, 0.2194, 0.152, 1.3167, 0.002,
+    1.0921, 0.0, 0.3158, 0.2303,
+  ];
+
+  /**
+   * 评分等级
+   * 1 = Again (完全忘记)
+   * 2 = Hard (困难)
+   * 3 = Good (好)
+   * 4 = Easy (简单)
+   */
+  static Rating = {
+    Again: 1,
+    Hard: 2,
+    Good: 3,
+    Easy: 4,
+  };
+
+  /**
+   * 初始化新卡片
+   * @param {number} rating - 初始评分
+   * @returns {Object} 初始状态
+   */
+  static initCard(rating) {
+    const w = this.weights;
+    return {
+      difficulty: Math.min(10, Math.max(1, w[0] - w[1] * (rating - 3))),
+      stability: w[2],
+      elapsedDays: 0,
+      reps: 0,
+      lapses: 0,
+      state: "Learning",
+    };
+  }
+
+  /**
+   * 回忆成功时更新稳定性
+   */
+  static shortTermRecall(stability, difficulty, elapsedDays) {
+    const w = this.weights;
+    return stability * (1 + Math.exp(w[6]) *
+      (11 - difficulty) *
+      Math.pow(stability, -w[7]) *
+      (Math.exp((1 - elapsedDays / stability) * w[8]) - 1));
+  }
+
+  /**
+   * 回忆失败时更新稳定性
+   */
+  static shortTermForget(stability, difficulty, elapsedDays) {
+    const w = this.weights;
+    return w[17] * Math.pow(difficulty, -w[18]) *
+      (Math.pow(stability + 1, w[15]) - 1) *
+      Math.exp(-w[16] * elapsedDays / stability);
+  }
+
+  /**
+   * 更新难度
+   */
+  static nextDifficulty(difficulty, rating) {
+    const w = this.weights;
+    const delta = rating - 3;
+    const newDifficulty = difficulty - w[11] * delta;
+    return Math.min(10, Math.max(1, newDifficulty + w[12] * (newDifficulty - 5) * -1));
+  }
+
+  /**
+   * 计算遗忘概率
+   */
+  static forgettingProbability(elapsedDays, stability) {
+    if (stability <= 0) return 1;
+    return Math.pow(1 + elapsedDays / (9 * stability), -1);
+  }
+
+  /**
+   * 计算下次间隔
+   */
+  static nextInterval(stability, desiredRetrievability = 0.9) {
+    const interval = 9 * stability * (1 / desiredRetrievability - 1);
+    return Math.max(1, Math.round(interval));
+  }
+
+  /**
+   * 完整复习调度 (FSRS v6)
+   * @param {Object} card - 卡片状态
+   * @param {number} rating - 评分 (1-4)
+   * @returns {Object} 新的卡片状态 + 各评分对应间隔
+   */
+  static review(card, rating) {
+    const now = Date.now();
+    const w = this.weights;
+
+    let { difficulty, stability, elapsedDays, reps, lapses, state } = card;
+
+    if (state === "New") {
+      const init = this.initCard(rating);
+      difficulty = init.difficulty;
+      stability = init.stability;
+      elapsedDays = 0;
+      reps = 1;
+      lapses = 0;
+      state = "Learning";
+    } else {
+      const recall = rating !== this.Rating.Again;
+
+      // 更新难度
+      difficulty = this.nextDifficulty(difficulty, rating);
+
+      // 更新稳定性
+      if (recall) {
+        stability = this.shortTermRecall(stability, difficulty, elapsedDays);
+        reps += 1;
+      } else {
+        stability = this.shortTermForget(stability, difficulty, elapsedDays);
+        lapses += 1;
+        reps = 0;
+        state = "Relearning";
+      }
+
+      // 更新状态
+      if (state === "Learning" && reps >= 3) {
+        state = "Review";
+      }
+    }
+
+    // 确保边界
+    difficulty = Math.min(10, Math.max(1, difficulty));
+    stability = Math.max(0.1, stability);
+
+    // 计算各评分对应的间隔 (用于 UI 显示)
+    const intervals = {
+      again: Math.max(1, Math.round(this.nextInterval(stability * 0.5, 0.7))),
+      hard: this.nextInterval(stability * 1.2, 0.85),
+      good: this.nextInterval(stability, 0.9),
+      easy: this.nextInterval(stability * 1.5, 0.95),
+    };
+
+    // 当前评分对应的间隔
+    let interval;
+    switch (rating) {
+      case this.Rating.Again:
+        interval = intervals.again;
+        break;
+      case this.Rating.Hard:
+        interval = intervals.hard;
+        break;
+      case this.Rating.Easy:
+        interval = intervals.easy;
+        break;
+      default:
+        interval = intervals.good;
+    }
+
+    return {
+      difficulty,
+      stability,
+      elapsedDays: 0,
+      reps,
+      lapses,
+      state,
+      interval,
+      intervals, // 保存所有评分对应的间隔
+      nextReview: now + interval * 24 * 60 * 60 * 1000,
+      lastReview: now,
+      algorithm: "fsrs-v6",
+    };
+  }
+
+  /**
+   * 计算记忆质量 (用于 UI 显示)
+   */
+  static retention(elapsedDays, stability) {
+    return 1 - this.forgettingProbability(elapsedDays, stability);
+  }
+}
+
 // ========== 学习卡片模态框 ==========
 class LearningCardModal extends Modal {
   /**

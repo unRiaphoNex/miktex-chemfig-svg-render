@@ -2637,3 +2637,387 @@ class DailyQuestionModal extends Modal {
     document.head.appendChild(style);
   }
 }
+
+// ========== 反应机理可视化模态框 (v15.5.0) ==========
+class ReactionMechanismModal extends Modal {
+  constructor(app) {
+    super(app);
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("reaction-mechanism-modal");
+
+    contentEl.createEl("h2", { text: "⚗️ 反应机理可视化" });
+    contentEl.createEl("p", {
+      text: "选择常见有机反应，查看反应历程和关键要点",
+      cls: "mechanism-desc",
+    });
+
+    // 反应类型选择
+    const typeBar = contentEl.createDiv({ cls: "mechanism-type-bar" });
+    const reactions = [
+      { id: "sn1", name: "SN1 亲核取代" },
+      { id: "sn2", name: "SN2 亲核取代" },
+      { id: "e1", name: "E1 消除" },
+      { id: "e2", name: "E2 消除" },
+      { id: "electrophilic-addition", name: "亲电加成" },
+      { id: "nucleophilic-addition", name: "亲核加成" },
+      { id: "friedel-crafts", name: "Friedel-Crafts" },
+      { id: "aldol", name: "羟醛缩合" },
+    ];
+
+    this.currentReaction = null;
+    reactions.forEach((r) => {
+      const btn = typeBar.createEl("button", {
+        text: r.name,
+        cls: "mechanism-type-btn",
+      });
+      btn.dataset.id = r.id;
+      btn.onclick = () => {
+        typeBar.querySelectorAll(".mechanism-type-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        this.renderMechanism(r.id);
+      };
+    });
+
+    // 机理显示区域
+    this.mechanismEl = contentEl.createDiv({ cls: "mechanism-display" });
+    this.mechanismEl.createEl("p", {
+      text: "👆 请选择一个反应类型查看机理",
+      cls: "mechanism-placeholder",
+    });
+
+    this.addCSS();
+  }
+
+  renderMechanism(reactionId) {
+    const mech = this.mechanismEl;
+    mech.empty();
+
+    const mechanisms = this.getMechanismData(reactionId);
+    if (!mechanisms) {
+      mech.createEl("p", { text: "该反应机理正在开发中..." });
+      return;
+    }
+
+    // 反应名称
+    mech.createEl("h3", { text: mechanisms.name });
+
+    // 反应类型说明
+    mech.createEl("p", {
+      text: mechanisms.description,
+      cls: "mechanism-desc",
+    });
+
+    // 分步显示
+    mechanisms.steps.forEach((step, i) => {
+      const stepDiv = mech.createDiv({ cls: "mechanism-step" });
+      stepDiv.createEl("h4", { text: `步骤 ${i + 1}: ${step.title}` });
+
+      // 反应物 → 产物
+      const equationDiv = stepDiv.createDiv({ cls: "mechanism-equation" });
+      equationDiv.createEl("code", { text: step.reactants });
+      equationDiv.createEl("span", { text: " → ", cls: "mechanism-arrow" });
+      equationDiv.createEl("code", { text: step.products });
+
+      // 说明
+      if (step.note) {
+        stepDiv.createEl("p", { text: `💡 ${step.note}`, cls: "mechanism-note" });
+      }
+    });
+
+    // 关键要点
+    if (mechanisms.keyPoints) {
+      const keyDiv = mech.createDiv({ cls: "mechanism-key-points" });
+      keyDiv.createEl("h4", { text: "🔑 关键要点" });
+      mechanisms.keyPoints.forEach((point) => {
+        keyDiv.createEl("li", { text: point });
+      });
+    }
+  }
+
+  getMechanismData(id) {
+    const data = {
+      sn1: {
+        name: "SN1 亲核取代反应",
+        description: "单分子亲核取代，分两步进行，生成碳正离子中间体",
+        steps: [
+          {
+            title: "离去基团离去",
+            reactants: "R-LG → R⁺ + LG⁻",
+            products: "碳正离子中间体",
+            note: "慢步骤，决定反应速率",
+          },
+          {
+            title: "亲核试剂进攻",
+            reactants: "R⁺ + Nu⁻ → R-Nu",
+            products: "取代产物",
+            note: "快步骤，两面进攻生成外消旋体",
+          },
+        ],
+        keyPoints: [
+          "三级卤代烷 > 二级 > 一级",
+          "生成碳正离子中间体",
+          "外消旋化产物",
+          "极性溶剂加速反应",
+        ],
+      },
+      sn2: {
+        name: "SN2 亲核取代反应",
+        description: "双分子亲核取代，一步完成，背面进攻",
+        steps: [
+          {
+            title: "背面进攻 + 离去基团离去",
+            reactants: "Nu⁻ + R-LG → [Nu---R---LG]‡ → Nu-R + LG⁻",
+            products: "取代产物",
+            note: "协同反应，构型翻转 (Walden 翻转)",
+          },
+        ],
+        keyPoints: [
+          "一级卤代烷 > 二级 > 三级",
+          "背面进攻，构型翻转",
+          "动力学二级反应",
+          "极性非质子溶剂加速",
+        ],
+      },
+      e1: {
+        name: "E1 消除反应",
+        description: "单分子消除，分两步进行，生成碳正离子中间体",
+        steps: [
+          {
+            title: "离去基团离去",
+            reactants: "R-LG → R⁺ + LG⁻",
+            products: "碳正离子中间体",
+            note: "慢步骤",
+          },
+          {
+            title: "去质子化",
+            reactants: "R⁺ + B: → 烯烃 + BH⁺",
+            products: "消除产物",
+            note: "Zaitsev 规则，生成更稳定烯烃",
+          },
+        ],
+        keyPoints: [
+          "三级 > 二级 > 一级",
+          "生成碳正离子，可能重排",
+          "Zaitsev 规则",
+          "与 SN1 竞争",
+        ],
+      },
+      e2: {
+        name: "E2 消除反应",
+        description: "双分子消除，一步完成，反式共平面",
+        steps: [
+          {
+            title: "碱夺取质子 + 离去基团离去",
+            reactants: "B: + H-C-C-LG → B-H + C=C + LG⁻",
+            products: "烯烃产物",
+            note: "反式共平面要求",
+          },
+        ],
+        keyPoints: [
+          "三级 > 二级 > 一级",
+          "反式共平面要求",
+          "Zaitsev 规则 (一般情况)",
+          "大体积碱给出 Hofmann 产物",
+        ],
+      },
+      "electrophilic-addition": {
+        name: "烯烃亲电加成",
+        description: "烯烃与亲电试剂的加成反应",
+        steps: [
+          {
+            title: "亲电试剂进攻 π 键",
+            reactants: "C=C + E⁺ → E-C-C⁺",
+            products: "碳正离子中间体",
+            note: "生成更稳定碳正离子 (马氏规则)",
+          },
+          {
+            title: "亲核试剂进攻",
+            reactants: "C⁺ + Nu⁻ → C-Nu",
+            products: "加成产物",
+            note: "完成加成",
+          },
+        ],
+        keyPoints: [
+          "马氏规则: H 加在氢多的碳上",
+          "碳正离子中间体",
+          "可能重排",
+          "过氧化物效应 (反马氏)",
+        ],
+      },
+      "nucleophilic-addition": {
+        name: "羰基亲核加成",
+        description: "醛酮与亲核试剂的加成反应",
+        steps: [
+          {
+            title: "亲核试剂进攻羰基碳",
+            reactants: "C=O + Nu⁻ → Nu-C-O⁻",
+            products: "四面体中间体",
+            note: "羰基碳带部分正电",
+          },
+          {
+            title: "质子化",
+            reactants: "O⁻ + H⁺ → OH",
+            products: "加成产物",
+            note: "生成醇/半缩醛等",
+          },
+        ],
+        keyPoints: [
+          "醛 > 酮 (空间位阻)",
+          "亲核性强的试剂更容易反应",
+          "酸性/碱性催化",
+          "生成四面体中间体",
+        ],
+      },
+      "friedel-crafts": {
+        name: "Friedel-Crafts 反应",
+        description: "芳烃的亲电取代反应",
+        steps: [
+          {
+            title: "生成亲电试剂",
+            reactants: "R-Cl + AlCl3 → R⁺ + AlCl4⁻",
+            products: "碳正离子亲电试剂",
+            note: "Lewis 酸催化",
+          },
+          {
+            title: "芳环进攻",
+            reactants: "Ar-H + R⁺ → Ar-H-R⁺",
+            products: "σ 络合物",
+            note: "破坏芳香性",
+          },
+          {
+            title: "去质子化",
+            reactants: "Ar-H-R⁺ → Ar-R + H⁺",
+            products: "取代芳烃",
+            note: "恢复芳香性",
+          },
+        ],
+        keyPoints: [
+          "需要 Lewis 酸催化",
+          "烷基化可能重排",
+          "酰基化不重排",
+          "强吸电子基钝化芳环",
+        ],
+      },
+      aldol: {
+        name: "羟醛缩合反应",
+        description: "含 α-H 的醛酮之间的缩合反应",
+        steps: [
+          {
+            title: "烯醇负离子生成",
+            reactants: "R-CH2-CHO + OH⁻ → R-CH(-)-CHO + H2O",
+            products: "烯醇负离子",
+            note: "夺取 α-H",
+          },
+          {
+            title: "亲核加成",
+            reactants: "R-CH(-)-CHO + R-CHO → β-羟基醛",
+            products: "β-羟基醛/酮",
+            note: "两分子醛酮加成",
+          },
+          {
+            title: "脱水 (加热)",
+            reactants: "β-羟基醛 → α,β-不饱和醛 + H2O",
+            products: "α,β-不饱和羰基化合物",
+            note: "形成共轭体系",
+          },
+        ],
+        keyPoints: [
+          "需要 α-H",
+          "稀碱催化",
+          "分子间/分子内均可",
+          "脱水生成 α,β-不饱和羰基",
+        ],
+      },
+    };
+
+    return data[id] || null;
+  }
+
+  addCSS() {
+    if (document.getElementById("reaction-mechanism-css")) return;
+    const style = document.createElement("style");
+    style.id = "reaction-mechanism-css";
+    style.textContent = `
+      .reaction-mechanism-modal h2 {
+        text-align: center;
+      }
+      .reaction-mechanism-modal .mechanism-desc {
+        color: var(--text-muted);
+        text-align: center;
+        margin-bottom: 15px;
+      }
+      .reaction-mechanism-modal .mechanism-type-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 20px;
+      }
+      .reaction-mechanism-modal .mechanism-type-btn {
+        padding: 6px 12px;
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 15px;
+        background: var(--background-primary);
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .reaction-mechanism-modal .mechanism-type-btn:hover,
+      .reaction-mechanism-modal .mechanism-type-btn.active {
+        background: var(--interactive-accent);
+        color: var(--text-on-accent);
+        border-color: var(--interactive-accent);
+      }
+      .reaction-mechanism-modal .mechanism-display {
+        min-height: 300px;
+      }
+      .reaction-mechanism-modal .mechanism-placeholder {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 60px 20px;
+      }
+      .reaction-mechanism-modal .mechanism-step {
+        padding: 15px;
+        margin: 10px 0;
+        background: var(--background-secondary);
+        border-radius: 8px;
+      }
+      .reaction-mechanism-modal .mechanism-equation {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+        flex-wrap: wrap;
+      }
+      .reaction-mechanism-modal .mechanism-equation code {
+        padding: 6px 10px;
+        background: var(--background-primary);
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      .reaction-mechanism-modal .mechanism-arrow {
+        font-size: 18px;
+        color: var(--interactive-accent);
+        font-weight: bold;
+      }
+      .reaction-mechanism-modal .mechanism-note {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin: 8px 0 0 0;
+      }
+      .reaction-mechanism-modal .mechanism-key-points {
+        margin-top: 20px;
+        padding: 15px;
+        background: var(--background-secondary);
+        border-radius: 8px;
+      }
+      .reaction-mechanism-modal .mechanism-key-points li {
+        margin: 6px 0;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}

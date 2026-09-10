@@ -1071,8 +1071,11 @@ class MoleculeEditorModal extends Modal {
           }
           try {
             const smiles = mol.toIsomericSmiles();
-            // 打开官能团分析
-            new Notice("SMILES: " + smiles + "\n官能团分析功能开发中...", 3000);
+            if (typeof FunctionalGroupAnalysisModal !== "undefined") {
+              new FunctionalGroupAnalysisModal(this.app, smiles).open();
+            } else {
+              new Notice("官能团分析模块未加载", 2000);
+            }
           } catch (e) {
             new Notice("分析失败: " + e.message, 3000);
           }
@@ -1107,10 +1110,19 @@ class MoleculeEditorModal extends Modal {
         name: "默写练习",
         tooltip: "开始结构式默写练习",
         action: () => {
+          // 从 plugin 获取学习卡片数据
+          const plugin = (this.app.workspace as any).plugin || window.chemfigPlugin;
+          const cards = plugin?.learningCards || [];
+
+          if (cards.length === 0) {
+            new Notice("学习卡片为空, 请先导入或等待数据库加载", 3000);
+            return;
+          }
+
           if (typeof QuizModal !== "undefined") {
-            new QuizModal(this.app, "name-to-structure").open();
+            new QuizModal(this.app, cards, "name_to_structure").open();
           } else {
-            new Notice("默写练习未加载", 2000);
+            new Notice("默写练习模块未加载", 2000);
           }
         },
       },

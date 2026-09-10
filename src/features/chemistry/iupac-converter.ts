@@ -158,6 +158,91 @@ const NAME_TO_SMILES = {
   "葡萄糖": "OC[C@H]1OC(O)[C@@H](O)[C@H](O)[C@H]1O",
   "果糖": "OC[C@H]1O[C@](O)(CO)[C@@H](O)[C@H]1O",
   "蔗糖": "OC[C@H]1O[C@@](O)(CO)[C@H](O)[C@@H]1O[C@H]1O[C@H](CO)[C@@H](O)[C@H](O)[C@H]1O",
+  "麦芽糖": "OC[C@H]1O[C@@H](O[C@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@H]1O",
+  "淀粉": "OC[C@H]1O[C@@H](O[C@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@H]1O",
+
+  // ========== 更多药物 (v15.2.0) ==========
+  // 解热镇痛
+  "布洛芬": "CC(C)Cc1ccc(cc1)C(C)C(=O)O",
+  "萘普生": "COc1ccc2c(c1)ccc(C(=O)O)c2C",
+  "双氯芬酸": "OC(=O)Cc1ccccc1Nc1c(Cl)cccc1Cl",
+  "吲哚美辛": "CC(=O)Nc1ccc2c(c1)c(CC(=O)O)c1ccccc1n2",
+
+  // 抗生素
+  "阿莫西林": "CC1(C(N2C(S1)C(C2=O)NC(=O)C(Nc1ccc(O)cc1)C(=O)O)C(=O)O)",
+  "青霉素": "CC1(C(N2C(S1)C(C2=O)NC(=O)C(C)c1ccccc1)C(=O)O)",
+  "头孢菌素": "CC1=C(N2[C@@H]([C@@H](C2=O)NC(=O)C(=N)O)SC1)C(=O)O",
+
+  // 心血管药物
+  "阿司匹林": "CC(=O)Oc1ccccc1C(=O)O",
+  "华法林": "CC(=O)C(c1ccccc1)C(=O)c1ccccc1",
+  "硝苯地平": "COC(=O)C1=C(C)NC(C)=C(C(=O)OC)C1c1ccccc1[N+](=O)[O-]",
+  "硝酸甘油": "O=[N+]([O-])OCC(CO[N+](=O)[O-])O[N+](=O)[O-]",
+
+  // 中枢神经
+  "咖啡因": "CN1C=NC2=C1C(=O)N(C)C(=O)N2C",
+  "尼古丁": "CN1CCCC1c1cccnc1",
+  "安定": "Clc1cc2c(n(c(=O)c3ccccc32)C)c1Cl",
+  "苯巴比妥": "CCC(CC1=O)c2ccccc2C(=O)NC1=O",
+
+  // 抗癌药物
+  "紫杉醇": "CC1=C(C(=O)[C@@]2(C)C[C@@H]3[C@@H](C1=O)[C@@H](O2)OC(=O)c1ccccc1)[C@@H](O)C[C@H]4[C@]3(C(=O)[C@@H](O[C@H]4O)c1ccc(OC)cc1)C",
+  "顺铂": "[NH3][Pt]([NH3])(Cl)Cl",
+
+  // 激素
+  "雌二醇": "C[C@]12CC[C@H]3[C@@H](CCC4=CC(O)=CC=C34)[C@@H]1CC[C@@H]2O",
+  "睾酮": "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC=C34)[C@@H]1CC[C@@H]2O",
+  "孕酮": "C[C@]12CCC(=O)C=C1CC[C@@H]1[C@@H]2[C@@H](CC[C@@]1(C)C(=O)CO)C",
+
+  // 氨基酸
+  "甘氨酸": "NCC(=O)O",
+  "丙氨酸": "CC(N)C(=O)O",
+  "缬氨酸": "CC(C)C(N)C(=O)O",
+  "亮氨酸": "CC(C)CC(N)C(=O)O",
+  "异亮氨酸": "CCC(C)C(N)C(=O)O",
+  "苯丙氨酸": "N[C@@H](Cc1ccccc1)C(=O)O",
+  "酪氨酸": "N[C@@H](Cc1ccc(O)cc1)C(=O)O",
+  "色氨酸": "N[C@@H](Cc1c[nH]c2ccccc12)C(=O)O",
+  "丝氨酸": "N[C@@H](CO)C(=O)O",
+  "苏氨酸": "N[C@@H](C(O)C)C(=O)O",
+  "半胱氨酸": "N[C@@H](CS)C(=O)O",
+  "甲硫氨酸": "N[C@@H](CCSC)C(=O)O",
+  "天冬氨酸": "N[C@@H](CC(=O)O)C(=O)O",
+  "谷氨酸": "N[C@@H](CCC(=O)O)C(=O)O",
+  "赖氨酸": "N[C@@H](CCCCN)C(=O)O",
+  "精氨酸": "N[C@@H](CCCNC(=N)N)C(=O)O",
+  "组氨酸": "N[C@@H](Cc1c[nH]cn1)C(=O)O",
+
+  // 核酸碱基
+  "腺嘌呤": "Nc1ncnc2[nH]cnc12",
+  "鸟嘌呤": "Oc1ncnc2[nH]cnc12",
+  "胞嘧啶": "Nc1ccnc(=O)[nH]1",
+  "胸腺嘧啶": "Cc1cc(=O)[nH]c(=O)[nH]1",
+  "尿嘧啶": "O=c1cc[nH]c(=O)[nH]1",
+
+  // 维生素
+  "维生素C": "OCC(O)C1OC(O)C(O)=C1O",
+  "维生素A": "CC1=C(C(CCC1)(C)C)/C=C/C(=C/C=C/C(=C/CO)/C)/C",
+  "维生素D": "CC1(C)CCCC2(C)C1CCC1=C[C@@H]3C[C@@H](O)CCC3(C)C12",
+  "维生素E": "CC(C)=CCC/C(C)=C/CC/C(C)=C/CC[C@@](C)(O)c1ccc(O)c(C(C)C)c1",
+  "维生素B1": "CC1=C(C=C(C)=C(C)N1)C2=NC(C)=C(N(C)C2=O)C",
+  "维生素B2": "C(C1C(C(C(C(O1)CO)O)O)O)N2C=CC(=O)NC2=O",
+  "维生素B6": "Cc1ncc(CO)c(CO)c1O",
+
+  // 天然产物
+  "薄荷醇": "CC1CCC(C(C(C1)O)C)C(C)C",
+  "樟脑": "CC1(C)C2CCC1(C)C(=O)C2",
+  "尼古丁": "CN1CCCC1c1cccnc1",
+  "吗啡": "CN1CCC23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5",
+  "奎宁": "COc1cc2c(cc1O)C[C@@H]1c3ncccc3C[C@H]2[C@@H]1N(C)C",
+
+  // 聚合物单体
+  "乙烯": "C=C",
+  "丙烯": "C=CC",
+  "氯乙烯": "C=CCl",
+  "苯乙烯": "C=Cc1ccccc1",
+  "对苯二甲酸": "O=C(O)c1ccc(C(=O)O)cc1",
+  "乙二醇": "OCCO",
 };
 
 /**
@@ -241,6 +326,222 @@ function registerIUPACCommands(plugin) {
   });
 
   console.log("[Chemfig-SVG] IUPAC 转换命令已注册 (支持 " + Object.keys(NAME_TO_SMILES).length + " 种化合物)");
+}
+
+// ========== 官能团分析模态框 (v15.2.0) ==========
+class FunctionalGroupAnalysisModal extends Modal {
+  constructor(app, smiles) {
+    super(app);
+    this.smiles = smiles;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("functional-group-analysis-modal");
+
+    contentEl.createEl("h2", { text: "🔬 官能团分析" });
+
+    // SMILES 显示
+    const smilesBar = contentEl.createDiv({ cls: "fg-smiles-bar" });
+    smilesBar.createEl("span", { text: "SMILES: " });
+    smilesBar.createEl("code", { text: this.smiles });
+
+    // 分析结果
+    const resultsDiv = contentEl.createDiv({ cls: "fg-results" });
+
+    const groups = IUPACToSMILES.analyzeFunctionalGroups(this.smiles);
+
+    if (groups.length === 0) {
+      resultsDiv.createEl("div", {
+        text: "未识别到明显的官能团 (可能为简单烷烃)",
+        cls: "fg-empty",
+      });
+    } else {
+      resultsDiv.createEl("h3", { text: `识别到 ${groups.length} 种官能团:` });
+
+      const groupList = resultsDiv.createDiv({ cls: "fg-group-list" });
+      groups.forEach((group) => {
+        const groupItem = groupList.createDiv({ cls: "fg-group-item" });
+        groupItem.innerHTML = `
+          <span class="fg-group-type fg-type-${group.type}">${group.type}</span>
+          <span class="fg-group-name">${group.name}</span>
+        `;
+      });
+    }
+
+    // 分子式估算
+    const formula = this.estimateFormula(this.smiles);
+    if (formula) {
+      const formulaDiv = contentEl.createDiv({ cls: "fg-formula" });
+      formulaDiv.createEl("h3", { text: "📊 分子式估算" });
+      formulaDiv.createEl("p", { text: `分子式: ${formula}` });
+    }
+
+    // 常见反应提示
+    const reactionsDiv = contentEl.createDiv({ cls: "fg-reactions" });
+    reactionsDiv.createEl("h3", { text: "⚗️ 常见反应" });
+
+    const reactions = this.getCommonReactions(groups);
+    if (reactions.length > 0) {
+      const reactionList = reactionsDiv.createDiv({ cls: "fg-reaction-list" });
+      reactions.forEach((reaction) => {
+        reactionList.createEl("div", { text: "• " + reaction, cls: "fg-reaction-item" });
+      });
+    } else {
+      reactionsDiv.createEl("p", { text: "暂无常见反应提示", cls: "fg-empty" });
+    }
+
+    // 关闭按钮
+    const closeBtn = contentEl.createEl("button", {
+      text: "关闭",
+      cls: "mod-cta",
+    });
+    closeBtn.onclick = () => this.close();
+
+    // 添加 CSS
+    this.addCSS();
+  }
+
+  estimateFormula(smiles) {
+    // 简单的分子式估算 (基于 SMILES 中的元素计数)
+    const counts = { C: 0, H: 0, O: 0, N: 0, S: 0, Cl: 0, Br: 0, F: 0, I: 0, P: 0 };
+
+    // 粗略统计元素
+    const elements = smiles.match(/[A-Z][a-z]?/g) || [];
+    elements.forEach((el) => {
+      if (counts[el] !== undefined) counts[el]++;
+    });
+
+    // 估算氢原子 (粗略)
+    if (counts.C > 0) {
+      // 假设每个碳有足够的氢
+      const unsaturation = this.estimateUnsaturation(smiles);
+      counts.H = Math.max(0, 2 * counts.C + 2 - 2 * unsaturation - counts.N);
+    }
+
+    // 生成分子式字符串
+    let formula = "";
+    if (counts.C > 0) formula += counts.C > 1 ? `C${counts.C}` : "C";
+    if (counts.H > 0) formula += counts.H > 1 ? `H${counts.H}` : "H";
+    if (counts.O > 0) formula += counts.O > 1 ? `O${counts.O}` : "O";
+    if (counts.N > 0) formula += counts.N > 1 ? `N${counts.N}` : "N";
+    if (counts.S > 0) formula += `S${counts.S}`;
+    if (counts.Cl > 0) formula += `Cl${counts.Cl}`;
+    if (counts.Br > 0) formula += `Br${counts.Br}`;
+    if (counts.F > 0) formula += `F${counts.F}`;
+
+    return formula || null;
+  }
+
+  estimateUnsaturation(smiles) {
+    // 粗略估算不饱和度
+    let unsaturation = 0;
+    // 双键
+    unsaturation += (smiles.match(/=/g) || []).length;
+    // 三键
+    unsaturation += (smiles.match(/#/g) || []).length * 2;
+    // 环
+    unsaturation += (smiles.match(/[1-9]/g) || []).length;
+    return unsaturation;
+  }
+
+  getCommonReactions(groups) {
+    const reactions = [];
+    const groupNames = groups.map((g) => g.name);
+
+    if (groupNames.includes("醇羟基") || groupNames.includes("酚羟基")) {
+      reactions.push("与羧酸发生酯化反应生成酯");
+      reactions.push("可被氧化为醛/酮/羧酸");
+    }
+    if (groupNames.includes("醛基")) {
+      reactions.push("可被还原为伯醇");
+      reactions.push("可被氧化为羧酸");
+    }
+    if (groupNames.includes("酮羰基")) {
+      reactions.push("可被还原为仲醇");
+    }
+    if (groupNames.includes("羧基")) {
+      reactions.push("与醇发生酯化反应");
+      reactions.push("可被还原为伯醇");
+    }
+    if (groupNames.includes("酯基")) {
+      reactions.push("酸性/碱性水解生成羧酸和醇");
+    }
+    if (groupNames.includes("氨基")) {
+      reactions.push("与酰氯/酸酐发生酰化反应");
+      reactions.push("可发生重氮化反应");
+    }
+    if (groupNames.includes("芳环")) {
+      reactions.push("可发生亲电取代反应 (卤代/硝化/磺化)");
+    }
+
+    return reactions.slice(0, 5); // 最多显示 5 条
+  }
+
+  addCSS() {
+    if (document.getElementById("fg-analysis-css")) return;
+    const style = document.createElement("style");
+    style.id = "fg-analysis-css";
+    style.textContent = `
+      .functional-group-analysis-modal .fg-smiles-bar {
+        padding: 10px;
+        background: var(--background-secondary);
+        border-radius: 6px;
+        margin-bottom: 15px;
+      }
+      .functional-group-analysis-modal .fg-group-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      .functional-group-analysis-modal .fg-group-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        background: var(--background-secondary);
+        border-radius: 6px;
+        border: 1px solid var(--background-modifier-border);
+      }
+      .functional-group-analysis-modal .fg-group-type {
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: bold;
+      }
+      .functional-group-analysis-modal .fg-type-含氧 {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+      .functional-group-analysis-modal .fg-type-含氮 {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+      .functional-group-analysis-modal .fg-type-芳香 {
+        background: #f3e5f5;
+        color: #7b1fa2;
+      }
+      .functional-group-analysis-modal .fg-type-烃类 {
+        background: #e8f5e9;
+        color: #388e3c;
+      }
+      .functional-group-analysis-modal .fg-reaction-list {
+        margin: 8px 0;
+        padding-left: 20px;
+      }
+      .functional-group-analysis-modal .fg-reaction-item {
+        margin: 4px 0;
+        color: var(--text-normal);
+      }
+      .functional-group-analysis-modal .fg-empty {
+        color: var(--text-muted);
+        font-style: italic;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 }
 
 // 导出

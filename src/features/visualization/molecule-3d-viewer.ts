@@ -58,8 +58,20 @@ class Molecule3DViewer {
         backgroundColor: options.backgroundColor || "white",
       });
 
-      // 添加分子
-      viewer.addModel(smiles, "smi");
+      // 添加分子 - 使用 SMILES 字符串 (3Dmol 会自动通过 Cactus 服务器生成 3D 坐标)
+      try {
+        // 先尝试直接从 SMILES 加载
+        viewer.addModel(smiles, "smi");
+      } catch (smilesError) {
+        console.warn("[Chemfig-SVG] 直接 SMILES 加载失败, 尝试通过 PubChem 获取:", smilesError);
+        // 备用方案: 通过 PubChem API 获取
+        loading.textContent = "正在从 PubChem 获取 3D 结构...";
+        try {
+          await this.loadFromPubChem(viewer, smiles);
+        } catch (pubchemError) {
+          throw new Error("SMILES 和 PubChem 都加载失败: " + smilesError.message);
+        }
+      }
 
       // 设置样式
       const style = options.style || "stick"; // stick / sphere / line
@@ -83,12 +95,49 @@ class Molecule3DViewer {
       return viewer;
     } catch (e) {
       container.empty();
-      container.createEl("div", {
-        text: "3D 模型加载失败: " + e.message,
+      const errorDiv = container.createEl("div", {
         cls: "mol3d-error",
       });
+      errorDiv.innerHTML = `
+        <strong>❌ 3D 模型加载失败</strong><br><br>
+        <strong>错误信息:</strong> ${e.message}<br><br>
+        <strong>可能原因:</strong><br>
+        1. 网络问题 - 无法连接到 3Dmol.js CDN 或 Cactus 服务器<br>
+        2. SMILES 格式不标准<br>
+        3. 浏览器安全策略限制<br><br>
+        <strong>建议:</strong><br>
+        - 检查网络连接<br>
+        - 尝试简化 SMILES 结构<br>
+        - 使用标准 SMILES 格式
+      `;
       return null;
     }
+  }
+
+  /**
+   * 通过 PubChem API 获取 3D 结构
+   */
+  static async loadFromPubChem(viewer, smiles) {
+    // 先通过 SMILES 获取 CID, 再获取 SDF
+    const encodeSmiles = encodeURIComponent(smiles);
+    const cidUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeSmiles}/cids/JSON`;
+
+    const cidResponse = await fetch(cidUrl);
+    if (!cidResponse.ok) throw new Error("PubChem CID 查询失败");
+
+    const cidData = await cidResponse.json();
+    if (!cidData.IdentifierList || !cidData.IdentifierList.CID || cidData.IdentifierList.CID.length === 0) {
+      throw new Error("PubChem 未找到该化合物");
+    }
+
+    const cid = cidData.IdentifierList.CID[0];
+    const sdfUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/SDF?record_type=3d`;
+
+    const sdfResponse = await fetch(sdfUrl);
+    if (!sdfResponse.ok) throw new Error("PubChem 3D SDF 获取失败");
+
+    const sdfText = await sdfResponse.text();
+    viewer.addModel(sdfText, "sdf");
   }
 
   /**

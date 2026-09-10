@@ -2364,3 +2364,186 @@ const ANALYTICS_CSS = `
 .trend-day { font-size: 11px; color: var(--text-muted); }
 .trend-count { font-size: 11px; font-weight: 600; }
 `;
+
+// ========== 每日一题模态框 (v15.5.0) ==========
+class DailyQuestionModal extends Modal {
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("daily-question-modal");
+
+    // 标题
+    const today = new Date().toLocaleDateString("zh-CN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+    contentEl.createEl("h2", { text: `📅 每日一题 - ${today}` });
+
+    // 获取今日化合物 (基于日期随机)
+    const cards = this.plugin.learningCards || DEFAULT_LEARNING_CARDS;
+    const todaySeed = this.getTodaySeed();
+    const card = cards[todaySeed % cards.length];
+
+    // 显示卡片
+    const cardEl = contentEl.createDiv({ cls: "daily-card" });
+    cardEl.createEl("h3", { text: card.name });
+    cardEl.createEl("p", { text: card.englishName, cls: "daily-card-english" });
+    cardEl.createEl("p", { text: `分子式: ${card.formula}`, cls: "daily-card-formula" });
+    cardEl.createEl("p", { text: `分类: ${card.category}`, cls: "daily-card-category" });
+
+    // 点击显示详情
+    const detailBtn = contentEl.createEl("button", {
+      text: "查看详情",
+      cls: "daily-detail-btn",
+    });
+    detailBtn.onclick = () => {
+      this.showDetails(cardEl, card);
+    };
+
+    // 操作按钮
+    const btnContainer = contentEl.createDiv({ cls: "daily-actions" });
+
+    const studyBtn = btnContainer.createEl("button", {
+      text: "开始学习",
+      cls: "daily-action-btn primary",
+    });
+    studyBtn.onclick = () => {
+      new LearningCardModal(this.app, card, () => {}, {}).open();
+    };
+
+    const quizBtn = btnContainer.createEl("button", {
+      text: "默写练习",
+      cls: "daily-action-btn",
+    });
+    quizBtn.onclick = () => {
+      new QuizModal(this.app, [card], "structure_to_name", { questionCount: 1 }).open();
+    };
+
+    // 提示
+    contentEl.createEl("p", {
+      text: "💡 每天学习一个新化合物，积少成多！",
+      cls: "daily-hint",
+    });
+
+    this.addCSS();
+  }
+
+  getTodaySeed() {
+    const now = new Date();
+    return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  }
+
+  showDetails(container, card) {
+    container.empty();
+    container.createEl("h3", { text: card.name });
+    if (card.englishName) {
+      container.createEl("p", { text: card.englishName, cls: "daily-card-english" });
+    }
+    container.createEl("p", { text: `分子式: ${card.formula}` });
+    container.createEl("p", { text: `分类: ${card.category}` });
+    if (card.usage) {
+      container.createEl("p", { text: `用途: ${card.usage}`, cls: "daily-detail" });
+    }
+    if (card.source) {
+      container.createEl("p", { text: `来源: ${card.source}`, cls: "daily-detail" });
+    }
+    if (card.smiles) {
+      container.createEl("p", { text: `SMILES:`, cls: "daily-detail-title" });
+      container.createEl("code", { text: card.smiles, cls: "daily-smiles" });
+    }
+  }
+
+  addCSS() {
+    if (document.getElementById("daily-question-css")) return;
+    const style = document.createElement("style");
+    style.id = "daily-question-css";
+    style.textContent = `
+      .daily-question-modal h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .daily-question-modal .daily-card {
+        padding: 20px;
+        background: var(--background-secondary);
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .daily-question-modal .daily-card-english {
+        color: var(--text-muted);
+        font-style: italic;
+      }
+      .daily-question-modal .daily-card-formula {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--interactive-accent);
+      }
+      .daily-question-modal .daily-card-category {
+        color: var(--text-muted);
+      }
+      .daily-question-modal .daily-detail {
+        text-align: left;
+        margin: 8px 0;
+      }
+      .daily-question-modal .daily-detail-title {
+        margin-top: 12px;
+        margin-bottom: 4px;
+        font-weight: bold;
+      }
+      .daily-question-modal .daily-smiles {
+        display: block;
+        padding: 8px;
+        background: var(--background-primary);
+        border-radius: 4px;
+        font-size: 12px;
+        word-break: break-all;
+      }
+      .daily-question-modal .daily-detail-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 6px;
+        background: var(--background-primary);
+        color: var(--text-normal);
+        cursor: pointer;
+      }
+      .daily-question-modal .daily-detail-btn:hover {
+        background: var(--background-modifier-hover);
+      }
+      .daily-question-modal .daily-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .daily-question-modal .daily-action-btn {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 6px;
+        background: var(--background-primary);
+        color: var(--text-normal);
+        cursor: pointer;
+      }
+      .daily-question-modal .daily-action-btn.primary {
+        background: var(--interactive-accent);
+        color: var(--text-on-accent);
+        border-color: var(--interactive-accent);
+      }
+      .daily-question-modal .daily-hint {
+        text-align: center;
+        color: var(--text-muted);
+        margin-top: 20px;
+        font-size: 13px;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}

@@ -3860,6 +3860,7 @@ class ReactionMechanismModal extends Modal {
 // ========== v15.8.0: 成就系统 (学习自 Carden) ==========
 class AchievementSystem {
   static ACHIEVEMENTS = [
+    // ========== 基础学习成就 ==========
     {
       id: "first_card",
       name: "初出茅庐",
@@ -3888,6 +3889,14 @@ class AchievementSystem {
       icon: "👨‍🔬",
       condition: (stats) => stats.masteredCards >= 100,
     },
+    // ========== 连续学习成就 ==========
+    {
+      id: "streak_3",
+      name: "三日坚持",
+      description: "连续学习 3 天",
+      icon: "📅",
+      condition: (stats) => stats.currentStreak >= 3,
+    },
     {
       id: "streak_7",
       name: "七日坚持",
@@ -3903,6 +3912,21 @@ class AchievementSystem {
       condition: (stats) => stats.currentStreak >= 30,
     },
     {
+      id: "streak_100",
+      name: "百日传奇",
+      description: "连续学习 100 天",
+      icon: "💎",
+      condition: (stats) => stats.currentStreak >= 100,
+    },
+    // ========== 答题成就 ==========
+    {
+      id: "perfect_5",
+      name: "小有成就",
+      description: "连续答对 5 题",
+      icon: "⭐",
+      condition: (stats) => stats.perfectStreak >= 5,
+    },
+    {
       id: "perfect_10",
       name: "十全十美",
       description: "连续答对 10 题",
@@ -3910,11 +3934,76 @@ class AchievementSystem {
       condition: (stats) => stats.perfectStreak >= 10,
     },
     {
+      id: "perfect_50",
+      name: "五十连胜",
+      description: "连续答对 50 题",
+      icon: "🎯",
+      condition: (stats) => stats.perfectStreak >= 50,
+    },
+    {
+      id: "quiz_50",
+      name: "初试锋芒",
+      description: "完成 50 道默写题",
+      icon: "✏️",
+      condition: (stats) => stats.totalQuizAttempts >= 50,
+    },
+    {
       id: "quiz_100",
       name: "百题斩",
       description: "完成 100 道默写题",
       icon: "⚔️",
       condition: (stats) => stats.totalQuizAttempts >= 100,
+    },
+    {
+      id: "quiz_500",
+      name: "题海无涯",
+      description: "完成 500 道默写题",
+      icon: "📖",
+      condition: (stats) => stats.totalQuizAttempts >= 500,
+    },
+    // ========== 分类成就 ==========
+    {
+      id: "alkane_master",
+      name: "烷烃专家",
+      description: "掌握所有烷烃化合物",
+      icon: "⛽",
+      condition: (stats) => stats.categoryMastered?.alkanes >= 10,
+    },
+    {
+      id: "aromatic_master",
+      name: "芳香行家",
+      description: "掌握所有芳香族化合物",
+      icon: "🌸",
+      condition: (stats) => stats.categoryMastered?.aromatics >= 10,
+    },
+    {
+      id: "drug_master",
+      name: "药理学家",
+      description: "掌握 20 个药物",
+      icon: "💊",
+      condition: (stats) => stats.categoryMastered?.drugs >= 20,
+    },
+    // ========== 特殊成就 ==========
+    {
+      id: "early_bird",
+      name: "早起的鸟儿",
+      description: "早上 6 点前学习",
+      icon: "🌅",
+      condition: (stats) => stats.earlyBirdDays >= 1,
+    },
+    {
+      id: "night_owl",
+      name: "夜猫子",
+      description: "晚上 12 点后学习",
+      icon: "🦉",
+      condition: (stats) => stats.nightOwlDays >= 1,
+    },
+    {
+      id: "all_rounder",
+      name: "全能选手",
+      description: "掌握所有分类的化合物",
+      icon: "🏅",
+      condition: (stats) => stats.allCategoriesMastered === true,
     },
   ];
 

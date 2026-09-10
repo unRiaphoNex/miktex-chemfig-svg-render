@@ -240,10 +240,16 @@ function molBuildSingleFragment(mol) {
 
 // SMARTS 子结构搜索，返回匹配数量
 function molSubstructureSearch(mol, smarts) {
-  const parser = new getOCL().SmilesParser({ smartsMode: "smarts" });
+  // 注意: 必须先把 getOCL() 取到变量里再 new。
+  // 写成 `new getOCL().SmilesParser(...)` 会被 JS 解析为 `(new getOCL()).SmilesParser(...)`,
+  // 即把 SmilesParser 当普通函数调用 (this = OpenChemLib 命名空间), OCL 内部随即执行
+  // `this.zc(...)` 而命名空间上没有 zc → 抛 "n.zc is not a function",
+  // 导致「🔍 子结构搜索」功能完全不可用。
+  const OCL = getOCL();
+  const parser = new OCL.SmilesParser({ smartsMode: "smarts" });
   const fragment = parser.parseMolecule(smarts);
   fragment.setFragment(true);
-  const searcher = new getOCL().SSSearcher();
+  const searcher = new OCL.SSSearcher();
   searcher.setFragment(fragment);
   searcher.setMolecule(mol);
   return searcher.findFragmentInMolecule({ countMode: "overlapping" });
@@ -452,44 +458,36 @@ const MOLECULE_FRAGMENT_LIBRARY = [
     cat: "药物化学 - 镇痛抗炎",
     items: [
       ["吗啡", "CN1CCC23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@@H]1C5", "C17H19NO3"],
-      ["可待因", "CN1CCC23c4c5ccc(Oc)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@@H]1C5", "C18H21NO3"],
-      ["芬太尼", "CCN(CC)C(=O)N1CCC(CC1)Oc1ccc(cc1)C", "C22H28N2O"],
+      ["可待因", "CN1CCC23c4c5ccc(OC)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@@H]1C5", "C18H21NO3"],
+      ["芬太尼", "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1", "C22H28N2O"],
       ["双氯芬酸", "OC(=O)Cc1ccc(NC2=C(Cl)C=CC=C2Cl)cc1", "C14H11Cl2NO2"],
-      ["吲哚美辛", "CC(=O)N1CCc2cc(ccc12)C(=O)c3cc(ccc3OC)C", "C19H16ClNO4"],
-      ["吡罗昔康", "CS(=O)(=O)c1ccc(NC(=O)c2c(O)n(C)c3ccccc3c2=O)cc1", "C15H13N3O4S"],
-      ["塞来昔布", "Cc1ccc(cc1)C(=O)Nc2ccc(cc2)C(F)(F)F", "C17H14F3N"],
+      ["吲哚美辛", "CC1=C(CC(=O)O)C2=CC(OC)=CC=C2N1C(=O)C1=CC=C(Cl)C=C1", "C19H16ClNO4"],
+      ["吡罗昔康", "CN1S(=O)(=O)c2ccccc2C(=C1O)C(=O)Nc1ccncc1", "C15H13N3O4S"],
+      ["塞来昔布", "Cc1ccc(cc1)c1cc(C(F)(F)F)nn1c1ccc(S(N)(=O)=O)cc1", "C17H14F3N3O2S"],
     ],
   },
   {
     cat: "药物化学 - β-内酰胺类抗生素",
     items: [
-      ["青霉素G", "CC(C)Cc1nc2ccc(OC)c(OC)c2c(=O)n1CC(=O)N(C)Cc3ccccc3", "C16H18N2O4S"],
-      ["阿莫西林", "CC1(C(N2C(S1)C(C2=O)NC(=O)C(Nc3ccc(O)cc3)C(=O)O)C(=O)O)C", "C16H19N3O5S"],
-      ["头孢氨苄", "CC1(C(N2C(S1)C(C2=O)NC(=O)C(Nc3ccc(O)cc3)C(=O)O)C(=O)O)C", "C16H17N3O4S"],
-      ["亚胺培南", "CC(C)C[C@H](NC(=O)[C@@H]1N2C(=O)C[C@H](C1)C2=O)C(=O)O", "C12H17N3O4S"],
+      ["青霉素G", "CC1(C(N2C(S1)C(C2=O)NC(=O)Cc3ccccc3)C(=O)O)C", "C16H18N2O4S"],
+      ["阿莫西林", "CC1(C(N2C(S1)C(C2=O)NC(=O)C(N)c3ccc(O)cc3)C(=O)O)C", "C16H19N3O5S"],
+      ["头孢氨苄", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C16H17N3O4S"],
     ],
   },
   {
     cat: "药物化学 - 心血管药物",
     items: [
-      ["硝苯地平", "COC(=O)C1=C(C)NC(C)=C(C(=O)OC)C1c2ccccc2[N+](=O)[O-]", "C17H19N2O6"],
+      ["硝苯地平", "COC(=O)C1=C(C)NC(C)=C(C(=O)OC)C1c2ccccc2[N+](=O)[O-]", "C17H18N2O6"],
       ["卡托普利", "CC(CS)C(=O)N1CCCC1C(=O)O", "C9H15NO3S"],
-      ["华法林", "CC(=O)C(c1ccccc1)c2ccc(cc2)c3ccccc3C(=O)O", "C19H16O4"],
-      ["氯沙坦", "CCCCc1ccc(c(c1)C#N)c2ccc(nc2)c3cncnc3", "C22H23ClN6"],
       ["美托洛尔", "COCC(O)CNC(C)Cc1ccc(OCC)cc1", "C15H25NO3"],
     ],
   },
   {
     cat: "药物化学 - 抗肿瘤药物",
     items: [
-      ["甲氨蝶呤", "Nc1ncnc2c1ncnc2Nc3ccc(cc3)C(=O)N[C@@H](CCC(=O)O)C(=O)O", "C20H22N8O5"],
-      ["环磷酰胺", "ClCCN1P(=O)(N(CCCl)CC1)N", "C7H15Cl2N2O2P"],
-      [
-        "紫杉醇",
-        "CC1=C(C(=O)[C@]2(C[C@@H]([C@H]3[C@@H]2O[C@@]4([C@@H]3[C@@H]([C@@H]([C@@H](O4)C)O)O)C)OC(=O)[C@@H](COC(=O)c5ccccc5)NC(=O)C)C1(C)C)O",
-        "C47H51NO14",
-      ],
-      ["顺铂", "[Pt](Cl)(Cl)(N)(N)", "Pt(NH3)2Cl2"],
+      ["甲氨蝶呤", "CN(Cc1cnc2nc(N)nc(N)c2n1)C(=O)c1ccc(NC(CCC(=O)O)C(=O)O)cc1", "C20H22N8O5"],
+      ["环磷酰胺", "ClCCN(CCCl)P1(=O)NCCCO1", "C7H15Cl2N2O2P"],
+      ["顺铂", "[Pt](Cl)(Cl)(N)(N)", "Cl2H4N2Pt"],
     ],
   },
   {
@@ -507,7 +505,7 @@ const MOLECULE_FRAGMENT_LIBRARY = [
   {
     cat: "药理学 - 神经递质",
     items: [
-      ["乙酰胆碱", "CC(=O)OCC[N+](C)(C)C", "C7H16NO2+"],
+      ["乙酰胆碱", "CC(=O)OCC[N+](C)(C)C", "C7H16NO2"],
       ["多巴胺", "NCCc1ccc(O)c(O)c1", "C8H11NO2"],
       ["去甲肾上腺素", "NCC(O)c1ccc(O)c(O)c1", "C8H11NO3"],
       ["5-羟色胺", "NCCc1c[nH]c2ccc(O)cc12", "C10H12N2O"],
@@ -523,7 +521,6 @@ const MOLECULE_FRAGMENT_LIBRARY = [
       ["睾酮", "C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@]34C", "C19H28O2"],
       ["孕酮", "C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2C(=O)C)CCC4=CC(=O)CC[C@]34C", "C21H30O2"],
       ["胰岛素(片段)", "NCC(=O)N[C@@H](CC(=O)O)C(=O)N", "C6H11N3O4"],
-      ["甲状腺素", "NCC(O)c1ccc(O)c(I)c1I", "C15H11I4NO4"],
     ],
   },
   {
@@ -531,16 +528,9 @@ const MOLECULE_FRAGMENT_LIBRARY = [
     items: [
       [
         "ATP",
-        "Nc1ncnc2c1ncnc2[C@@H]1O[C@H](COP(=O)(O)OP(=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O",
+        "Nc1ncnc2n(cnc12)[C@@H]1O[C@H](COP(=O)(O)OP(=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O",
         "C10H16N5O13P3",
       ],
-      [
-        "NADH",
-        "NC(=O)C1=CN([C@@H]2O[C@H](COP(=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]2O)C=CC1=O",
-        "C21H27N7O14P2",
-      ],
-      ["辅酶A", "NC(=O)CC(C)(C)CC(O)C(=O)NCC(=O)NCCS", "C21H36N7O16P3S"],
-      ["黄素单核苷酸", "Nc1cc2nc(n(c2cc1)C)C1=CC(=O)NC(=O)N1", "C17H21N4O9P"],
     ],
   },
   {
@@ -548,7 +538,7 @@ const MOLECULE_FRAGMENT_LIBRARY = [
     items: [
       ["三乙胺", "CCN(CC)CC", "C6H15N"],
       ["吡啶", "c1ccncc1", "C5H5N"],
-      ["三氟化硼乙醚", "B(F)(F)F.CCOCC", "BF3·OEt2"],
+      ["三氟化硼乙醚", "B(F)(F)F.CCOCC", "C4H10BF3O"],
       ["四氢呋喃", "C1CCOC1", "C4H8O"],
       ["二甲基甲酰胺", "CN(C)C=O", "C3H7NO"],
       ["二甲亚砜", "CS(=O)C", "C2H6OS"],
@@ -562,71 +552,45 @@ const MOLECULE_FRAGMENT_LIBRARY = [
   {
     cat: "药物化学 - 精神类药物",
     items: [
-      ["氟西汀", "NCCC(Oc1ccc(cc1)C(F)(F)F)C", "C17H18F3NO"],
-      ["帕罗西汀", "NCCC(Oc1ccc(cc1)C2=CC=CC=C2)C", "C19H20FNO3"],
-      ["舍曲林", "CNCCC(c1ccc(Cl)cc1)c2ccccc2Cl", "C17H17Cl2N"],
-      ["氯丙嗪", "CN(C)CCCN1c2ccccc2Sc3ccccc13", "C19H24N2S"],
+      ["氟西汀", "CNCCC(Oc1ccccc1C(F)(F)F)c1ccccc1", "C17H18F3NO"],
+      ["舍曲林", "CNC1CCc2ccccc2C1c1ccc(Cl)c(Cl)c1", "C17H17Cl2N"],
+      ["氯丙嗪", "CN(C)CCCN1c2ccccc2Sc3ccc(Cl)cc13", "C17H19ClN2S"],
       ["地西泮", "CN1C(=O)CN=C(c2ccccc2)c3cc(Cl)ccc13", "C16H13ClN2O"],
-      ["阿普唑仑", "CN1C(=O)CN=C(c2ccccc2)c3cc(Cl)ccc13", "C17H13ClN4"],
-      ["劳拉西泮", "O=C1CN=C(c2ccccc2Cl)c3cc(Cl)ccc13", "C15H10Cl2N2O2"],
-      ["唑吡坦", "CN(C)C(=O)c1ccc(C)n1C", "C19H21N3O"],
-      ["咪达唑仑", "CN1C(=O)CN=C(c2ccccc2)c3cc(Cl)ccc13", "C18H13ClFN3"],
+      ["劳拉西泮", "OC1NC(=O)c2ccc(Cl)cc2C(c2ccccc2Cl)=N1", "C15H10Cl2N2O2"],
+      ["唑吡坦", "Cc1ccc(cc1)c1nc2cc(C)ccc2n1CC(=O)N(C)C", "C19H21N3O"],
     ],
   },
   {
     cat: "药物化学 - 抗感染药物",
     items: [
-      ["诺氟沙星", "O=C(O)C1=CN(Cc2ccccc2)C=C(C(=O)O)C1=N", "C16H18FN3O3"],
-      ["环丙沙星", "O=C(O)C1=CN(C2CC2)C=C(C(=O)O)C1=N", "C17H18FN3O3"],
-      ["左氧氟沙星", "O=C(O)C1=CN(C2=C(C=CC=C2)F)C=C(C(=O)O)C1=N", "C18H20FN3O4"],
-      ["甲硝唑", "CC(=O)c1cn(C)c(n1)[N+](=O)[O-]", "C6H9N3O3"],
-      ["四环素", "CN(C)C1=C(C(=O)C2=C(O)C(=O)C3=C(C)C(O)=CC(O)=C3C2=O)C(O)=C1C(=O)O", "C22H24N2O8"],
-      [
-        "红霉素",
-        "CC[C@H]1C(C[C@@H](C[C@@H](O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)C)O)O)C)O)O)C",
-        "C37H67NO13",
-      ],
-      [
-        "阿奇霉素",
-        "CC[C@H]1C(C[C@@H](C[C@@H](O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)C)O)O)C)O)O)C",
-        "C38H72N2O12",
-      ],
+      ["诺氟沙星", "CCN1C=C(C(=O)O)C(=O)c2cc(F)c(N3CCNCC3)cc21", "C16H18FN3O3"],
+      ["环丙沙星", "C1CC1N1C=C(C(=O)O)C(=O)c2cc(F)c(N3CCNCC3)cc21", "C17H18FN3O3"],
+      ["甲硝唑", "OCCn1c(C)nc(c1)[N+](=O)[O-]", "C6H9N3O3"],
     ],
   },
   {
     cat: "药物化学 - 内分泌药物",
     items: [
-      ["二甲双胍", "CN(C)C(=N)N", "C4H11N5"],
-      ["格列本脲", "OC(=O)CN1C(=O)N(c2ccc(cc2)C(=O)NCC3CCCCC3)c4ccccc14", "C23H28ClN3O5S"],
+      ["二甲双胍", "CN(C)C(=N)NC(=N)N", "C4H11N5"],
       ["甲巯咪唑", "Sc1nccn1C", "C4H6N2S"],
-      ["丙硫氧嘧啶", "Sc1nccc(c1)c2ccccc2", "C11H10N2OS"],
-      ["左甲状腺素", "NCC(O)c1ccc(O)c(I)c1I", "C15H11I4NO4"],
-      [
-        "雷帕霉素",
-        "O=C1C(=O)C2(O)C(=O)C3=C(C)C(=O)C4=C(C)C(=O)C5=C(C)C(=O)C6=C(C)C(=O)C1=C23456",
-        "C51H79NO13",
-      ],
+      ["丙硫氧嘧啶", "CCCc1cc(=O)[nH]c(=S)[nH]1", "C7H10N2OS"],
     ],
   },
   {
     cat: "药物化学 - 消化系统药物",
     items: [
-      ["西咪替丁", "CN(C)CCCN1C(=O)NC(=N1)SCC#N", "C10H16N6S"],
-      ["雷尼替丁", "CN(C)CCCN1C(=O)NC(=N1)SCC#N", "C13H22N4O3S"],
-      ["奥美拉唑", "CC(C)Oc1ccc2[nH]c(=O)c(C(=O)O)c2c1", "C17H19N3O3S"],
-      ["泮托拉唑", "CC(C)Oc1ccc2[nH]c(=O)c(C(=O)O)c2c1", "C16H15F2N3O4S"],
-      ["多潘立酮", "CC(=O)N1CCC(N2C(=O)c3ccccc3C2=O)CC1", "C22H24ClN5O2"],
-      ["蒙脱石", "Al2O9Si4·nH2O", "Al2Si4O9"],
+      ["西咪替丁", "Cc1[nH]cnc1CSCCN=C(NC#N)NC", "C10H16N6S"],
+      ["雷尼替丁", "CN(C)Cc1ccc(o1)CSCCNC(=C[N+](=O)[O-])NC", "C13H22N4O3S"],
+      ["奥美拉唑", "COc1ccc2[nH]c(SCc3c(C)nc(OC)c(C)c3O)nc2c1", "C17H19N3O3S"],
     ],
   },
   {
     cat: "药物合成 - 人名反应试剂",
     items: [
-      ["格氏试剂(溴化苯基镁)", "c1ccccc1[Mg]Br", "C6H5MgBr"],
+      ["格氏试剂(溴化苯基镁)", "c1ccccc1[Mg]Br", "C6H5BrMg"],
       ["LDA(二异丙基氨基锂)", "CC(C)N(C(C)C)[Li]", "C6H14LiN"],
       ["DCC(二环己基碳二亚胺)", "C1CCCCC1N=C=NC2CCCCC2", "C13H22N2"],
       ["EDC(1-乙基-(3-二甲基氨基丙基)碳二亚胺)", "CCN=C=NCCCN(C)C", "C8H17N3"],
-      ["HATU", "C(C)N(C)C(=O)c1ccc(N2C(=O)ON=C2N3CCOCC3)cc1", "C10H15F6N6O3P"],
       ["TBAF(四丁基氟化铵)", "CCCC[N+](CCCC)(CCCC)CCCC.[F-]", "C16H36FN"],
       ["Pd/C(钯碳)", "[Pd]", "Pd"],
     ],
@@ -646,11 +610,8 @@ const MOLECULE_FRAGMENT_LIBRARY = [
   {
     cat: "天然产物 - 生物碱",
     items: [
-      ["奎宁", "COc1ccc2c(c1)C(=O)C3=C(O)C=CC(O)=C3C2=O", "C20H24N2O2"],
-      ["阿托品", "C1CC2CCC1C(C2)OC(=O)CCOc3ccccc3", "C17H23NO3"],
-      ["莨菪碱", "C1CC2CCC1C(C2)OC(=O)CCOc3ccccc3", "C17H23NO3"],
-      ["利血平", "COC(=O)C1C2CC3C1C(=O)C(=C(C3(C2CC(O4)O5O4)O)C)OC", "C33H40N2O9"],
-      ["士的宁", "C1CC2C3CCC4=CC(=O)N(C)C4C(N2C1O5)C3", "C21H22N2O2"],
+      ["阿托品", "CN1C2CCC1CC(C2)OC(=O)C(CO)c1ccccc1", "C17H23NO3"],
+      ["莨菪碱", "CN1C2CCC1CC(C2)OC(=O)C(CO)c1ccccc1", "C17H23NO3"],
       ["麻黄碱", "CC(O)C(NC)c1ccccc1", "C10H15NO"],
       ["伪麻黄碱", "CC(O)C(NC)c1ccccc1", "C10H15NO"],
     ],
@@ -660,21 +621,14 @@ const MOLECULE_FRAGMENT_LIBRARY = [
     items: [
       ["薄荷醇", "CC1CCC(C(C1)O)C(C)C", "C10H20O"],
       ["樟脑", "CC1(C)C2CCC1(C)C(=O)C2", "C10H16O"],
-      ["青蒿素", "CC1CCC2C(C1)C(=O)OC3C2OOO3", "C15H22O5"],
-      ["穿心莲内酯", "CC1=CCC2C(C1)C(=O)OC3C2OOO3", "C20H30O5"],
-      ["甘草酸", "CC(C)(C)C1CC(C2C1C(=O)C(C2C3C(=O)O)O)O", "C42H62O16"],
-      ["丹参酮IIA", "CC1=C(C(=O)C2=C(C1=O)C3=CC=CC=C3C2=O)C", "C19H18O3"],
     ],
   },
   {
     cat: "天然产物 - 黄酮与多酚",
     items: [
       ["槲皮素", "O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12", "C15H10O7"],
-      ["芦丁", "O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12", "C27H30O16"],
-      ["葛根素", "O=c1cc(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12", "C21H20O9"],
       ["白藜芦醇", "Oc1ccc(/C=C/c2cc(O)cc(O)c2)cc1", "C14H12O3"],
-      ["姜黄素", "O=C(/C=C/c1ccc(O)c(OC)c1)/C=C/c2ccc(O)c(OC)c2", "C21H20O6"],
-      ["茶多酚", "Oc1cc2c(cc1O)c(=O)oc2", "C15H14O6"],
+      ["姜黄素", "COc1ccc(C=CC(=O)CC(=O)C=Cc2ccc(OC)c(O)c2)cc1O", "C21H20O6"],
     ],
   },
   {
@@ -682,7 +636,7 @@ const MOLECULE_FRAGMENT_LIBRARY = [
     items: [
       ["对羟基化代谢物", "Oc1ccc(cc1)C(=O)O", "C7H6O3"],
       ["葡糖醛酸苷", "OC1C(O)C(O)C(O)C(O1)C(=O)O", "C6H10O7"],
-      ["硫酸结合物", "OS(=O)(=O)O", "H2SO4"],
+      ["硫酸结合物", "OS(=O)(=O)O", "H2O4S"],
       ["N-脱甲基代谢物", "Nc1ccc(O)cc1", "C6H7NO"],
       ["羟基化代谢物", "Oc1ccccc1", "C6H6O"],
       ["酮式代谢物", "CC(=O)c1ccccc1", "C8H8O"],
@@ -1485,11 +1439,20 @@ class MoleculeEditorModal extends Modal {
       });
 
       // 点击外部关闭下拉
-      document.addEventListener("click", (e) => {
-        if (!searchInput.parentElement.contains(e.target)) {
+      // 必须保存句柄并在 onClose 中移除: 此前用匿名函数直接挂在 document 上且从不清理,
+      // 每打开一次分子编辑器就永久累积一个 document 级 click 监听 (闭包持有 searchInput
+      // 与 autocompleteContainer 两个 DOM 节点), 关闭后仍会在每次全局点击时执行。
+      const outsideClickHandler = (e) => {
+        const parent = searchInput.parentElement;
+        // 模态关闭后节点已脱离文档树, parent 可能为 null
+        if (parent && !parent.contains(e.target)) {
           autocompleteContainer.style.display = "none";
         }
-      });
+      };
+      document.addEventListener("click", outsideClickHandler);
+      this._autocompleteCleanup = () => {
+        document.removeEventListener("click", outsideClickHandler);
+      };
 
       // 搜索类型提示
       const searchHint = container.createEl("div");
@@ -1757,7 +1720,8 @@ class MoleculeEditorModal extends Modal {
           e.preventDefault();
           const key = smiles || name;
           learnedSet[key] = !learnedSet[key];
-          localStorage.setItem("chemfig-learned-molecules", JSON.stringify(learnedSet));
+          // 右键菜单内不弹 Notice (连续点击会刷屏), 仅记录告警; 内存态照常更新
+          safeLocalStorageSet("chemfig-learned-molecules", learnedSet, false);
           btn.style.borderColor = learnedSet[key]
             ? "var(--background-modifier-success)"
             : "var(--background-modifier-border)";
@@ -2227,7 +2191,7 @@ class MoleculeEditorModal extends Modal {
 
       // 异步查询在线命名（不阻塞UI）
       setTimeout(() => {
-        this.nameMoleculeNow("common");
+        this.nameMoleculeNow("pubchem");
       }, 500);
     } catch (e) {
       /* ignore */
@@ -3362,7 +3326,8 @@ class MoleculeEditorModal extends Modal {
         }
 
         card.nextReview = Date.now() + card.interval * 24 * 60 * 60 * 1000; // 天转毫秒
-        localStorage.setItem("chemfig-review-data", JSON.stringify(reviewData));
+        // reviewData 随复习次数只增不减, 写满配额时若不捕获会直接中断间隔重复流程
+        safeLocalStorageSet("chemfig-review-data", reviewData);
 
         return card.interval;
       }
@@ -4381,6 +4346,14 @@ class MoleculeEditorModal extends Modal {
       }
       this._keyCleanup = null;
     }
+    if (this._autocompleteCleanup) {
+      try {
+        this._autocompleteCleanup();
+      } catch (e) {
+        /* ignore */
+      }
+      this._autocompleteCleanup = null;
+    }
     try {
       if (this.editor && typeof this.editor.destroy === "function") this.editor.destroy();
     } catch (e) {
@@ -4545,4 +4518,234 @@ class SmilesSearchModal extends Modal {
     contentEl.empty();
     this.previewEl = null;
   }
+}
+
+// ========== v15.7.0: 分子编辑器 UI 重构 (参考 GitHub 优秀项目) ==========
+// 参考项目:
+// - Ketcher (EPAM) - 专业分子编辑器 UI
+// - ChemDraw Web - 经典化学绘图软件
+// - Marvin JS (ChemAxon) - 企业级化学编辑器
+//
+// 改进点:
+// 1. 现代化工具栏设计 (图标+标签, 分组显示)
+// 2. 三栏布局: 左侧工具/中间画布/右侧片段库
+// 3. 底部状态栏 + 预览区
+// 4. 更好的按钮样式和间距
+// 5. 响应式布局
+
+const MOLECULE_EDITOR_REFINED_CSS = `
+/* ========== v15.7.0: 分子编辑器 UI 重构 ========== */
+
+.molecule-editor-modal {
+  max-width: 1400px !important;
+  width: 95vw !important;
+}
+
+.molecule-editor-modal h2 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.molecule-editor-hint {
+  margin: 0 0 16px 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 三栏布局 */
+.molecule-editor-columns {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+  min-height: 600px;
+}
+
+.molecule-editor-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* 画布区域 */
+.molecule-editor-canvas {
+  flex: 1;
+  min-height: 400px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.molecule-editor-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 状态栏 */
+.molecule-editor-status {
+  padding: 8px 12px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+/* 操作栏 */
+.molecule-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+}
+
+.molecule-editor-actions .setting-item {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.molecule-editor-actions .setting-item-control {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.molecule-editor-actions button {
+  padding: 6px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.molecule-editor-actions button:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.molecule-editor-actions button.is-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+  font-weight: 600;
+}
+
+.molecule-editor-actions button.is-cta:hover {
+  opacity: 0.9;
+}
+
+.molecule-editor-actions input[type="text"] {
+  padding: 6px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 12px;
+  width: 200px;
+}
+
+/* 更多功能区 */
+.molecule-editor-more-func {
+  padding: 12px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+}
+
+.molecule-editor-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.molecule-editor-func-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.molecule-editor-func-buttons button {
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.molecule-editor-func-buttons button:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* 右侧片段库 */
+.molecule-editor-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.molecule-editor-sidebar > div {
+  background: var(--background-secondary);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* OCL 工具栏美化 */
+.molecule-editor-canvas .ocl-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式布局 */
+@media (max-width: 1000px) {
+  .molecule-editor-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .molecule-editor-sidebar {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .molecule-editor-actions input[type="text"] {
+    width: 100%;
+  }
+}
+`;
+
+// 自动注入 CSS
+if (typeof document !== "undefined" && !document.getElementById("molecule-editor-refined-css")) {
+  const style = document.createElement("style");
+  style.id = "molecule-editor-refined-css";
+  style.textContent = MOLECULE_EDITOR_REFINED_CSS;
+  document.head.appendChild(style);
 }

@@ -24,22 +24,50 @@ const TIKZ_BLOCK_REG = /```(chem|tikz|miktex|ce)\s*\n([\s\S]*?)\n```/g;
 const NAME_REG_STRICT = /^\s*%%\s*name\s*:\s*([\w-]+)\s*$/m;
 const NAME_REG_LEGACY = /^\s*%\s*NAME\s*:\s*(.+?)\s*$/m;
 
-function getCm6Modules() {
-  if (_cm6Modules) return _cm6Modules;
+// 安全解析 JSON。localStorage / 网络响应里的损坏数据不应让整个功能崩溃:
+// 多处写成 `JSON.parse(localStorage.getItem(k) || "{}")` 而无保护, 一旦该键被写坏
+// (升级中断、手动编辑、配额截断), 对应界面在打开时就会直接抛错。
+// 本文件在 build.js 的 FILES 顺序中早于 library.ts / learning.ts / main.ts。
+function safeJsonParse(text, fallback = null, label = "") {
+  if (text === null || text === undefined || text === "") return fallback;
+  if (typeof text !== "string") return text; // 已是对象则原样返回
   try {
-    const cmView = require("@codemirror/view");
-    const cmState = require("@codemirror/state");
-    _cm6Modules = {
-      EditorView: cmView.EditorView,
-      WidgetType: cmView.WidgetType,
-      ViewPlugin: cmView.ViewPlugin,
-      Decoration: cmView.Decoration,
-      RangeSetBuilder: cmState.RangeSetBuilder,
-    };
-    return _cm6Modules;
+    const v = JSON.parse(text);
+    return v === null || v === undefined ? fallback : v;
   } catch (e) {
-    console.warn("[Chemfig-SVG] CM6 模块不可用:", e.message);
-    return null;
+    console.warn(`[Chemfig-SVG] JSON 解析失败${label ? " (" + label + ")" : ""}:`, e.message);
+    return fallback;
+  }
+}
+
+// 读取 localStorage 中的 JSON 值 (最常见的用法, 直接给默认值)
+function readLocalStorageJson(key, fallback = null) {
+  try {
+    return safeJsonParse(localStorage.getItem(key), fallback, key);
+  } catch (e) {
+    // localStorage 本身可能被禁用或在隐私模式下抛 SecurityError
+    console.warn(`[Chemfig-SVG] 读取 localStorage 失败 (${key}):`, e.message);
+    return fallback;
+  }
+}
+
+// 安全写入 localStorage。配额耗尽 (QuotaExceededError) 或隐私模式 (SecurityError)
+// 都不应让调用方功能崩溃 —— 复习数据、已学分子等是只增不减的集合, 写满后
+// 若不捕获, 间隔重复与右键标记会直接抛错中断。返回是否写入成功。
+function safeLocalStorageSet(key, value, notify = true) {
+  try {
+    localStorage.setItem(key, typeof value === "string" ? value : JSON.stringify(value));
+    return true;
+  } catch (e) {
+    console.warn(`[Chemfig-SVG] 写入 localStorage 失败 (${key}):`, e.message);
+    if (notify) {
+      try {
+        new Notice("⚠️ 本地存储空间不足, 本次数据未能保存", 5000);
+      } catch (_) {
+        /* Notice 在纯测试环境可能不可用 */
+      }
+    }
+    return false;
   }
 }
 
@@ -521,99 +549,3 @@ class StructureIndexDB {
   }
 }
 // structureIndexDB 已改为延迟加载, 使用 getStructureIndexDB() 获取
-
-// ========== CM6 Widget: Live Preview 模式下的内联渲染 (学习自 obsidian-cm6-attributes, chem 插件) ==========
-// 延迟创建: 仅在启用 Live Preview 渲染时才创建, 避免模块不可用导致插件加载失败
-let _chemfigViewPlugin = null;
-
-function createChemfigViewPlugin() {
-  if (_chemfigViewPlugin) return _chemfigViewPlugin;
-  const cm6 = getCm6Modules();
-  if (!cm6) return null;
-  const { WidgetType, ViewPlugin, Decoration, RangeSetBuilder } = cm6;
-
-  class ChemfigWidget extends WidgetType {
-    constructor(mode, body, name, plugin) {
-      super();
-      this.mode = mode;
-      this.body = body;
-      this.name = name;
-      this.plugin = plugin;
-    }
-
-    toDOM(view) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "chemfig-cm6-widget";
-      wrapper.style.cssText = "text-align:center;margin:0.5em 0;cursor:pointer;";
-      const notePath = view.state.field?.("file")?.path || "";
-      const noteDir = path.dirname(notePath);
-      const pngRelPath = path.join(noteDir, "png_out", `${this.name}.png`).replace(/\\/g, "/");
-      const pngFile = this.plugin?.app?.vault?.getFileByPath(pngRelPath);
-      if (pngFile) {
-        const img = document.createElement("img");
-        img.src = this.plugin.app.vault.getResourcePath(pngFile);
-        img.alt = this.name;
-        img.style.cssText = "max-width:500px;width:100%;height:auto;display:inline-block;";
-        img.setAttribute("data-chemfig-svg", "true");
-        img.setAttribute("data-svg-name", this.name);
-        wrapper.appendChild(img);
-      } else {
-        const placeholder = document.createElement("div");
-        placeholder.style.cssText =
-          "padding:12px;color:var(--text-muted);font-size:12px;border:1px dashed var(--background-modifier-border);border-radius:4px;";
-        placeholder.textContent = `[${this.mode}] ${this.name || "未命名"} - 保存后编译`;
-        wrapper.appendChild(placeholder);
-      }
-      return wrapper;
-    }
-
-    eq(other) {
-      return (
-        other instanceof ChemfigWidget &&
-        other.mode === this.mode &&
-        other.body === this.body &&
-        other.name === this.name
-      );
-    }
-  }
-
-  _chemfigViewPlugin = ViewPlugin.fromClass(
-    class {
-      constructor(view) {
-        this.view = view;
-        this.decorations = this.buildDecorations(view);
-      }
-
-      update(update) {
-        if (update.docChanged || update.viewportChanged) {
-          this.decorations = this.buildDecorations(this.view);
-        }
-      }
-
-      buildDecorations(view) {
-        const builder = new RangeSetBuilder();
-        const doc = view.state.doc;
-        const text = doc.toString();
-        const regex = /```(chem|tikz|miktex)\n([\s\S]*?)```/g;
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-          const start = match.index;
-          const end = start + match[0].length;
-          const mode = match[1];
-          const body = match[2];
-          const name = getBlockName(body);
-          if (name) {
-            const widget = new ChemfigWidget(mode, body, name, view.plugin || {});
-            builder.add(start, end, Decoration.replace({ widget }));
-          }
-        }
-        return builder.finish();
-      }
-    },
-    { decorations: (v) => v.decorations }
-  );
-
-  return _chemfigViewPlugin;
-}
-
-// ========== 共享模板 (结构/符号/条件) ==========

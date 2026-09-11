@@ -24,6 +24,8 @@ class MatchingGameModal extends Modal {
     this.mistakes = 0;
     this.currentRound = 0;
     this.totalRounds = 5;
+    this.selectedName = null;
+    this.selectedStructure = null;
   }
 
   async onOpen() {
@@ -91,10 +93,11 @@ class MatchingGameModal extends Modal {
     });
 
     this.selectedName = null;
+    this.selectedStructure = null;
   }
 
   onNameClick(btn) {
-    // 取消之前的选中
+    // 取消之前选中的名称; 结构侧的选中态保留, 因此支持「先点结构再点名称」
     document.querySelectorAll(".game-name-btn.selected").forEach((el) => {
       el.classList.remove("selected");
     });
@@ -102,36 +105,52 @@ class MatchingGameModal extends Modal {
     btn.classList.add("selected");
     this.selectedName = btn;
 
+    // 两侧都选中后才判定配对。
+    // 注意: 此处原先调用的 this.checkMatch() 在本类中从未定义 (方法只有
+    // constructor/onOpen/nextRound/onNameClick/onStructureClick/updateStatus/
+    // showResult/onClose), 于是「点一下官能团名称」就抛
+    // TypeError: this.checkMatch is not a function, 整个配对游戏无法进行。
     this.checkMatch();
   }
 
   onStructureClick(btn) {
-    if (!this.selectedName) {
-      new Notice("请先选择一个官能团名称", 1500);
-      return;
-    }
+    // 与 onNameClick 对称: 先记录结构侧选择, 再由 checkMatch 统一判定
+    document.querySelectorAll(".game-structure-btn.selected").forEach((el) => {
+      el.classList.remove("selected");
+    });
 
-    const nameId = this.selectedName.dataset.id;
-    const structureId = btn.dataset.id;
+    btn.classList.add("selected");
+    this.selectedStructure = btn;
 
-    if (nameId === structureId) {
+    this.checkMatch();
+  }
+
+  // 判定当前选中的一对「名称 ↔ 结构」是否匹配 (由 onNameClick / onStructureClick 共用)
+  checkMatch() {
+    // 只选中一侧时不判定, 等待另一侧
+    if (!this.selectedName || !this.selectedStructure) return;
+
+    const nameBtn = this.selectedName;
+    const structureBtn = this.selectedStructure;
+
+    if (nameBtn.dataset.id === structureBtn.dataset.id) {
       // 配对正确
       this.score += 10;
-      this.selectedName.classList.remove("selected");
-      this.selectedName.classList.add("correct");
-      btn.classList.add("correct");
+      nameBtn.classList.remove("selected");
+      nameBtn.classList.add("correct");
+      structureBtn.classList.remove("selected");
+      structureBtn.classList.add("correct");
 
       // 禁用这两个按钮
-      this.selectedName.disabled = true;
-      btn.disabled = true;
+      nameBtn.disabled = true;
+      structureBtn.disabled = true;
 
       new Notice("✅ 配对正确! +10 分", 1000);
 
-      this.selectedName = null;
-
-      // 检查是否全部配对完成
-      const allCorrect = document.querySelectorAll(".game-btn:not(.correct)").length === 0;
-      if (allCorrect) {
+      // 本轮是否全部配对完成 (限定在本游戏区域内查询, 避免与其它视图的同名类互相干扰)
+      const scope = this.gameArea || document;
+      const remaining = scope.querySelectorAll(".game-btn:not(.correct)").length;
+      if (remaining === 0) {
         this.currentRound++;
         setTimeout(() => this.nextRound(), 1000);
       }
@@ -139,9 +158,10 @@ class MatchingGameModal extends Modal {
       // 配对错误
       this.mistakes++;
       this.score = Math.max(0, this.score - 2);
-      this.selectedName.classList.remove("selected");
-      this.selectedName.classList.add("wrong");
-      btn.classList.add("wrong");
+      nameBtn.classList.remove("selected");
+      nameBtn.classList.add("wrong");
+      structureBtn.classList.remove("selected");
+      structureBtn.classList.add("wrong");
 
       new Notice("❌ 配对错误! -2 分", 1000);
 
@@ -150,10 +170,10 @@ class MatchingGameModal extends Modal {
           el.classList.remove("wrong");
         });
       }, 500);
-
-      this.selectedName = null;
     }
 
+    this.selectedName = null;
+    this.selectedStructure = null;
     this.updateStatus();
   }
 

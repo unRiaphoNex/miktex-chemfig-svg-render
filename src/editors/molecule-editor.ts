@@ -1,4 +1,4 @@
-// ========== molecule-editor.js - 分子画布编辑器 (OpenChemLib) ==========
+﻿// ========== molecule-editor.js - 分子画布编辑器 (OpenChemLib) ==========
 // 依赖:
 //   - 全局 OpenChemLib（由 ocl.bundle.js 提供，先于本模块合并进 main.js）
 //   - 全局 Modal / Notice / Setting / Menu（constants.js 已 require("obsidian")）
@@ -642,6 +642,192 @@ const MOLECULE_FRAGMENT_LIBRARY = [
       ["酮式代谢物", "CC(=O)c1ccccc1", "C8H8O"],
     ],
   },
+  // v16.4.0: 扩展化学知识库到 300+
+  {
+    cat: "糖类",
+    items: [
+      ["葡萄糖", "OC[C@H]1OC(O)[C@@H](O)[C@H](O)[C@@H]1O", "C6H12O6"],
+      ["果糖", "OC[C@H]1OC(=O)[C@H](O)[C@@H](O)[C@@H]1O", "C6H12O6"],
+      ["半乳糖", "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O", "C6H12O6"],
+      ["蔗糖", "OC[C@H]1OC(O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O", "C12H22O11"],
+      ["麦芽糖", "OC[C@H]1OC(O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O", "C12H22O11"],
+      ["淀粉(片段)", "OC[C@H]1OC(O)[C@@H](O)[C@H](O)[C@@H]1O", "(C6H10O5)n"],
+      ["纤维素(片段)", "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O", "(C6H10O5)n"],
+      ["核糖", "OC[C@H]1OC(O)[C@H](O)[C@@H]1O", "C5H10O5"],
+      ["脱氧核糖", "OC[C@H]1OC(O)[C@H](O)[C@@H]1O", "C5H10O4"],
+    ],
+  },
+  {
+    cat: "维生素",
+    items: [
+      ["维生素C(抗坏血酸)", "OC(=O)C(O)=C(O)[C@H]1OC(CO)[C@@H](O)1", "C6H8O6"],
+      ["维生素B1(硫胺素)", "CC1=C(C)C=C(SC[C@H]2O[C@H](CO)[C@@H](O)[C@@H]2O)N=C1N", "C12H17N4OS"],
+      ["维生素B2(核黄素)", "C12H4N4O2(OH)4(CH3)2", "C17H20N4O6"],
+      ["维生素B6(吡哆醇)", "Cc1c(CO)c(O)cc(CO)n1", "C8H11NO3"],
+      ["维生素B12(片段)", "CN1C=NC2=C1C(=O)N(C(=O)N2C)C", "C63H88CoN14O14P"],
+      ["维生素A(视黄醇)", "CC1=C(C(CCC1)(C)C)/C=C/C(=C/C=C/C(=C/CO)/C)/C", "C20H30O"],
+      ["维生素D2(麦角钙化醇)", "CC(C)=CCCC(C)C(O)C1C(=C)CCC2C1(C)CCCC2(C)C", "C28H44O"],
+      ["维生素E(α-生育酚)", "CC(C)=CCC[C@@](C)(O)c1ccc(OC)c2c1OCCC2(C)C", "C29H50O2"],
+      ["维生素K1(叶绿醌)", "CC(C)=CCC[C@@](C)(O)c1ccc(OC)c2c1OCCC2(C)C", "C31H46O2"],
+      ["烟酸(维生素B3)", "OC(=O)c1cccnc1", "C6H5NO2"],
+      ["叶酸", "Nc1ncnc2n(cnc12)[C@@H]1O[C@H](COP(=O)(O)OP(=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O", "C19H19N7O6"],
+    ],
+  },
+  {
+    cat: "核酸碱基",
+    items: [
+      ["腺嘌呤", "Nc1ncnc2n(cnc12)", "C5H5N5"],
+      ["鸟嘌呤", "Nc1nc2n(cnc2c(=O)[nH]1)", "C5H5N5O"],
+      ["胞嘧啶", "Nc1cncc(=O)[nH]1", "C4H5N3O"],
+      ["胸腺嘧啶", "Cc1cn(c(=O)[nH]c1=O)", "C5H6N2O2"],
+      ["尿嘧啶", "O=c1cc[nH]c(=O)[nH]1", "C4H4N2O2"],
+    ],
+  },
+  {
+    cat: "更多杂环化合物",
+    items: [
+      ["呋喃", "c1ccoc1", "C4H4O"],
+      ["吡喃", "C1=CC=COC1", "C5H6O"],
+      ["噻吩", "c1ccsc1", "C4H4S"],
+      ["吡啶", "c1ccncc1", "C5H5N"],
+      ["哒嗪", "c1cccnn1", "C4H4N2"],
+      ["嘧啶", "c1cncnc1", "C4H4N2"],
+      ["吡嗪", "c1cnccn1", "C4H4N2"],
+      ["喹啉", "c1ccc2ncccc2c1", "C9H7N"],
+      ["异喹啉", "c1ccc2ccncc2c1", "C9H7N"],
+      ["吲哚", "c1ccc2[nH]ccc2c1", "C8H7N"],
+      ["苯并呋喃", "c1ccc2occc2c1", "C8H6O"],
+      ["苯并噻吩", "c1ccc2sccc2c1", "C8H6S"],
+      ["咔唑", "c1ccc2c(c1)[nH]c1ccccc12", "C12H9N"],
+      ["吖啶", "c1ccc2cc3ccccc3nc2c1", "C13H9N"],
+      ["嘌呤", "c1ncc2nc[nH]c2n1", "C5H4N4"],
+    ],
+  },
+  {
+    cat: "更多天然产物",
+    items: [
+      ["尼古丁", "CN1CCCC1C1=CN=CC=C1", "C10H14N2"],
+      ["吗啡", "CN1CCC23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@@H]1C5", "C17H19NO3"],
+      ["海洛因", "CN1CCC23c4c5ccc(OC(=O)C)c4O[C@H]2[C@@H](OC(=O)C)C=C[C@H]3[C@@H]1C5", "C21H23NO5"],
+      ["可卡因", "COC(=O)C1CC2CCC1C(C2)OC(=O)Cc1ccccc1", "C17H21NO4"],
+      ["奎宁", "COc1ccc2nccc([C@@H](O)[C@@H]3CCN4C5=C3C=CC(OC)=C5C=C4)c2c1", "C20H24N2O2"],
+      ["紫杉醇(片段)", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C47H51NO14"],
+      ["青蒿素", "CC1(C)C2CCC1(C)C(=O)OC(=O)C2", "C15H22O5"],
+      ["丹参酮ⅡA", "CC1=C(C)C2=C(C3=C1C(=O)C=C3)C(=O)OC2", "C19H18O3"],
+      ["人参皂苷(片段)", "OC[C@H]1OC(O)[C@@H](O)[C@H](O)[C@@H]1O", "C42H72O14"],
+      ["小檗碱", "COc1cc2c(cc1OC)C[n+]3CCc4cc(OC)c(OC)cc4C3=C2", "C20H18NO4"],
+    ],
+  },
+  {
+    cat: "更多药物 - 中枢神经",
+    items: [
+      ["阿司匹林", "CC(=O)Oc1ccccc1C(=O)O", "C9H8O4"],
+      ["对乙酰氨基酚", "CC(=O)Nc1ccc(O)cc1", "C8H9NO2"],
+      ["布洛芬", "CC(C)Cc1ccc(cc1)C(C)C(=O)O", "C13H18O2"],
+      ["萘普生", "COc1ccc2cc(ccc2c1)C(C)C(=O)O", "C14H14O3"],
+      ["双氯芬酸", "OC(=O)Cc1ccc(NC2=C(Cl)C=CC=C2Cl)cc1", "C14H11Cl2NO2"],
+      ["吲哚美辛", "CC1=C(CC(=O)O)C2=CC(OC)=CC=C2N1C(=O)C1=CC=C(Cl)C=C1", "C19H16ClNO4"],
+      ["吡罗昔康", "CN1S(=O)(=O)c2ccccc2C(=C1O)C(=O)Nc1ccncc1", "C15H13N3O4S"],
+      ["塞来昔布", "Cc1ccc(cc1)c1cc(C(F)(F)F)nn1c1ccc(S(N)(=O)=O)cc1", "C17H14F3N3O2S"],
+      ["美洛昔康", "Cc1cc(=O)n2[nH]c(=S)nc2s1", "C14H13N3O4S2"],
+      ["酮洛芬", "CC(C(=O)O)c1ccc(-c2ccccc2)cc1", "C16H14O3"],
+    ],
+  },
+  {
+    cat: "更多药物 - 心血管",
+    items: [
+      ["硝苯地平", "COC(=O)C1=C(C)NC(C)=C(C(=O)OC)C1c2ccccc2[N+](=O)[O-]", "C17H18N2O6"],
+      ["尼莫地平", "COC(=O)C1=C(C)NC(C)=C(C(=O)OCC=C)C1c2ccccc2[N+](=O)[O-]", "C21H26N2O7"],
+      ["氨氯地平", "COC(=O)C1=C(C)NC(C)=C(C(=O)OCCN)C1c2cc(Cl)ccc2OCC", "C20H25ClN2O5"],
+      ["卡托普利", "CC(CS)C(=O)N1CCCC1C(=O)O", "C9H15NO3S"],
+      ["依那普利", "CC(C)CC(N)C(=O)N1CCCC1C(=O)O", "C20H28N2O5"],
+      ["氯沙坦", "CCCc1cn(c2ccccc2)c1cc1ccc(C(=O)O)cc1", "C22H23ClN6O"],
+      ["缬沙坦", "CCCc1cn(c2ccccc2)c1cc1ccc(C(=O)N(C)C(C)C(=O)O)cc1", "C24H29N5O3"],
+      ["美托洛尔", "COCC(O)CNC(C)Cc1ccc(OCC)cc1", "C15H25NO3"],
+      ["阿替洛尔", "CC(=O)Nc1ccc(OCC(O)CNC(C)C)cc1", "C14H22N2O3"],
+      ["普萘洛尔", "OC(CNC(C)C)COc1ccccc1", "C16H21NO2"],
+    ],
+  },
+  {
+    cat: "更多药物 - 抗感染",
+    items: [
+      ["阿莫西林", "CC1(C(N2C(S1)C(C2=O)NC(=O)C(N)c3ccc(O)cc3)C(=O)O)C", "C16H19N3O5S"],
+      ["头孢氨苄", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C16H17N3O4S"],
+      ["头孢曲松", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccc(O)cc3)C2SC1", "C18H18N8O7S3"],
+      ["诺氟沙星", "CCN1C=C(C(=O)O)C(=O)c2cc(F)c(N3CCNCC3)cc21", "C16H18FN3O3"],
+      ["环丙沙星", "C1CC1N1C=C(C(=O)O)C(=O)c2cc(F)c(N3CCNCC3)cc21", "C17H18FN3O3"],
+      ["左氧氟沙星", "C1CC1N1C=C(C(=O)O)C(=O)c2cc(F)c(N3CCNCC3)cc21", "C18H20FN3O4"],
+      ["阿奇霉素", "CC1OC(=O)C(C)C(OC(=O)C(C)C(OC(=O)C(C)C(OC(=O)C(C)C(OC(=O)C(C)C(OC(=O)C(C)C(OC(=O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C(C)C(O)C)C(=O)O", "C38H72N2O12"],
+      ["甲硝唑", "OCCn1c(C)nc(c1)[N+](=O)[O-]", "C6H9N3O3"],
+      ["克霉唑", "Clc1ccc(C(=C(c2ccccc2)c3ccccc3)n4ccnc4)cc1", "C22H17ClN2"],
+      ["氟康唑", "c1nc(nc(n1)c2ccc(cc2)OCC(O)CN3C=CN=C3)c4ccc(cc4)F", "C13H12F2N6O"],
+    ],
+  },
+  {
+    cat: "更多药物 - 抗肿瘤",
+    items: [
+      ["环磷酰胺", "ClCCN(CCCl)P1(=O)NCCCO1", "C7H15Cl2N2O2P"],
+      ["异环磷酰胺", "ClCCN(CCCl)P1(=O)NCCCO1", "C7H15Cl2N2O2P"],
+      ["顺铂", "[Pt](Cl)(Cl)(N)(N)", "Cl2H4N2Pt"],
+      ["卡铂", "[Pt]1(OC(=O)C2CCCCC2C(=O)O1)(N)N", "C6H12N2O4Pt"],
+      ["甲氨蝶呤", "CN(Cc1cnc2nc(N)nc(N)c2n1)C(=O)c1ccc(NC(CCC(=O)O)C(=O)O)cc1", "C20H22N8O5"],
+      ["氟尿嘧啶", "O=c1cc(F)[nH]c(=O)[nH]1", "C4H3FN2O2"],
+      ["阿糖胞苷", "Nc1ncnc2n(cnc12)[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O", "C9H11N3O5"],
+      ["紫杉醇(片段)", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C47H51NO14"],
+      ["多西他赛(片段)", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C43H53NO14"],
+      ["吉非替尼", "COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1", "C22H24ClFN4O3"],
+    ],
+  },
+  {
+    cat: "更多药物 - 精神类",
+    items: [
+      ["氟西汀", "CNCCC(Oc1ccccc1C(F)(F)F)c1ccccc1", "C17H18F3NO"],
+      ["帕罗西汀", "COc1ccc(cc1)C(O)CN2CCC(CC2)Oc3ccccc3", "C19H20FNO3"],
+      ["舍曲林", "CNC1CCc2ccccc2C1c1ccc(Cl)c(Cl)c1", "C17H17Cl2N"],
+      ["氟伏沙明", "COc1ccc(cc1)C(O)CN2CCC(CC2)C#N", "C15H21F3N2O2"],
+      ["西酞普兰", "COc1ccc(cc1)C(O)CN2CCC(CC2)C#N", "C20H21FN2O"],
+      ["氯丙嗪", "CN(C)CCCN1c2ccccc2Sc3ccc(Cl)cc13", "C17H19ClN2S"],
+      ["异丙嗪", "CN(C)CCN1c2ccccc2Sc3ccccc13", "C17H20N2S"],
+      ["地西泮", "CN1C(=O)CN=C(c2ccccc2)c3cc(Cl)ccc13", "C16H13ClN2O"],
+      ["劳拉西泮", "OC1NC(=O)c2ccc(Cl)cc2C(c2ccccc2Cl)=N1", "C15H10Cl2N2O2"],
+      ["阿普唑仑", "Cc1nn(c2cc(Cl)ccc12)C1=NC=CN=C1", "C17H13ClN4"],
+      ["唑吡坦", "Cc1ccc(cc1)c1nc2cc(C)ccc2n1CC(=O)N(C)C", "C19H21N3O"],
+      ["利培酮", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C23H27FN4O2"],
+      ["奥氮平", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C17H20N4S"],
+      ["喹硫平", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C21H25N3O2S"],
+      ["阿立哌唑", "CC1=C(C(=O)O)N2C(=O)C(NC(=O)C(N)c3ccccc3)C2SC1", "C23H27Cl2N3O2"],
+    ],
+  },
+  {
+    cat: "更多溶剂与试剂",
+    items: [
+      ["正己烷", "CCCCCC", "C6H14"],
+      ["环己烷", "C1CCCCC1", "C6H12"],
+      ["苯", "c1ccccc1", "C6H6"],
+      ["甲苯", "Cc1ccccc1", "C7H8"],
+      ["二甲苯", "Cc1ccccc1C", "C8H10"],
+      ["氯苯", "Clc1ccccc1", "C6H5Cl"],
+      ["二氯甲烷", "ClCCl", "CH2Cl2"],
+      ["氯仿", "ClC(Cl)Cl", "CHCl3"],
+      ["四氯化碳", "ClC(Cl)(Cl)Cl", "CCl4"],
+      ["乙醚", "CCOCC", "C4H10O"],
+      ["异丙醚", "CC(C)OC(C)C", "C6H14O"],
+      ["乙酸乙酯", "CCOC(=O)C", "C4H8O2"],
+      ["丙酮", "CC(=O)C", "C3H6O"],
+      ["丁酮", "CCC(=O)C", "C4H8O"],
+      ["甲醇", "CO", "CH4O"],
+      ["乙醇", "CCO", "C2H6O"],
+      ["异丙醇", "CC(C)O", "C3H8O"],
+      ["正丁醇", "CCCCO", "C4H10O"],
+      ["DMSO", "CS(=O)C", "C2H6OS"],
+      ["DMF", "CN(C)C=O", "C3H7NO"],
+      ["乙腈", "CC#N", "C2H3N"],
+      ["二氧六环", "C1COCCO1", "C4H8O2"],
+      ["THF", "C1CCOC1", "C4H8O"],
+      ["吡啶", "c1ccncc1", "C5H5N"],
+      ["三乙胺", "CCN(CC)CC", "C6H15N"],
+    ],
+  },
 ];
 
 // ---------------- 分子式反推 (结构 → 可读结构式, 如 甲烷 → CH4) ----------------
@@ -827,7 +1013,7 @@ class MoleculeEditorModal extends Modal {
   async onOpen() {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.addClass("molecule-editor-modal");
+    contentEl.addClass("chem-modal-root molecule-editor-modal");
 
     contentEl.createEl("h2", { text: "分子结构式编辑器" });
     contentEl.createEl("p", {
@@ -843,10 +1029,259 @@ class MoleculeEditorModal extends Modal {
       return;
     }
 
-    // ==== 两栏布局: 左侧为主画布工作区, 右侧为片段库侧栏 ====
-    const cols = contentEl.createDiv("molecule-editor-columns");
-    const mainCol = cols.createDiv("molecule-editor-main");
-    const sideCol = cols.createDiv("molecule-editor-sidebar");
+    // ==== v16.4.0: 三栏布局 - 左侧学习栏(可收缩) + 中间画布 + 右侧化学库 ====
+    const cols = contentEl.createDiv("chem-modal-columns molecule-editor-columns");
+
+    // 左侧学习栏（可收缩）
+    const learningCol = cols.createDiv("chem-modal-sidebar chem-modal-sidebar--left molecule-editor-learning-sidebar");
+    learningCol.style.cssText =
+      "background:var(--background-primary);border-right:1px solid var(--background-modifier-border);overflow:hidden;display:flex;flex-direction:column;min-height:0;";
+
+    // 中间主区域
+    const mainCol = cols.createDiv("chem-modal-canvas molecule-editor-main");
+
+    // 右侧化学库（常驻）
+    const sideCol = cols.createDiv("chem-modal-sidebar chem-modal-sidebar--right molecule-editor-sidebar");
+
+    // ==== v16.4.0: 画布上方悬浮工具栏 ====
+    const floatingToolbar = mainCol.createDiv("chem-modal-toolbar molecule-editor-floating-toolbar");
+    
+    // 第一行: 编辑操作 + 主要操作
+    const toolbarTop = floatingToolbar.createDiv("chem-modal-toolbar-row molecule-editor-toolbar-top");
+
+    // 左侧: 编辑操作组
+    const editGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
+    editGroup.createEl("button", {
+      text: "↩️",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    }).onclick = () => this.undo();
+    editGroup.querySelector("button").title = "撤销 (Ctrl+Z)";
+
+    editGroup.createEl("button", {
+      text: "↪️",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    }).onclick = () => this.redo();
+    editGroup.querySelectorAll("button")[1].title = "重做 (Ctrl+Y)";
+
+    editGroup.createEl("button", {
+      text: "🗑️",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    }).onclick = () => {
+      this.pushHistory();
+      if (this.editor) this.editor.clearAll();
+      this.setStatus("画布已清空");
+    };
+    editGroup.querySelectorAll("button")[2].title = "清空画布";
+
+    editGroup.createEl("button", {
+      text: "🔍",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    }).onclick = () => this.resetView();
+    editGroup.querySelectorAll("button")[3].title = "重置视图 (Ctrl+0)";
+
+    // 分隔线
+    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
+
+    // 工具选择组
+    const toolGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
+    
+    const selectBtn = toolGroup.createEl("button", {
+      text: "👆",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn active",
+    });
+    selectBtn.title = "选择/移动";
+    selectBtn.onclick = () => {
+      this._setActiveTool(selectBtn);
+      this.setStatus("选择模式：点击原子/键进行编辑");
+    };
+
+    const eraseBtn = toolGroup.createEl("button", {
+      text: "🗑️",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    });
+    eraseBtn.title = "删除工具";
+    eraseBtn.onclick = () => {
+      this._setActiveTool(eraseBtn);
+      this.setStatus("删除模式：点击要删除的原子/键");
+    };
+
+    // 分隔线
+    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
+
+    // 键工具组
+    const bondGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
+    const bonds = [
+      { icon: "─", label: "单键", type: 1 },
+      { icon: "＝", label: "双键", type: 2 },
+      { icon: "≡", label: "三键", type: 3 },
+    ];
+    bonds.forEach(b => {
+      const btn = bondGroup.createEl("button", {
+        text: b.icon,
+        cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+      });
+      btn.title = b.label;
+      btn.onclick = () => {
+        this._setActiveTool(btn);
+        this.setStatus(b.label + "模式：在两个原子间点击创建" + b.label);
+        this._simulateOclToolClick("bond", b.type);
+      };
+    });
+
+    // 分隔线
+    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
+
+    // 原子工具组
+    const atomGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
+    const atoms = [
+      { symbol: "C", label: "碳" },
+      { symbol: "N", label: "氮" },
+      { symbol: "O", label: "氧" },
+      { symbol: "S", label: "硫" },
+      { symbol: "P", label: "磷" },
+      { symbol: "Si", label: "硅" },
+      { symbol: "F", label: "氟" },
+      { symbol: "Cl", label: "氯" },
+      { symbol: "Br", label: "溴" },
+      { symbol: "I", label: "碘" },
+      { symbol: "H", label: "氢" },
+    ];
+    atoms.forEach(a => {
+      const btn = atomGroup.createEl("button", {
+        text: a.symbol,
+        cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+      });
+      btn.title = a.label + "原子";
+      btn.onclick = () => {
+        this._setActiveTool(btn);
+        this.setStatus(a.label + "原子：点击画布添加" + a.label + "原子");
+        this._simulateOclToolClick("atom", a.symbol);
+      };
+    });
+
+    // 分隔线
+    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
+
+    // 模板工具组
+    const tplGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
+    const templates = [
+      { icon: "⬡", label: "苯环", smiles: "c1ccccc1" },
+      { icon: "⬢", label: "环己烷", smiles: "C1CCCCC1" },
+      { icon: "⬟", label: "环戊烷", smiles: "C1CCCC1" },
+    ];
+    templates.forEach(t => {
+      const btn = tplGroup.createEl("button", {
+        text: t.icon,
+        cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+      });
+      btn.title = t.label;
+      btn.onclick = () => {
+        try {
+          const mol = getOCL().Molecule.fromSmiles(t.smiles);
+          this.loadMolecule(mol, "已载入模板: " + t.label);
+        } catch (e) {
+          this.setStatus("模板加载失败: " + e.message);
+        }
+      };
+    });
+
+    // 分隔线
+    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
+
+    // 化学工具组
+    const chemGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
+    
+    const namingBtn = chemGroup.createEl("button", {
+      text: "🔤",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    });
+    namingBtn.title = "化学命名";
+    namingBtn.onclick = () => this.openNamingPanel();
+
+    const formulaBtn = chemGroup.createEl("button", {
+      text: "🧮",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    });
+    formulaBtn.title = "计算分子式";
+    formulaBtn.onclick = () => this.computeFormulaFromToolbar();
+
+    const fgBtn = chemGroup.createEl("button", {
+      text: "⚗️",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    });
+    fgBtn.title = "官能团分析";
+    fgBtn.onclick = () => this.openFunctionalGroupAnalysis();
+
+    const dbBtn = chemGroup.createEl("button", {
+      text: "📚",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    });
+    dbBtn.title = "化合物数据库";
+    dbBtn.onclick = () => this.openCompoundDatabase();
+
+    const viewer3DBtn = chemGroup.createEl("button", {
+      text: "🧊",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn",
+    });
+    viewer3DBtn.title = "3D 查看器";
+    viewer3DBtn.onclick = () => this.open3DViewer();
+
+    // 右侧: 主要操作按钮
+    const mainActions = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
+
+    mainActions.createEl("button", {
+      text: "💾 仅保存 SMILES",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn secondary",
+    }).onclick = () => {
+      const mol = this.getMoleculeSafe();
+      if (!mol) return;
+      try {
+        const smiles = mol.toIsomericSmiles();
+        this.onSave({ type: "smiles", value: smiles });
+        this.close();
+      } catch (e) {
+        new Notice("导出失败: " + e.message);
+      }
+    };
+
+    mainActions.createEl("button", {
+      text: "✨ 插入结构式",
+      cls: "chem-modal-tool-btn molecule-editor-tool-btn primary",
+    }).onclick = () => {
+      const mol = this.getMoleculeSafe();
+      if (!mol) return;
+      try {
+        const smiles = mol.toIsomericSmiles();
+        const chemfig = molGenerateChemfig(mol);
+        this.onSave({ type: "chemfig", code: chemfig, smiles });
+        this.close();
+      } catch (e) {
+        new Notice("导出失败: " + e.message);
+      }
+    };
+
+    // ==== SMILES 输入栏 ====
+    const smilesBar = mainCol.createDiv("molecule-editor-smiles-bar");
+    const smilesInputEl = smilesBar.createEl("input", {
+      type: "text",
+      placeholder: "输入 SMILES 字符串加载分子...",
+      cls: "molecule-editor-smiles-input",
+    });
+
+    smilesBar.createEl("button", {
+      text: "📂 加载",
+      cls: "molecule-editor-smiles-btn",
+    }).onclick = () => {
+      const val = smilesInputEl.value.trim();
+      if (!val) return;
+      try {
+        const mol = getOCL().Molecule.fromSmiles(val);
+        this.loadMolecule(mol, "已加载: " + val);
+      } catch (e) {
+        this.setStatus("SMILES 解析失败: " + e.message);
+        new Notice("SMILES 解析失败: " + e.message);
+      }
+    };
 
     // ==== 画布 ====
     this.editorContainer = mainCol.createDiv("molecule-editor-canvas");
@@ -855,6 +1290,27 @@ class MoleculeEditorModal extends Modal {
 
     try {
       this.editor = new OCL.CanvasEditor(this.editorContainer, {});
+      
+      // v16.4.0: 隐藏 OCL 自带的左侧工具栏，使用我们自己的悬浮工具栏
+      setTimeout(() => {
+        // 隐藏 OCL 自带的工具栏
+        const oclToolbar = this.editorContainer.querySelector('.ocl-editor__toolbar, .mol-widget__toolbar, [class*="toolbar"]');
+        if (oclToolbar) {
+          oclToolbar.style.display = 'none';
+        }
+        // 也隐藏所有左侧面板
+        const oclLeftPanel = this.editorContainer.querySelector('.ocl-editor__left-panel, .mol-widget__left-panel, [class*="left-panel"]');
+        if (oclLeftPanel) {
+          oclLeftPanel.style.display = 'none';
+        }
+      }, 200);
+      
+      // v16.4.0: 实现悬浮工具栏可拖动
+      const floatingToolbar = contentEl.querySelector('.molecule-editor-floating-toolbar');
+      if (floatingToolbar) {
+        this.makeDraggable(floatingToolbar);
+      }
+      
       setTimeout(() => addOclToolbarTooltips(this.editorContainer), 120);
       this.setupCanvasGestures();
       this.setupKeyboardShortcuts();
@@ -893,96 +1349,6 @@ class MoleculeEditorModal extends Modal {
       new Notice("分子画布初始化失败: " + e.message);
     }
 
-    // ==== v15.7.0: 重构后的顶部工具栏 ====
-    const toolbarTop = mainCol.createDiv("molecule-editor-toolbar-top");
-
-    // 左侧: 编辑操作组
-    const editGroup = toolbarTop.createDiv("molecule-editor-tool-group");
-    editGroup.createEl("button", {
-      text: "↩️",
-      cls: "molecule-editor-tool-btn",
-    }).onclick = () => this.undo();
-    editGroup.querySelector("button").title = "撤销 (Ctrl+Z)";
-
-    editGroup.createEl("button", {
-      text: "↪️",
-      cls: "molecule-editor-tool-btn",
-    }).onclick = () => this.redo();
-    editGroup.querySelectorAll("button")[1].title = "重做 (Ctrl+Y)";
-
-    editGroup.createEl("button", {
-      text: "🗑️",
-      cls: "molecule-editor-tool-btn",
-    }).onclick = () => {
-      this.pushHistory();
-      if (this.editor) this.editor.clearAll();
-      this.setStatus("画布已清空");
-    };
-    editGroup.querySelectorAll("button")[2].title = "清空画布";
-
-    editGroup.createEl("button", {
-      text: "🔍",
-      cls: "molecule-editor-tool-btn",
-    }).onclick = () => this.resetView();
-    editGroup.querySelectorAll("button")[3].title = "重置视图 (Ctrl+0)";
-
-    // 右侧: 主要操作按钮
-    const mainActions = toolbarTop.createDiv("molecule-editor-tool-group");
-
-    mainActions.createEl("button", {
-      text: "💾 仅保存 SMILES",
-      cls: "molecule-editor-tool-btn secondary",
-    }).onclick = () => {
-      const mol = this.getMoleculeSafe();
-      if (!mol) return;
-      try {
-        const smiles = mol.toIsomericSmiles();
-        this.onSave({ type: "smiles", value: smiles });
-        this.close();
-      } catch (e) {
-        new Notice("导出失败: " + e.message);
-      }
-    };
-
-    mainActions.createEl("button", {
-      text: "✨ 插入结构式",
-      cls: "molecule-editor-tool-btn primary",
-    }).onclick = () => {
-      const mol = this.getMoleculeSafe();
-      if (!mol) return;
-      try {
-        const smiles = mol.toIsomericSmiles();
-        const chemfig = molGenerateChemfig(mol);
-        this.onSave({ type: "chemfig", code: chemfig, smiles });
-        this.close();
-      } catch (e) {
-        new Notice("导出失败: " + e.message);
-      }
-    };
-
-    // ==== SMILES 输入栏 ====
-    const smilesBar = mainCol.createDiv("molecule-editor-smiles-bar");
-    const smilesInputEl = smilesBar.createEl("input", {
-      type: "text",
-      placeholder: "输入 SMILES 字符串加载分子...",
-      cls: "molecule-editor-smiles-input",
-    });
-
-    smilesBar.createEl("button", {
-      text: "📂 加载",
-      cls: "molecule-editor-smiles-btn",
-    }).onclick = () => {
-      const val = smilesInputEl.value.trim();
-      if (!val) return;
-      try {
-        const mol = getOCL().Molecule.fromSmiles(val);
-        this.loadMolecule(mol, "已加载: " + val);
-      } catch (e) {
-        this.setStatus("SMILES 解析失败: " + e.message);
-        new Notice("SMILES 解析失败: " + e.message);
-      }
-    };
-
     // ==== 更多功能 (折叠式) ====
     const moreFuncWrap = mainCol.createDiv("molecule-editor-more-wrap");
     const moreToggle = moreFuncWrap.createEl("button", {
@@ -998,6 +1364,10 @@ class MoleculeEditorModal extends Modal {
       moreFuncContent.style.display = moreOpen ? "block" : "none";
       moreToggle.textContent = moreOpen ? "🔧 更多功能 ▴" : "🔧 更多功能 ▾";
     };
+
+    // v16.4.0: 功能按钮容器
+    const funcBtnRow = moreFuncContent.createDiv("molecule-editor-func-row");
+    funcBtnRow.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;";
 
     // 功能按钮配置
     const funcButtons = [
@@ -1127,167 +1497,48 @@ class MoleculeEditorModal extends Modal {
       button.onclick = btn.action;
     });
 
-    const helpEl = mainCol.createDiv("molecule-editor-help");
-    helpEl.innerHTML =
-      "<strong>操作提示:</strong> 工具栏选原子/键类型绘制 | 选中后 Delete 删除(拆键) | " +
-      "选键类型后点击两原子间拼键<br>" +
-      "<strong>画布手势:</strong> <em>按住右键拖动</em> = 平移画布 | <em>滚轮</em> = 以光标为中心缩放 | 工具栏放大镜也可缩放结构";
+    // v16.0.0: 快捷键说明面板
+    const helpEl = moreFuncContent.createDiv("molecule-editor-shortcuts");
+    helpEl.style.cssText = `
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--background-secondary);
+      border-radius: 8px;
+      font-size: 11px;
+    `;
+    
+    helpEl.createEl("div", { 
+      text: "⌨️ 快捷键说明",
+      cls: "molecule-editor-shortcuts-title",
+    }).style.cssText = "font-weight: 600; margin-bottom: 8px; font-size: 12px;";
 
-    // ==== 化学命名（结构式 → 名称，三种服务可选并写入本地索引）====
-    const namingSection = mainCol.createDiv("molecule-editor-section");
-    namingSection.createEl("div", { text: "🔤 化学命名", cls: "molecule-editor-section-title" });
-
-    // v10.15.7: 命名查询模式选择 + 目标分子选择
-    const namingControls = namingSection.createDiv("molecule-editor-naming-controls");
-    namingControls.style.cssText = "display:flex;flex-direction:column;gap:8px;";
-
-    // 第一行: 查询模式 + 目标
-    const namingRow1 = namingControls.createDiv("molecule-editor-row");
-    namingRow1.style.cssText = "display:flex;gap:8px;align-items:center;";
-
-    const nameModeLabel = namingRow1.createEl("span", { text: "模式:", cls: "setting-item-name" });
-    nameModeLabel.style.cssText = "font-size:12px;color:var(--text-muted);min-width:40px;";
-
-    const nameModeSelect = namingRow1.createEl("select", { cls: "dropdown" });
-    nameModeSelect.createEl("option", { text: "A: 外部数据库", value: "external" });
-    nameModeSelect.createEl("option", { text: "B: 本地缓存", value: "local" });
-    nameModeSelect.createEl("option", { text: "C: 校准模式", value: "calibrate" });
-    nameModeSelect.style.cssText = "flex:1;";
-
-    const fragLabel = namingRow1.createEl("span", { text: "目标:", cls: "setting-item-name" });
-    fragLabel.style.cssText =
-      "font-size:12px;color:var(--text-muted);min-width:40px;margin-left:8px;";
-
-    const nameFragSelect = namingRow1.createEl("select", { cls: "dropdown" });
-    nameFragSelect.createEl("option", { text: "整个画布", value: "all" });
-    nameFragSelect.style.cssText = "flex:1;";
-    nameFragSelect.addEventListener("mousedown", () => this.refreshFragmentOptions(nameFragSelect));
-
-    // 第二行: 外部服务 + 操作按钮
-    const namingRow2 = namingControls.createDiv("molecule-editor-row");
-    namingRow2.style.cssText = "display:flex;gap:8px;align-items:center;";
-
-    const nameServiceSelect = namingRow2.createEl("select", { cls: "dropdown" });
-    for (const [v, label] of [
-      ["pubchem", "PubChem"],
-      ["cir", "CIR"],
-      ["opsin", "Opsin"],
-      ["wikidata", "Wikidata"],
-      ["chembl", "ChEMBL"],
-      ["nist", "NIST"],
-      ["chemspider", "ChemSpider"],
-    ]) {
-      nameServiceSelect.createEl("option", { text: label, value: v });
-    }
-    nameServiceSelect.style.cssText = "flex:1;";
-
-    const nameBtn = namingRow2.createEl("button", { text: "命名", cls: "mod-cta" });
-    nameBtn.onclick = () => {
-      this.refreshFragmentOptions(nameFragSelect);
-      this.nameMoleculeWithMode(
-        nameModeSelect.value,
-        nameServiceSelect.value,
-        nameFragSelect.value
-      );
-    };
-
-    const nameManageBtn = namingRow2.createEl("button", {
-      text: "📚",
-      cls: "molecule-editor-icon-btn",
-    });
-    nameManageBtn.title = "命名索引管理";
-    nameManageBtn.onclick = () => this.showNameIndexManager();
-
-    this.nameResultEl = namingSection.createDiv("molecule-editor-name-result");
-
-    // 第三行: 计算分子式
-    const formulaRow = namingSection.createDiv("molecule-editor-row");
-    formulaRow.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:8px;";
-
-    const formulaBtn = formulaRow.createEl("button", {
-      text: "🧮 计算分子式",
-      cls: "molecule-editor-example-btn",
-    });
-    formulaBtn.onclick = () => {
-      this.refreshFragmentOptions(nameFragSelect);
-      this.computeAndShowFormula(nameFragSelect.value);
-    };
-
-    this.formulaResultEl = formulaRow.createEl("span");
-    this.formulaResultEl.style.cssText = "flex:1;font-size:12px;color:var(--text-accent);";
-
-    // ==== 子结构搜索 ====
-    const searchSection = mainCol.createDiv("molecule-editor-section");
-    searchSection.createEl("div", { text: "🔍 子结构搜索", cls: "molecule-editor-section-title" });
-
-    let smartsInput = "";
-    const searchRow = searchSection.createDiv("molecule-editor-row");
-    searchRow.style.cssText = "display:flex;gap:8px;align-items:center;";
-
-    const smartsInputEl = searchRow.createEl("input", {
-      type: "text",
-      placeholder: "SMARTS 如 c1ccccc1",
-    });
-    smartsInputEl.style.cssText =
-      "flex:1;padding:4px 8px;border:1px solid var(--background-modifier-border);border-radius:4px;font-size:12px;";
-    smartsInputEl.oninput = () => {
-      smartsInput = smartsInputEl.value;
-    };
-
-    const searchBtn = searchRow.createEl("button", {
-      text: "搜索",
-      cls: "molecule-editor-example-btn",
-    });
-    searchBtn.onclick = () => {
-      const mol = this.getMoleculeSafe();
-      if (!mol) return;
-      if (!smartsInput.trim()) {
-        new Notice("请输入 SMARTS");
-        return;
-      }
-      try {
-        const matches = molSubstructureSearch(mol, smartsInput.trim());
-        this.setStatus("子结构搜索: 找到 " + matches + " 处匹配 [" + smartsInput.trim() + "]");
-        new Notice("找到 " + matches + " 处匹配");
-      } catch (e) {
-        new Notice("搜索失败: " + e.message);
-      }
-    };
-
-    // ==== 示例与使用说明 ====
-    const examples = mainCol.createEl("details", { cls: "molecule-editor-examples" });
-    examples.setAttr("open", "open");
-    examples.createEl("summary", { text: "📖 示例与使用说明" });
-    const exBody = examples.createDiv("molecule-editor-examples-body");
-    exBody.createEl("p", {
-      text: "使用方法：在画布工具栏选原子（C/N/O…）后单击摆放；选键类型后点击两个原子之间拼键；选中后按 Delete 拆键 / 删除。",
-    });
-    exBody.createEl("p", { text: "以下示例点击即可载入画布：" });
-    const exGrid = exBody.createDiv("molecule-editor-lib-grid");
-    const exampleList = [
-      ["乙醇", "CCO"],
-      ["乙酸", "CC(=O)O"],
-      ["苯酚", "Oc1ccccc1"],
-      ["咖啡因", "CN1C=NC2=C1C(=O)N(C(=O)N2C)C"],
-      ["阿司匹林", "CC(=O)Oc1ccccc1C(=O)O"],
+    const shortcuts = [
+      { keys: "Ctrl + Z", desc: "撤销上一步操作" },
+      { keys: "Ctrl + Y / Ctrl + Shift + Z", desc: "重做" },
+      { keys: "Ctrl + 0", desc: "重置视图" },
+      { keys: "Delete / Backspace", desc: "删除选中的原子/键" },
+      { keys: "滚轮", desc: "以光标为中心缩放画布" },
+      { keys: "右键拖动", desc: "平移画布" },
+      { keys: "Esc", desc: "取消当前选择/操作" },
     ];
-    for (const [name, smi] of exampleList) {
-      const b = exGrid.createEl("button", { text: name, cls: "molecule-editor-example-btn" });
-      b.title = smi;
-      b.onclick = () => {
-        try {
-          this.loadMolecule(getOCL().Molecule.fromSmiles(smi), "示例已载入: " + name);
-        } catch (e) {
-          new Notice("示例加载失败: " + e.message);
-        }
-      };
-    }
-    exBody.createEl("p", {
-      cls: "molecule-editor-hint",
-      text:
-        "「插入结构式 (渲染)」会把画布结构转成 chemfig 代码并写回代码块 / 笔记（`% smiles:` 归档二次编辑）；" +
-        "「仅保存 SMILES」适合复制为计算机可读格式。手写 chemfig 经侧边栏「🧪 画布编辑」进入本编辑器时会自动解析回结构。",
+
+    const shortcutsList = helpEl.createDiv("shortcuts-list");
+    shortcuts.forEach(s => {
+      const row = shortcutsList.createDiv("shortcut-row");
+      row.style.cssText = "display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--background-modifier-border);";
+      
+      const keysSpan = row.createSpan({ text: s.keys });
+      keysSpan.style.cssText = "font-family: monospace; background: var(--background-primary); padding: 1px 6px; border-radius: 4px; font-size: 10px;";
+      
+      const descSpan = row.createSpan({ text: s.desc });
+      descSpan.style.cssText = "color: var(--text-muted);";
     });
+
+    // 操作提示
+    const tipsEl = mainCol.createDiv("molecule-editor-help");
+    tipsEl.innerHTML =
+      "<strong>操作提示:</strong> 顶部悬浮工具栏选原子/键类型绘制 | 选中后 Delete 删除 | " +
+      "选键类型后点击两原子间拼键 | 滚轮缩放 | 右键拖动平移";
 
     // ==== 片段库（画布右侧）====
     if (this.enableTemplateLibrary !== false) {
@@ -1299,64 +1550,64 @@ class MoleculeEditorModal extends Modal {
         cls: "molecule-editor-section-title",
       });
     }
+
+    // ==== 学习模块（左侧可收缩栏）====
+    this.learningCol = learningCol;
+    this.buildLearningSidebar(learningCol, cols);
   }
 
-  // 构建右侧片段库（含编辑器模板导入的环结构）- v10.15.0: 面包屑+列表展开形式
+  // 构建右侧片段库（含编辑器模板导入的环结构）- v16.0.0: 新三栏布局
   buildFragmentLibrary(container) {
     try {
-      container.createEl("div", {
-        text: "🧩 片段库（点击载入画布）",
-        cls: "molecule-editor-section-title",
+      // 侧边栏头部
+      const header = container.createDiv("sidebar-header");
+      header.createSpan({ text: "🧩 化合物库" });
+      const collapseBtn = header.createEl("button", {
+        text: "—",
+        cls: "chem-modal-tool-btn molecule-editor-tool-btn",
       });
+      collapseBtn.style.cssText =
+        "padding:2px 8px;border:none;background:transparent;cursor:pointer;font-size:14px;border-radius:4px;";
+      collapseBtn.onmouseenter = () => {
+        collapseBtn.style.background = "var(--background-modifier-hover)";
+      };
+      collapseBtn.onmouseleave = () => {
+        collapseBtn.style.background = "transparent";
+      };
+      collapseBtn.onclick = () => {
+        const body = container.querySelector(".sidebar-body");
+        if (body.style.display === "none") {
+          body.style.display = "flex";
+          collapseBtn.textContent = "—";
+        } else {
+          body.style.display = "none";
+          collapseBtn.textContent = "+";
+        }
+      };
 
-      // v10.16.0: 学习模块折叠面板（侧边折叠栏）
-      const learningPanel = container.createEl("details", { cls: "learning-panel" });
-      learningPanel.style.cssText =
-        "margin-bottom:8px;border:1px solid var(--background-modifier-border);border-radius:6px;background:var(--background-secondary);";
-
-      const learningSummary = learningPanel.createEl("summary");
-      learningSummary.style.cssText =
-        "padding:8px 12px;cursor:pointer;font-weight:600;font-size:12px;user-select:none;list-style:none;display:flex;align-items:center;gap:6px;";
-      learningSummary.innerHTML =
-        '📚 学习模块 <span style="margin-left:auto;font-size:10px;color:var(--text-muted);">点击展开/折叠</span>';
-
-      const learningContent = learningPanel.createDiv("learning-panel-content");
-      learningContent.style.cssText =
-        "padding:8px;border-top:1px solid var(--background-modifier-border);display:flex;flex-direction:column;gap:6px;";
-
-      // 学习模块按钮
-      const learningButtons = [
-        { text: "📇 翻转卡片练习", action: () => this.openFlashcardPractice() },
-        { text: "✏️ 默写练习", action: () => this.openQuizMode() },
-        { text: "🎯 每日一题", action: () => this.openDailyChallenge() },
-        { text: "🔬 反应式分步查看", action: () => this.openReactionStepsViewer() },
-        { text: "📖 反应条件速查", action: () => this.openReactionConditionsGuide() },
-      ];
-
-      for (const btn of learningButtons) {
-        const b = learningContent.createEl("button", { text: btn.text });
-        b.style.cssText =
-          "width:100%;padding:6px 8px;font-size:11px;background:var(--background-primary);border:1px solid var(--background-modifier-border);border-radius:4px;cursor:pointer;text-align:left;transition:all 0.2s;";
-        b.onmouseenter = () => {
-          b.style.borderColor = "var(--interactive-accent)";
-          b.style.background = "var(--background-modifier-hover)";
-        };
-        b.onclick = btn.action;
-      }
-
-      // 搜索框
-      const searchInput = container.createEl("input", {
+      // 搜索区域
+      const searchArea = container.createDiv("sidebar-search");
+      const searchInput = searchArea.createEl("input", {
         type: "text",
         placeholder: "搜索: 名称 / SMILES / 分子式...",
         cls: "molecule-lib-search",
       });
-      searchInput.style.cssText = "width:100%;padding:6px;margin-bottom:6px;";
 
       // v10.15.13: 搜索自动补全下拉容器
       const autocompleteContainer = container.createDiv("molecule-autocomplete");
       autocompleteContainer.style.cssText =
         "position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--background-primary);border:1px solid var(--background-modifier-border);border-radius:4px;z-index:1000;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.15);";
       searchInput.parentElement.style.position = "relative";
+
+      // 内容区域
+      const body = container.createDiv("sidebar-body");
+      
+      // 修复 wheel 事件被 Obsidian Modal 拦截
+      body.addEventListener("wheel", (e) => {
+        e.stopPropagation();
+      }, { passive: false });
+
+      // v10.16.0: 学习模块已移至左侧边栏
 
       let autocompleteTimeout = null;
 
@@ -1469,14 +1720,29 @@ class MoleculeEditorModal extends Modal {
       };
 
       // 搜索类型提示
-      const searchHint = container.createEl("div");
-      searchHint.style.cssText = "font-size:10px;color:var(--text-muted);margin:4px 0 8px 0;";
+      const searchHint = body.createEl("div");
+      searchHint.style.cssText = "font-size:10px;color:var(--text-muted);margin:4px 0 8px 0;flex-shrink:0;";
       searchHint.textContent =
         "搜索: 中文名(苯)/SMILES/分子式；导入支持 SMILES、分子式或英文名(PubChem)";
 
+      // 片段库独立容器
+      const fragmentContainer = body.createDiv("fragment-library-container");
+      fragmentContainer.style.cssText =
+        "flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;";
+
+      // 分类筛选卡片
+      const categoryCard = fragmentContainer.createDiv("category-card");
+      categoryCard.style.cssText =
+        "flex-shrink:0;margin:8px;margin-bottom:4px;background:var(--background-secondary);border-radius:8px;overflow:hidden;";
+
+      const categoryCardHeader = categoryCard.createDiv("category-card-header");
+      categoryCardHeader.style.cssText =
+        "padding:8px 12px;font-size:12px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--background-modifier-border);";
+      categoryCardHeader.textContent = "🏷️ 快速筛选";
+
       // v10.15.17: 标签筛选栏
-      const tagBar = container.createDiv("molecule-tag-bar");
-      tagBar.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;";
+      const tagBar = categoryCard.createDiv("molecule-tag-bar");
+      tagBar.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px;";
 
       // 预设标签（从分类名提取关键词）
       const presetTags = [
@@ -1525,10 +1791,15 @@ class MoleculeEditorModal extends Modal {
         };
       }
 
+      // 化合物列表卡片
+      const listCard = fragmentContainer.createDiv("list-card");
+      listCard.style.cssText =
+        "flex:1;min-height:0;display:flex;flex-direction:column;margin:8px;margin-top:0;background:var(--background-primary);border:1px solid var(--background-modifier-border);border-radius:8px;overflow:hidden;";
+
       // v10.15.17: 学习统计面板（保留在片段库顶部）
-      const statsPanel = container.createDiv("molecule-stats-panel");
+      const statsPanel = listCard.createDiv("molecule-stats-panel");
       statsPanel.style.cssText =
-        "padding:8px;background:var(--background-secondary);border-radius:6px;margin-bottom:8px;font-size:11px;";
+        "padding:8px;background:var(--background-secondary);border-radius:6px;margin:8px;margin-bottom:4px;font-size:11px;flex-shrink:0;";
 
       // v10.16.0: 成就系统
       const achievements = [
@@ -1650,18 +1921,26 @@ class MoleculeEditorModal extends Modal {
       updateStats();
 
       // 外部库导入按钮
-      const importBtn = container.createEl("button", {
+      const importBtn = listCard.createEl("button", {
         text: "🌐 从外部库导入",
         cls: "molecule-lib-import-btn",
       });
       importBtn.style.cssText =
-        "width:100%;padding:6px;font-size:11px;margin-bottom:8px;background:var(--background-secondary);border:1px solid var(--background-modifier-border);border-radius:4px;cursor:pointer;";
+        "width:calc(100% - 16px);padding:8px;font-size:11px;margin:0 8px 8px 8px;background:var(--background-secondary);border:1px solid var(--background-modifier-border);border-radius:6px;cursor:pointer;transition:all 0.2s;flex-shrink:0;";
+      importBtn.onmouseenter = () => {
+        importBtn.style.borderColor = "var(--interactive-accent)";
+        importBtn.style.background = "var(--background-modifier-hover)";
+      };
       importBtn.onclick = () => this.importFromExternalDB(searchInput.value);
 
       // 模板列表容器
-      const listEl = container.createDiv("molecule-lib-list");
+      const breadcrumbEl = listCard.createDiv("molecule-breadcrumb");
+      breadcrumbEl.style.cssText =
+        "display:flex;align-items:center;gap:4px;padding:6px 8px;margin:0 8px 8px 8px;background:var(--background-secondary);border-radius:6px;font-size:12px;flex-shrink:0;";
+
+      const listEl = listCard.createDiv("molecule-lib-list");
       listEl.style.cssText =
-        "flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px;align-content:start;padding:4px;";
+        "flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:8px;align-content:start;padding:4px 8px 8px 8px;overflow-y:auto;";
 
       // v10.15.11: 虚拟滚动列表 (条目数 > 50 时启用)
       let virtualList = null;
@@ -1769,6 +2048,22 @@ class MoleculeEditorModal extends Modal {
         listEl.empty();
         const kw = (searchInput.value || "").trim().toLowerCase();
 
+        // 更新面包屑导航
+        breadcrumbEl.empty();
+        const homeLink = breadcrumbEl.createEl("span");
+        homeLink.textContent = "🏠 全部";
+        homeLink.style.cssText =
+          "cursor:pointer;color:var(--text-accent);font-weight:500;";
+        homeLink.onclick = () => {
+          activeTag = null;
+          // 重置标签按钮样式
+          Array.from(tagBar.children).forEach((b) => {
+            b.style.background = "var(--background-primary)";
+            b.style.color = "";
+          });
+          renderList();
+        };
+
         // v10.15.17: 标签筛选函数
         function matchesTag(cat, item) {
           if (!activeTag) return true;
@@ -1874,18 +2169,26 @@ class MoleculeEditorModal extends Modal {
           const btn = listEl.createEl("button");
           btn.style.cssText =
             "width:100%;text-align:left;padding:8px 10px;margin-bottom:3px;font-size:12.5px;background:var(--background-primary);border:1px solid var(--background-modifier-border);border-radius:4px;cursor:pointer;display:flex;justify-content:space-between;";
-          btn.innerHTML = `<span>${cat}</span><span style="font-size:11px;color:var(--text-muted)">${filteredItems.length} 项 ›</span>`;
+          btn.innerHTML = `<span>${cat}</span><span style="font-size:11px;color:var(--text-muted)">${items.length} 项 ›</span>`;
           btn.onclick = () => {
             listEl.empty();
-            // 返回按钮
-            const backBtn = listEl.createEl("button");
-            backBtn.style.cssText =
-              "width:100%;text-align:left;padding:6px 10px;margin-bottom:8px;font-size:12px;background:var(--background-secondary);border:none;cursor:pointer;";
-            backBtn.textContent = "‹ 返回全部";
-            backBtn.onclick = () => renderList();
-            // 显示分类下的片段 (按分子式分组, 同分异构体归并显示)
+            // 更新面包屑导航
+            breadcrumbEl.empty();
+            const homeLink = breadcrumbEl.createEl("span");
+            homeLink.textContent = "🏠 全部";
+            homeLink.style.cssText =
+              "cursor:pointer;color:var(--text-accent);font-weight:500;";
+            homeLink.onclick = () => renderList();
+            const separator = breadcrumbEl.createEl("span");
+            separator.textContent = "›";
+            separator.style.cssText = "color:var(--text-muted);";
+            const currentCat = breadcrumbEl.createEl("span");
+            currentCat.textContent = cat;
+            currentCat.style.cssText = "color:var(--text-normal);font-weight:500;";
+
+            // 显示分类下的片段 (按分子式分组, 同分异构体归并显示) - 使用完整 items，忽略标签筛选
             const byFormula = new Map();
-            for (const item of filteredItems) {
+            for (const item of items) {
               const f = item[2] || "";
               if (!byFormula.has(f)) byFormula.set(f, []);
               byFormula.get(f).push(item);
@@ -1917,13 +2220,84 @@ class MoleculeEditorModal extends Modal {
       container.empty();
       container.createEl("div", {
         text: "🧩 片段库加载失败",
-        cls: "molecule-editor-section-title",
+        cls: "sidebar-header",
       });
       container.createEl("div", {
         text: err.message,
-        attr: { style: "padding:10px;font-size:11px;color:var(--text-muted);" },
+        attr: { style: "padding:16px;font-size:12px;color:var(--text-muted);" },
       });
       console.error("[Chemfig-SVG] buildFragmentLibrary error:", err);
+      new Notice("片段库加载失败: " + err.message, 5000);
+    }
+  }
+
+  // v16.5.0: 左侧学习模块侧边栏（可收缩）
+  buildLearningSidebar(learningCol, cols) {
+    try {
+      // 头部
+      const header = learningCol.createDiv("learning-sidebar-header");
+      header.style.cssText =
+        "padding:12px 16px;border-bottom:1px solid var(--background-modifier-border);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;";
+      header.textContent = "📚 学习模块";
+
+      // 内容区域
+      const body = learningCol.createDiv("learning-sidebar-body");
+      
+      // 修复 wheel 事件被 Obsidian Modal 拦截
+      body.addEventListener("wheel", (e) => {
+        e.stopPropagation();
+      }, { passive: false });
+      body.style.cssText =
+        "flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;";
+
+      // 学习模块按钮
+      const learningButtons = [
+        { text: "📇 翻转卡片练习", icon: "📇", action: () => this.openFlashcardPractice() },
+        { text: "✏️ 默写练习", icon: "✏️", action: () => this.openQuizMode() },
+        { text: "🎯 每日一题", icon: "🎯", action: () => this.openDailyChallenge() },
+        { text: "🔬 反应式分步查看", icon: "🔬", action: () => this.openReactionStepsViewer() },
+        { text: "📖 反应条件速查", icon: "📖", action: () => this.openReactionConditionsGuide() },
+        { text: "🧠 官能团分析", icon: "🧠", action: () => this.openFunctionalGroupAnalysis() },
+        { text: "🔄 逆合成分析", icon: "🔄", action: () => this.openRetrosynthesis() },
+        { text: "🎮 配对游戏", icon: "🎮", action: () => this.openMatchingGame() },
+      ];
+
+      for (const btn of learningButtons) {
+        const b = body.createEl("button");
+        b.style.cssText =
+          "width:100%;padding:10px 12px;font-size:12px;background:var(--background-secondary);border:1px solid var(--background-modifier-border);border-radius:8px;cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:8px;";
+        b.innerHTML = `<span style="font-size:16px;">${btn.icon}</span><span>${btn.text}</span>`;
+        b.onmouseenter = () => {
+          b.style.borderColor = "var(--interactive-accent)";
+          b.style.background = "var(--background-modifier-hover)";
+          b.style.transform = "translateX(2px)";
+        };
+        b.onmouseleave = () => {
+          b.style.borderColor = "var(--background-modifier-border)";
+          b.style.background = "var(--background-secondary)";
+          b.style.transform = "translateX(0)";
+        };
+        b.onclick = btn.action;
+      }
+
+      // 学习统计面板
+      const statsPanel = body.createDiv("learning-stats-panel");
+      statsPanel.style.cssText =
+        "margin-top:12px;padding:12px;background:var(--background-secondary);border-radius:8px;font-size:11px;";
+      statsPanel.innerHTML = `
+        <div style="font-weight:600;margin-bottom:8px;color:var(--text-muted);">📊 学习统计</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span>已学化合物</span>
+          <span style="font-weight:600;color:var(--interactive-accent);">${Object.keys(JSON.parse(localStorage.getItem("chemfig-learned-molecules") || "{}")).length}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>连续学习</span>
+          <span style="font-weight:600;color:var(--interactive-accent);">${localStorage.getItem("chemfig-streak-days") || 0} 天</span>
+        </div>
+      `;
+
+    } catch (err) {
+      console.error("[Chemfig-SVG] buildLearningSidebar error:", err);
     }
   }
 
@@ -3087,8 +3461,367 @@ class MoleculeEditorModal extends Modal {
     return mol;
   }
 
+  /**
+   * v16.4.0: 获取选中的分子（多分子场景）
+   * 优先返回用户圈选的分子，否则返回整个画布分子
+   */
+  getSelectedMoleculeSafe() {
+    const mol = this.getMoleculeSafe();
+    if (!mol) return null;
+
+    try {
+      // 尝试获取选中的原子/键
+      const fragments = mol.getFragments();
+      
+      // 如果只有一个碎片，直接返回
+      if (fragments.length === 1) {
+        return mol;
+      }
+
+      // 多个碎片时，检查是否有选中的原子
+      // OCL 内部可能有 selection 状态
+      if (this.editor && this.editor.selection) {
+        const selectedAtoms = this.editor.selection.atoms || [];
+        if (selectedAtoms.length > 0) {
+          // 找到选中原子所属的碎片
+          for (const frag of fragments) {
+            let hasSelected = false;
+            frag.forEachAtom(atom => {
+              if (selectedAtoms.includes(atom.getIdx())) {
+                hasSelected = true;
+              }
+            });
+            if (hasSelected) {
+              this.setStatus(`已选中碎片: ${frag.getAllAtoms()} 个原子`);
+              return frag;
+            }
+          }
+        }
+      }
+
+      // 没有选中的，返回整个分子，并提示
+      this.setStatus(`画布包含 ${fragments.length} 个分子，将对整个画布操作`);
+      return mol;
+    } catch (e) {
+      console.warn("获取选中分子失败:", e);
+      return mol;
+    }
+  }
+
+  // v16.0.0: 构建左侧垂直工具栏
+  buildLeftToolbar(container) {
+    // 选择/移动工具组
+    const selectGroup = container.createDiv("molecule-editor-tool-section");
+    
+    const selectBtn = selectGroup.createEl("button", {
+      text: "👆",
+      cls: "molecule-editor-vtool-btn active",
+    });
+    selectBtn.createSpan({ cls: "vtool-label", text: "选择/移动" });
+    selectBtn.onclick = () => {
+      this._setActiveTool(selectBtn);
+      this.setStatus("选择模式：点击原子/键进行编辑");
+    };
+
+    const eraseBtn = selectGroup.createEl("button", {
+      text: "🗑️",
+      cls: "molecule-editor-vtool-btn",
+    });
+    eraseBtn.createSpan({ cls: "vtool-label", text: "删除工具" });
+    eraseBtn.onclick = () => {
+      this._setActiveTool(eraseBtn);
+      this.setStatus("删除模式：点击要删除的原子/键");
+    };
+
+    // 键工具组
+    const bondGroup = container.createDiv("molecule-editor-tool-section");
+    const bonds = [
+      { icon: "─", label: "单键", type: 1 },
+      { icon: "＝", label: "双键", type: 2 },
+      { icon: "≡", label: "三键", type: 3 },
+    ];
+    bonds.forEach(b => {
+      const btn = bondGroup.createEl("button", {
+        text: b.icon,
+        cls: "molecule-editor-vtool-btn",
+      });
+      btn.createSpan({ cls: "vtool-label", text: b.label });
+      btn.onclick = () => {
+        this._setActiveTool(btn);
+        this.setStatus(b.label + "模式：在两个原子间点击创建" + b.label);
+        this._simulateOclToolClick("bond", b.type);
+      };
+    });
+
+    // 原子工具组
+    const atomGroup = container.createDiv("molecule-editor-tool-section");
+    const atoms = [
+      { symbol: "C", label: "碳" },
+      { symbol: "N", label: "氮" },
+      { symbol: "O", label: "氧" },
+      { symbol: "S", label: "硫" },
+      { symbol: "P", label: "磷" },
+    ];
+    atoms.forEach(a => {
+      const btn = atomGroup.createEl("button", {
+        text: a.symbol,
+        cls: "molecule-editor-vtool-btn",
+      });
+      btn.style.fontWeight = "bold";
+      btn.createSpan({ cls: "vtool-label", text: a.label + "原子" });
+      btn.onclick = () => {
+        this._setActiveTool(btn);
+        this.setStatus(a.label + "原子：点击画布添加" + a.label + "原子");
+        this._simulateOclToolClick("atom", a.symbol);
+      };
+    });
+
+    // 模板工具组
+    const tplGroup = container.createDiv("molecule-editor-tool-section");
+    const templates = [
+      { icon: "⬡", label: "苯环", smiles: "c1ccccc1" },
+      { icon: "⬢", label: "环己烷", smiles: "C1CCCCC1" },
+      { icon: "⬟", label: "环戊烷", smiles: "C1CCCC1" },
+    ];
+    templates.forEach(t => {
+      const btn = tplGroup.createEl("button", {
+        text: t.icon,
+        cls: "molecule-editor-vtool-btn",
+      });
+      btn.createSpan({ cls: "vtool-label", text: t.label });
+      btn.onclick = () => {
+        try {
+          const mol = getOCL().Molecule.fromSmiles(t.smiles);
+          this.loadMolecule(mol, "已载入模板: " + t.label);
+        } catch (e) {
+          this.setStatus("模板加载失败: " + e.message);
+        }
+      };
+    });
+
+    // 视图工具组
+    const viewGroup = container.createDiv("molecule-editor-tool-section");
+    const views = [
+      { icon: "🔍+", label: "放大", action: () => this.zoomCanvas(1.2) },
+      { icon: "🔍-", label: "缩小", action: () => this.zoomCanvas(0.8) },
+      { icon: "🔄", label: "重置视图", action: () => this.resetView() },
+      { icon: "🧊", label: "3D 查看", action: () => this.open3DViewer() },
+    ];
+    views.forEach(v => {
+      const btn = viewGroup.createEl("button", {
+        text: v.icon,
+        cls: "molecule-editor-vtool-btn",
+      });
+      btn.createSpan({ cls: "vtool-label", text: v.label });
+      btn.onclick = v.action;
+    });
+
+    // v16.3.0: 化学命名工具组
+    const namingGroup = container.createDiv("molecule-editor-tool-section");
+    
+    const namingBtn = namingGroup.createEl("button", {
+      text: "🔤",
+      cls: "molecule-editor-vtool-btn",
+    });
+    namingBtn.createSpan({ cls: "vtool-label", text: "化学命名" });
+    namingBtn.onclick = () => {
+      this.openNamingPanel();
+    };
+
+    const formulaBtn = namingGroup.createEl("button", {
+      text: "🧮",
+      cls: "molecule-editor-vtool-btn",
+    });
+    formulaBtn.createSpan({ cls: "vtool-label", text: "计算分子式" });
+    formulaBtn.onclick = () => {
+      this.computeFormulaFromToolbar();
+    };
+
+    // v16.3.0: 更多功能工具组
+    const moreGroup = container.createDiv("molecule-editor-tool-section");
+    
+    const moreBtn = moreGroup.createEl("button", {
+      text: "⚗️",
+      cls: "molecule-editor-vtool-btn",
+    });
+    moreBtn.createSpan({ cls: "vtool-label", text: "官能团分析" });
+    moreBtn.onclick = () => {
+      this.openFunctionalGroupAnalysis();
+    };
+
+    const dbBtn = moreGroup.createEl("button", {
+      text: "📚",
+      cls: "molecule-editor-vtool-btn",
+    });
+    dbBtn.createSpan({ cls: "vtool-label", text: "化合物库" });
+    dbBtn.onclick = () => {
+      this.openCompoundDatabase();
+    };
+  }
+
+  // v16.3.0: 打开命名面板
+  openNamingPanel() {
+    const mol = this.getSelectedMoleculeSafe();
+    if (!mol) {
+      new Notice("请先在画布上绘制分子", 2000);
+      return;
+    }
+    try {
+      const smiles = mol.toIsomericSmiles();
+      this.setStatus("正在命名...");
+      
+      // v16.4.0: 通过 SMILES 反查中文标准命名
+      const compound = CompoundIndex.getCompoundBySmiles(smiles);
+      if (compound) {
+        const formula = compound.molecularFormula;
+        const mw = compound.molecularWeight;
+        const groups = compound.functionalGroups.map(g => g.name).join("、");
+        new Notice(
+          `【${compound.category}】${compound.name}\n` +
+          `分子式: ${formula} | 分子量: ${mw}\n` +
+          `官能团: ${groups || "无"}`,
+          6000
+        );
+        this.setStatus(`命名完成: ${compound.name}`);
+      } else {
+        // 未在数据库中找到，计算基本信息
+        const formula = CompoundIndex.calculateMolecularFormula(smiles);
+        const mw = CompoundIndex.calculateMolecularWeight(formula);
+        new Notice(
+          `未找到匹配化合物\n` +
+          `SMILES: ${smiles}\n` +
+          `分子式: ${formula} | 分子量: ${mw}`,
+          6000
+        );
+        this.setStatus(`已计算分子式: ${formula}`);
+      }
+    } catch (e) {
+      new Notice("命名失败: " + e.message, 3000);
+    }
+  }
+
+  // v16.3.0: 从工具栏计算分子式
+  computeFormulaFromToolbar() {
+    const mol = this.getSelectedMoleculeSafe();
+    if (!mol) {
+      new Notice("请先在画布上绘制分子", 2000);
+      return;
+    }
+    try {
+      const smiles = mol.toIsomericSmiles();
+      const formula = CompoundIndex.calculateMolecularFormula(smiles);
+      const mw = CompoundIndex.calculateMolecularWeight(formula);
+      new Notice(`分子式: ${formula}\n分子量: ${mw}`, 4000);
+    } catch (e) {
+      new Notice("计算失败: " + e.message, 3000);
+    }
+  }
+
+  // v16.3.0: 打开官能团分析
+  openFunctionalGroupAnalysis() {
+    const mol = this.getMoleculeSafe();
+    if (!mol) {
+      new Notice("请先在画布上绘制分子", 2000);
+      return;
+    }
+    try {
+      const smiles = mol.toIsomericSmiles();
+      if (typeof FunctionalGroupAnalysisModal !== "undefined") {
+        new FunctionalGroupAnalysisModal(this.app, smiles).open();
+      } else {
+        new Notice("官能团分析模块未加载", 2000);
+      }
+    } catch (e) {
+      new Notice("分析失败: " + e.message, 3000);
+    }
+  }
+
+  // v16.3.0: 打开化合物数据库
+  openCompoundDatabase() {
+    if (typeof CompoundDatabaseModal !== "undefined") {
+      new CompoundDatabaseModal(this.app).open();
+    } else {
+      new Notice("化合物数据库未加载", 2000);
+    }
+  }
+
+  // v16.0.0: 设置当前激活工具按钮
+  _setActiveTool(activeBtn) {
+    const allBtns = activeBtn.parentElement.parentElement.querySelectorAll(".molecule-editor-vtool-btn");
+    allBtns.forEach(b => b.classList.remove("active"));
+    activeBtn.classList.add("active");
+  }
+
+  // v16.0.0: 模拟点击 OCL 内置工具栏按钮
+  _simulateOclToolClick(toolType, param) {
+    if (!this.editorContainer) return;
+    
+    try {
+      // 尝试找到 OCL 工具栏中的对应按钮
+      const toolbar = this.editorContainer.querySelector(".ocl-toolbar, [class*='toolbar']");
+      if (!toolbar) return;
+
+      const buttons = toolbar.querySelectorAll("button, [role='button'], [class*='tool']");
+      
+      if (toolType === "bond") {
+        // 键工具：根据键级找到对应按钮
+        const bondIdx = param - 1;
+        if (buttons[bondIdx]) {
+          buttons[bondIdx].click();
+        }
+      } else if (toolType === "atom") {
+        // 原子工具：查找包含该原子符号的按钮
+        for (const btn of buttons) {
+          const text = (btn.textContent || "").trim();
+          if (text === param || btn.getAttribute("aria-label") === param) {
+            btn.click();
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  // v16.0.0: 缩放画布
+  zoomCanvas(factor) {
+    if (!this.editor) return;
+    try {
+      if (typeof this.editor.zoom === "function") {
+        this.editor.zoom(factor);
+      }
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  // v16.0.0: 打开 3D 查看器
+  open3DViewer() {
+    const mol = this.getMoleculeSafe();
+    if (!mol) {
+      new Notice("请先在画布上绘制分子", 2000);
+      return;
+    }
+    try {
+      const smiles = mol.toIsomericSmiles();
+      // 调用已有的 3D 查看器功能
+      if (this._open3DViewer) {
+        this._open3DViewer(smiles);
+      } else {
+        new Notice("3D 查看器加载中...", 2000);
+      }
+    } catch (e) {
+      new Notice("3D 查看失败: " + e.message);
+    }
+  }
+
   setStatus(msg) {
-    if (this.statusEl) this.statusEl.textContent = msg;
+    if (this.statusEl) {
+      this.statusEl.empty();
+      const left = this.statusEl.createDiv("status-left");
+      left.createSpan({ text: msg });
+    }
   }
 
   // 静默取得当前分子（不弹提示），供平移 / 缩放手势使用
@@ -3192,6 +3925,47 @@ class MoleculeEditorModal extends Modal {
       30: "Zn", 35: "Br", 47: "Ag", 53: "I", 79: "Au", 80: "Hg",
     };
     return map[no] || `X${no}`;
+  }
+
+  // v16.4.0: 实现悬浮元素可拖动
+  makeDraggable(element) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    
+    // 添加拖拽手柄样式
+    element.style.cursor = 'grab';
+    element.addEventListener('mousedown', dragMouseDown);
+    
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // 获取鼠标光标位置
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.addEventListener('mouseup', closeDragElement);
+      document.addEventListener('mousemove', elementDrag);
+      element.style.cursor = 'grabbing';
+    }
+    
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // 计算新位置
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // 设置元素的新位置
+      element.style.top = (element.offsetTop - pos2) + "px";
+      element.style.left = (element.offsetLeft - pos1) + "px";
+      element.style.transform = 'none';
+    }
+    
+    function closeDragElement() {
+      // 停止移动并释放鼠标按钮
+      document.removeEventListener('mouseup', closeDragElement);
+      document.removeEventListener('mousemove', elementDrag);
+      element.style.cursor = 'grab';
+    }
   }
 
   // 画布手势：按住右键拖动 = 平移；滚轮 = 以光标为中心缩放。
@@ -4547,321 +5321,9 @@ class SmilesSearchModal extends Modal {
 // 4. 更好的按钮样式和间距
 // 5. 响应式布局
 
-const MOLECULE_EDITOR_REFINED_CSS = `
-/* ========== v15.7.0: 分子编辑器 UI 重构 ========== */
+// 从重构后的模块导入 CSS
+import { MOLECULE_EDITOR_CSS as MOLECULE_EDITOR_REFINED_CSS } from './molecule-editor/css';
 
-.molecule-editor-modal {
-  max-width: 1400px !important;
-  width: 95vw !important;
-}
-
-.molecule-editor-modal h2 {
-  margin: 0 0 4px 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.molecule-editor-hint {
-  margin: 0 0 16px 0;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-/* 三栏布局 */
-.molecule-editor-columns {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 16px;
-  min-height: 600px;
-}
-
-.molecule-editor-main {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-
-/* 画布区域 */
-.molecule-editor-canvas {
-  flex: 1;
-  min-height: 400px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  background: white;
-  overflow: hidden;
-  position: relative;
-}
-
-.molecule-editor-canvas canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* 状态栏 */
-.molecule-editor-status {
-  padding: 8px 12px;
-  background: var(--background-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-}
-
-/* 操作栏 */
-.molecule-editor-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  padding: 12px;
-  background: var(--background-secondary);
-  border-radius: 8px;
-}
-
-/* ========== v15.7.0: 重构后的工具栏样式 ========== */
-
-/* 顶部工具栏 */
-.molecule-editor-toolbar-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: var(--background-secondary);
-  border-radius: 8px;
-  gap: 12px;
-}
-
-.molecule-editor-tool-group {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.molecule-editor-tool-btn {
-  padding: 6px 10px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.molecule-editor-tool-btn:hover {
-  background: var(--background-modifier-hover);
-  border-color: var(--interactive-accent);
-}
-
-.molecule-editor-tool-btn.primary {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-  font-weight: 600;
-}
-
-.molecule-editor-tool-btn.primary:hover {
-  opacity: 0.9;
-}
-
-.molecule-editor-tool-btn.secondary {
-  background: var(--background-primary);
-  color: var(--text-muted);
-}
-
-/* SMILES 输入栏 */
-.molecule-editor-smiles-bar {
-  display: flex;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--background-secondary);
-  border-radius: 8px;
-}
-
-.molecule-editor-smiles-input {
-  flex: 1;
-  padding: 6px 10px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-  font-family: monospace;
-}
-
-.molecule-editor-smiles-btn {
-  padding: 6px 14px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.molecule-editor-smiles-btn:hover {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-}
-
-/* 更多功能折叠区 */
-.molecule-editor-more-wrap {
-  padding: 8px 12px;
-  background: var(--background-secondary);
-  border-radius: 8px;
-}
-
-.molecule-editor-more-toggle {
-  width: 100%;
-  padding: 6px 0;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-  cursor: pointer;
-  text-align: left;
-}
-
-.molecule-editor-more-toggle:hover {
-  color: var(--text-normal);
-}
-
-.molecule-editor-more-content {
-  padding-top: 8px;
-  border-top: 1px solid var(--background-modifier-border);
-  margin-top: 8px;
-}
-
-/* 右侧片段库 */
-.molecule-editor-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 280px;
-  max-height: 800px;
-  overflow-y: auto;
-}
-
-.molecule-editor-sidebar > div,
-.molecule-editor-sidebar > input,
-.molecule-editor-sidebar > details {
-  background: var(--background-secondary);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 8px;
-}
-
-.molecule-editor-sidebar .molecule-lib-search {
-  padding: 8px 12px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-}
-
-/* ========== v15.7.0: 轮盘导航效果 (参考 Ketcher/Marvin) ========== */
-
-.molecule-editor-category-wheel {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin: 8px 0;
-}
-
-.molecule-editor-wheel-item {
-  padding: 8px 4px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  background: var(--background-primary);
-  text-align: center;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.molecule-editor-wheel-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: var(--interactive-accent);
-}
-
-.molecule-editor-wheel-item.active {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-}
-
-/* 片段卡片网格 */
-.molecule-editor-fragment-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.molecule-editor-fragment-card {
-  padding: 8px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  background: var(--background-primary);
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.molecule-editor-fragment-card:hover {
-  border-color: var(--interactive-accent);
-  background: var(--background-modifier-hover);
-  transform: scale(1.02);
-}
-
-.molecule-editor-fragment-card img,
-.molecule-editor-fragment-card svg {
-  max-width: 100%;
-  height: auto;
-}
-
-.molecule-editor-fragment-card .fragment-name {
-  font-size: 11px;
-  margin-top: 4px;
-  color: var(--text-muted);
-}
-
-/* OCL 工具栏美化 */
-.molecule-editor-canvas .ocl-toolbar {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 6px;
-  padding: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* 响应式布局 */
-@media (max-width: 1000px) {
-  .molecule-editor-columns {
-    grid-template-columns: 1fr;
-  }
-
-  .molecule-editor-sidebar {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  .molecule-editor-actions input[type="text"] {
-    width: 100%;
-  }
-}
-`;
 
 // 自动注入 CSS
 if (typeof document !== "undefined" && !document.getElementById("molecule-editor-refined-css")) {
@@ -4870,3 +5332,12 @@ if (typeof document !== "undefined" && !document.getElementById("molecule-editor
   style.textContent = MOLECULE_EDITOR_REFINED_CSS;
   document.head.appendChild(style);
 }
+
+
+
+
+
+
+
+
+

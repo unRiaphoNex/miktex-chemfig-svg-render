@@ -135,7 +135,13 @@ class ExcalidrawCanvas {
       this.tempFile = await this.app.vault.create(tempPath, JSON.stringify(data, null, 2));
 
       // 在当前标签页打开 Excalidraw 文件
-      await this.app.workspace.activeLeaf.openFile(this.tempFile);
+      // workspace.activeLeaf 已废弃且在无活动标签页时为 null, 直接 .openFile 会抛
+      // TypeError 并被下面的 catch 吞成「无法打开视图」。改用现行的 getLeaf()。
+      const ws = this.app.workspace;
+      const leaf =
+        typeof ws.getLeaf === "function" ? ws.getLeaf(false) : ws.activeLeaf;
+      if (!leaf) throw new Error("无法获取工作区标签页");
+      await leaf.openFile(this.tempFile);
 
       this.initialized = true;
       this.standaloneMode = true;
@@ -149,18 +155,6 @@ class ExcalidrawCanvas {
       this.showFallback("无法打开 Excalidraw 视图: " + e.message);
       return false;
     }
-  }
-
-  // 设置 postMessage 通信 (与 iframe 中的 Excalidraw 通信)
-  setupPostMessage() {
-    window.addEventListener("message", (event) => {
-      if (event.source !== this.iframe.contentWindow) return;
-      const data = event.data;
-      if (data && data.type === "excalidraw-change") {
-        this.elements = data.elements || [];
-        this.onChange(this.elements);
-      }
-    });
   }
 
   // 显示降级界面 (当 Excalidraw 不可用时)
@@ -254,7 +248,30 @@ class ExcalidrawCanvas {
         },
         "*"
       );
+      return;
     }
+    // v10.15.14 起改用「独立视图」架构: 不再有嵌入式 view / iframe 句柄,
+    // 正确的同步方式是把最新 elements/files 写回本插件自己创建的临时 .excalidraw.md。
+    // 此前这里只判断 this.iframe (该架构下从未被赋值), 于是 addComponent 之后
+    // 组分虽被 push 进 this.elements, 却永远不会出现在画布上 —— 且无任何日志。
+    if (this.standaloneMode && this.tempFile) {
+      const data = {
+        type: "excalidraw",
+        version: 2,
+        source: "miktex-chemfig-svg-render",
+        elements: this.elements,
+        appState: { viewBackgroundColor: "#ffffff", gridSize: null },
+        files: this.files,
+      };
+      // 不 await: 调用方 (addComponent) 是同步语义; 用 catch 避免 unhandled rejection
+      Promise.resolve(this.app.vault.modify(this.tempFile, JSON.stringify(data, null, 2))).catch(
+        (e) => console.warn("[Chemfig-SVG] Excalidraw updateView 写回临时文件失败:", e.message)
+      );
+      return;
+    }
+    console.warn(
+      "[Chemfig-SVG] Excalidraw updateView: 无可用同步通道 (view / iframe / tempFile 均未就绪)"
+    );
   }
 
   // 获取所有组分的布局
@@ -277,7 +294,9 @@ class ExcalidrawCanvas {
     if (this.view && typeof this.view.exportSVG === "function") {
       return await this.view.exportSVG();
     }
-    // 降级: 返回空
+    // 降级: 独立视图模式下无嵌入式句柄, 明确返回 null 并记录原因
+    // (此前静默返回 null, 调用方无法区分「导出为空」与「功能不可用」)
+    console.warn("[Chemfig-SVG] Excalidraw exportSVG: 当前模式不支持导出 (无 view 句柄)");
     return null;
   }
 
@@ -290,9 +309,6 @@ class ExcalidrawCanvas {
       } catch (e) {
         // 忽略删除错误
       }
-    }
-    if (this.iframe) {
-      this.iframe.remove();
     }
     this.container.empty();
   }
@@ -326,14 +342,9 @@ function extractLayoutFromExcalidraw(elements) {
     }));
 }
 
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = {
-    isExcalidrawAvailable,
-    getExcalidrawPlugin,
-    getExcalidrawAPI,
-    getExcalidrawAutomate,
-    parseExcalidrawFile,
-    ExcalidrawCanvas,
-    extractLayoutFromExcalidraw,
-  };
-}
+// 注意: 本插件由 build.js 把所有 .ts 逐文件转译后「拼接进同一个 CJS 作用域」,
+// 顶层 function / class 跨文件直接可见, 无需也不应再写 module.exports。
+// 此前这里有一段 `module.exports = { ExcalidrawCanvas, ... }`, 它对本模块毫无作用
+// (没有任何文件 require 它), 却会在拼接顺序中「临时覆盖」module.exports ——
+// 插件最终能正确导出 ChemfigSvgPlugin 仅仅因为 main.ts 恰好排在 FILES 顺序最后。
+// 一旦有人调整顺序或在其后新增带 module.exports 的文件, 插件会静默加载失败。

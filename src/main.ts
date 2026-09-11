@@ -319,9 +319,10 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
 
       // 专业代码块处理器 (学习自 obsidian-better-codeblock, 比 PostProcessor 更高效)
       // 只处理指定语言的代码块, 避免遍历所有 DOM 元素
-      try {
-        if (typeof this.registerMarkdownCodeBlockProcessor === "function") {
-          for (const lang of ["chem", "tikz", "miktex", "ce"]) {
+      if (typeof this.registerMarkdownCodeBlockProcessor === "function") {
+        const langsToRegister = ["chem", "tikz", "miktex", "ce"];
+        for (const lang of langsToRegister) {
+          try {
             this.registerMarkdownCodeBlockProcessor(lang, (source, el, ctx) => {
               if (!this._renderReady()) return;
               perf.start("codeBlockProcessor:" + lang);
@@ -379,15 +380,16 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
                 perf.end("codeBlockProcessor:" + lang);
               }
             });
+            console.log(`[Chemfig-SVG] registerMarkdownCodeBlockProcessor 已注册: ${lang}`);
+          } catch (e) {
+            // 语言已被其他插件注册 (如 TikZJax 注册了 tikz)，跳过不报错
+            console.warn(`[Chemfig-SVG] ${lang} 代码块处理器已存在 (可能由其他插件注册)，跳过注册:`, e.message);
           }
-          console.log("[Chemfig-SVG] registerMarkdownCodeBlockProcessor 已注册");
-        } else {
-          console.warn(
-            "[Chemfig-SVG] registerMarkdownCodeBlockProcessor 不可用, 回退到 PostProcessor"
-          );
         }
-      } catch (e) {
-        console.error("[Chemfig-SVG] registerMarkdownCodeBlockProcessor 注册失败:", e);
+      } else {
+        console.warn(
+          "[Chemfig-SVG] registerMarkdownCodeBlockProcessor 不可用, 回退到 PostProcessor"
+        );
       }
 
       // smiles 代码块已在 smiles-renderer.ts 的 registerSMILESProcessor 中注册
@@ -1753,7 +1755,7 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
       try {
         const svg = await this.compileTikz(blk.mode, blk.body);
         fs.writeFileSync(svgFile, svg, "utf8");
-        console.log(`[Chemfig-SVG] 编译: ${name}.svg`);
+        console.debug(`[Chemfig-SVG] 编译: ${name}.svg`);
       } catch (e) {
         console.error(`[Chemfig-SVG] 失败 [${name}]:`, e.message);
         new Notice(`[Chemfig-SVG] 编译失败 [${name}]: ${e.message.slice(0, 60)}`, 8000);
@@ -1936,14 +1938,12 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
       const showNext = () => {
         if (idx >= shuffled.length) {
           // 复习完成，清除答对的薄弱卡片
-          const remaining = JSON.parse(
-            localStorage.getItem("chemfig-weak-cards") || "[]"
-          );
-          const newWeak = remaining.filter((id) => {
+          const remaining = readLocalStorageJson("chemfig-weak-cards", []);
+          const newWeak = (Array.isArray(remaining) ? remaining : []).filter((id) => {
             const card = shuffled.find((c) => c.id === id);
             return card && card._justCleared !== true;
           });
-          localStorage.setItem("chemfig-weak-cards", JSON.stringify(newWeak));
+          safeLocalStorageSet("chemfig-weak-cards", newWeak);
 
           new Notice(
             `✅ 薄弱卡片复习完成! 答对了 ${cleared} / ${shuffled.length} 张`,
@@ -2104,18 +2104,12 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
           return;
         }
 
-        // 导入其他数据
+        // 导入其他数据 (导入体积可能很大, 配额不足时不应让整个导入抛错中断)
         if (data.reviewHistory) {
-          localStorage.setItem(
-            "chemfig-review-history",
-            JSON.stringify(data.reviewHistory)
-          );
+          safeLocalStorageSet("chemfig-review-history", data.reviewHistory);
         }
         if (data.weakCards) {
-          localStorage.setItem(
-            "chemfig-weak-cards",
-            JSON.stringify(data.weakCards)
-          );
+          safeLocalStorageSet("chemfig-weak-cards", data.weakCards);
         }
 
         new Notice("✅ 学习数据导入成功", 3000);
@@ -2401,7 +2395,7 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     if (this.svgCacheManager) cached = this.svgCacheManager.get(cacheKey);
     if (cached === undefined && this._compileCache) cached = this._compileCache.get(cacheKey);
     if (cached !== undefined) {
-      console.log(`[Chemfig-SVG] 编译缓存命中: ${cacheKey.slice(0, 16)}`);
+      console.debug(`[Chemfig-SVG] 编译缓存命中: ${cacheKey.slice(0, 16)}`);
       perf.end("compileTikz:" + mode);
       return Promise.resolve(cached);
     }
@@ -2830,7 +2824,7 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
           }
         }
       }
-      console.log(`[Chemfig-SVG] 自动刷新: ${svgName}`);
+      console.debug(`[Chemfig-SVG] 自动刷新: ${svgName}`);
     } catch (e) {
       console.warn("[Chemfig-SVG] 自动刷新编译失败:", e.message?.slice(0, 80));
     }

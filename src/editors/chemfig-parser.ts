@@ -93,9 +93,18 @@ class ChemfigParser {
       cx = x,
       cy = y,
       ca = angle;
+    // 死循环防护: 记录每轮起始位置。若某轮未消费任何字符 (例如 "CH3" 遗留的裸数字、
+    // 或任何无法识别的符号), 强制前进一格。此前 readAtom 遇到非字母会「不消费即返回」,
+    // 主循环便无限添加同坐标原子直到内存耗尽 (Obsidian UI 线程冻结)。
+    let guardPos = -1;
     while (!this.eof()) {
       this.ws();
       if (this.eof()) break;
+      if (this.pos === guardPos) {
+        this.pos++;
+        continue;
+      }
+      guardPos = this.pos;
       const c = this.peek();
       if (c === "}" || c === ")") break;
       if (c === "+" || c === ";") break;
@@ -230,6 +239,10 @@ class ChemfigParser {
         let n = 1;
         if (this.peek() === "_") {
           this.pos++;
+          n = this.readCount();
+        } else if (!this.eof() && /\d/.test(this.peek())) {
+          // 兼容常见写法 CH3 / CH2 (chemfig 标准形式为 CH_3); 同时消费掉数字,
+          // 避免遗留裸数字回到主循环
           n = this.readCount();
         }
         h += n;

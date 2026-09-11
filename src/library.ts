@@ -54,7 +54,10 @@ class StructureLibrary {
     } catch (e) {
       console.warn("[Chemfig-SVG] 结构式库加载失败:", e.message);
       const data = localStorage.getItem("chemfig-structure-library");
-      this.items = data ? JSON.parse(data) : [];
+      // 这是 IndexedDB 失败后的兜底路径: 若此处再抛错 (localStorage 也被写坏),
+      // load() 会整体 reject, 结构式库彻底不可用。降级为空数组更安全。
+      const parsed = safeJsonParse(data, [], "chemfig-structure-library");
+      this.items = Array.isArray(parsed) ? parsed : [];
     }
     this._loaded = true;
     return this.items;

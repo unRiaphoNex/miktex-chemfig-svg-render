@@ -610,6 +610,14 @@ class Molecule3DModal extends Modal {
     bgSelect.createEl("option", { text: "⚫ 黑色", value: "black" });
     bgSelect.createEl("option", { text: "⬜ 透明", value: "transparent" });
 
+    // 配色方案
+    const colorSchemeSelect = controlBar.createEl("select", { cls: "color-scheme-select" });
+    colorSchemeSelect.createEl("option", { text: "🌈 经典", value: "default" });
+    colorSchemeSelect.createEl("option", { text: "🎨 CPK", value: "cpk" });
+    colorSchemeSelect.createEl("option", { text: "🔥 温暖", value: "warm" });
+    colorSchemeSelect.createEl("option", { text: "❄️ 冷色", value: "cool" });
+    colorSchemeSelect.createEl("option", { text: "🌊 光谱", value: "spectrum" });
+
     // 旋转速度
     const speedSelect = controlBar.createEl("select", { cls: "speed-select" });
     speedSelect.createEl("option", { text: "🐢 慢速", value: "1" });
@@ -718,6 +726,10 @@ class Molecule3DModal extends Modal {
 
     bgSelect.onchange = () => {
       this.viewer.setBackgroundColor(bgSelect.value);
+    };
+
+    colorSchemeSelect.onchange = () => {
+      this.viewer.setColorScheme(colorSchemeSelect.value);
     };
 
     speedSelect.onchange = () => {

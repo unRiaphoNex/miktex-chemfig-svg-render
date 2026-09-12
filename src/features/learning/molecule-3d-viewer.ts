@@ -88,6 +88,29 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 从文本内容加载分子（支持多种格式）
+   */
+  loadFromText(text, format = "mol") {
+    if (!this.viewer) {
+      throw new Error("Viewer 未初始化");
+    }
+
+    this.viewer.clear();
+    
+    // 根据格式加载
+    this.viewer.addModel(text, format);
+    
+    // 设置显示样式
+    this.applyStyle();
+    
+    // 自动缩放
+    this.viewer.zoomTo();
+    this.viewer.render();
+
+    this.currentMol = text;
+  }
+
+  /**
    * 应用显示样式
    */
   applyStyle() {
@@ -354,6 +377,19 @@ class Molecule3DModal extends Modal {
       cls: "load-btn",
     });
 
+    // 文件上传按钮
+    const fileInput = controlBar.createEl("input", {
+      type: "file",
+      cls: "file-input",
+    });
+    fileInput.style.display = "none";
+    fileInput.accept = ".mol,.sdf,.pdb,.xyz,.cif";
+
+    const uploadBtn = controlBar.createEl("button", {
+      text: "📁 上传文件",
+      cls: "upload-btn",
+    });
+
     // 模型切换
     const modelSelect = controlBar.createEl("select", { cls: "model-select" });
     modelSelect.createEl("option", { text: "球棍模型", value: "stick" });
@@ -428,6 +464,34 @@ class Molecule3DModal extends Modal {
         await this.viewer.loadFromSmiles(smiles);
       } catch (e) {
         new Notice(`加载失败: ${e.message}`, 3000);
+      }
+    };
+
+    // 文件上传
+    uploadBtn.onclick = () => {
+      fileInput.click();
+    };
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const ext = file.name.split(".").pop().toLowerCase();
+        
+        // 根据文件类型确定格式
+        let format = "mol";
+        if (ext === "pdb") format = "pdb";
+        else if (ext === "xyz") format = "xyz";
+        else if (ext === "sdf") format = "sdf";
+        else if (ext === "cif") format = "cif";
+
+        // 加载分子
+        this.viewer.loadFromText(text, format);
+        new Notice(`已加载: ${file.name}`, 2000);
+      } catch (err) {
+        new Notice(`文件加载失败: ${err.message}`, 3000);
       }
     };
 

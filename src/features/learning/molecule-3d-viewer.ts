@@ -10,9 +10,11 @@ class Molecule3DModalViewer {
       height: options.height || 400,
       model: options.model || "stick", // stick, sphere, cartoon, surface
       colorScheme: options.colorScheme || "default",
+      performance: options.performance || "auto", // low/medium/high/auto
     };
     this.viewer = null;
     this.currentMol = null;
+    this.atomCount = 0;
   }
 
   /**
@@ -24,10 +26,98 @@ class Molecule3DModalViewer {
       await this.load3Dmol();
     }
 
-    // 创建 viewer
-    this.viewer = $3Dmol.createViewer(this.container, {
+    // 创建 viewer - 根据性能模式调整
+    const viewerConfig = {
       backgroundColor: "white",
-    });
+    };
+
+    // 性能优化：低性能模式使用 WebGL 简化设置
+    if (this.options.performance === "low") {
+      viewerConfig.defaultcolorscheme = "default";
+    }
+
+    this.viewer = $3Dmol.createViewer(this.container, viewerConfig);
+  }
+
+  /**
+   * 设置性能模式
+   */
+  setPerformanceMode(mode) {
+    this.options.performance = mode;
+    
+    // 根据原子数自动判断
+    if (mode === "auto") {
+      if (this.atomCount > 5000) {
+        mode = "low";
+      } else if (this.atomCount > 1000) {
+        mode = "medium";
+      } else {
+        mode = "high";
+      }
+    }
+
+    // 应用性能优化
+    this.applyPerformanceOptimizations(mode);
+  }
+
+  /**
+   * 应用性能优化
+   */
+  applyPerformanceOptimizations(mode) {
+    if (!this.viewer) return;
+
+    switch (mode) {
+      case "low":
+        // 低性能：关闭抗锯齿、降低线宽
+        this.viewer.setRenderSettings({
+          antialias: false,
+          lineWidth: 1,
+        });
+        break;
+
+      case "medium":
+        // 中等性能：平衡质量和性能
+        this.viewer.setRenderSettings({
+          antialias: true,
+          lineWidth: 1.5,
+        });
+        break;
+
+      case "high":
+        // 高性能：最佳质量
+        this.viewer.setRenderSettings({
+          antialias: true,
+          lineWidth: 2,
+        });
+        break;
+    }
+
+    this.viewer.render();
+  }
+
+  /**
+   * 根据分子大小自动调整显示样式
+   */
+  autoAdjustDisplay() {
+    if (!this.currentMol) return;
+
+    const atomCount = this.currentMol.numAtoms();
+    this.atomCount = atomCount;
+
+    // 大分子自动切换为简化显示
+    if (atomCount > 5000) {
+      // 蛋白质/大分子：使用卡通模型
+      this.viewer.setStyle({}, {
+        cartoon: { color: "spectrum" },
+      });
+      new Notice("大分子已自动切换为卡通模型", 2000);
+    } else if (atomCount > 1000) {
+      // 中等分子：使用细棍模型
+      this.viewer.setStyle({}, {
+        stick: { radius: 0.1 },
+      });
+    }
+    // 小分子：保持默认球棍模型
   }
 
   /**
@@ -108,6 +198,9 @@ class Molecule3DModalViewer {
     this.viewer.render();
 
     this.currentMol = text;
+
+    // 性能优化：自动调整显示
+    this.autoAdjustDisplay();
   }
 
   /**

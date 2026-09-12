@@ -341,7 +341,8 @@ class AdvancedExternalDBService {
       const mol = OCL.Molecule.fromSmiles(smiles);
       
       // 生成 3D 坐标
-      mol.add3DCoordinates();
+      // OCL 正确的 API 是 generateCoordinates，不是 add3DCoordinates
+      mol.generateCoordinates('mmff94');
       
       // 导出为 MOL 文件
       const molFile = mol.toMolfile();

@@ -264,7 +264,8 @@ class Molecule3DModalViewer {
     try {
       // 使用 OCL 生成 3D 坐标
       const mol = OCL.Molecule.fromSmiles(smiles);
-      mol.add3DCoordinates();
+      // OCL 正确的 API 是 generateCoordinates，不是 add3DCoordinates
+      mol.generateCoordinates('mmff94');
       const molFile = mol.toMolfile();
 
       this.loadFromMolFile(molFile);

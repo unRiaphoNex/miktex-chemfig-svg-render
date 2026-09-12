@@ -189,6 +189,32 @@ ${cjkPackage}${pkgLines}\\pagestyle{empty}
   const hasCe = /\\ce\{/.test(clean); // 无机化学式 \ce{}
   const hasTikzpicture = /\\begin\s*\{\s*tikzpicture\s*\}/.test(clean);
 
+  // math 模式: $$ 数学公式块, 用数学模式包裹
+  if (mode === "math") {
+    // 检查是否已经在数学环境中
+    const alreadyMath = /\\begin\s*\{\s*(equation|align|gather|displaymath)\s*\}/.test(clean) ||
+                        /\\\[|\\\]|^\$\$|^\$/.test(clean);
+    
+    if (alreadyMath) {
+      // 已经在数学环境中, 直接使用
+      return `${preamble}\n${cleanWithChinese}\n\\end{document}\n`;
+    }
+    
+    // 检查是否包含 \ce{} 命令 (mhchem)
+    if (hasCe) {
+      // ce 模式下直接使用, mhchem 自动处理
+      return `${preamble}\n${cleanWithChinese}\n\\end{document}\n`;
+    }
+    
+    // 普通数学公式, 用 \[ \] 包裹
+    return `${preamble}
+\\[
+${cleanWithChinese}
+\\]
+\\end{document}
+`;
+  }
+
   if (mode === "ce") {
     // ce 模式: mhchem 化学反应式
     // 如果代码中同时包含 chemfig 和 \ce{}, 使用 schemestart 包裹 (chemfig 环境)

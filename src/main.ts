@@ -941,6 +941,20 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // 分子结构比较器
+      this.addCommand({
+        id: "open-molecule-comparison",
+        name: "分子结构比较器",
+        callback: () => {
+          if (typeof MoleculeComparisonModal !== "undefined") {
+            const modal = new MoleculeComparisonModal(this.app);
+            modal.open();
+          } else {
+            new Notice("比较器未加载", 2000);
+          }
+        },
+      });
+
       // ========== v11.9.0: 从笔记导入卡片 ==========
       this.addCommand({
         id: "import-cards-from-note",

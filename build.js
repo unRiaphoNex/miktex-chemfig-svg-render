@@ -78,6 +78,7 @@ const FILES = [
   "features/learning/chemistry-db-advanced.ts", // 更多外部数据库+对比+药物设计 (v17.2.0)
   "features/learning/molecule-3d-viewer.ts", // 3D 结构可视化 (v17.2.0)
   "features/learning/molecular-properties.ts", // 分子性质计算器 (v17.3.0)
+  "features/learning/molecule-comparison.ts", // 分子结构比较 (v17.4.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

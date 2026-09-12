@@ -44,6 +44,7 @@ const FILES = [
   "features/learning/matching-game.ts", // 官能团配对游戏
   "features/learning/knowledge-linking.ts", // 知识关联 (v15.6.0)
   "features/learning/retrosynthesis.ts", // 反向合成分析 (v15.6.0)
+  "features/learning/learning-widgets.ts", // 学习日历 & 错题本 (v17.1.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

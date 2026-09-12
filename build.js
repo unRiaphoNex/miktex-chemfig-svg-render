@@ -68,6 +68,7 @@ const FILES = [
   "features/learning/knowledge-sidebar-view.ts", // 知识库侧边栏 (v17.2.0)
   "features/learning/external-db-service.ts", // 外部数据库集成 (v17.2.0)
   "features/learning/plugin-api.ts", // 插件 API 接口 (v17.2.0)
+  "features/learning/advanced-external-db.ts", // 深化外部数据库 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

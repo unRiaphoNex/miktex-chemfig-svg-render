@@ -439,14 +439,7 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
 
           const getFile = () => view.file || this.app.workspace.getActiveFile();
 
-          menu.addItem((item) => {
-            item
-              .setTitle("Chemfig-SVG: 在侧边栏编辑结构式")
-              .setIcon("pencil")
-              .onClick(() => this.openBlockInSidebar(getFile(), editor, line));
-          });
-
-          // 高级弹窗编辑 (保留原 ChemfigEditModal)
+          // 高级弹窗编辑
           menu.addItem((item) => {
             item
               .setTitle("Chemfig-SVG: 弹窗高级编辑")
@@ -454,7 +447,7 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
               .onClick(() => this.openEditorModal(getFile(), editor, line));
           });
 
-          // 切换渲染模式: 子菜单形式, 不再弹到左上角
+          // 切换渲染模式: 子菜单形式
           menu.addItem((item) => {
             item.setTitle("Chemfig-SVG: 切换渲染模式").setIcon("shuffle");
             const { mode: currentMode } = this.extractBlock(editor, line);
@@ -1725,26 +1718,74 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     }
   }
 
-  // 获取代码块的起止行
+  // 获取代码块的起止行 (支持 ``` 代码块和 $$ 数学公式块)
   getCodeBlockRange(editor, line) {
-    let start = line;
-    while (start >= 0 && !editor.getLine(start).trim().startsWith("```")) start--;
-    let end = line;
+    // 有效性检查
+    if (line == null || isNaN(line)) {
+      const cursor = editor.getCursor();
+      line = cursor.line;
+    }
+    
     const total = editor.lineCount();
-    while (end < total && !editor.getLine(end).trim().startsWith("```")) end++;
-    // end 是结束的 ``` 那行
-    return { start, end };
+    if (line < 0 || line >= total) {
+      return { start: 0, end: 0, type: 'unknown' };
+    }
+    
+    // 向上查找块开始标记 (``` 或 $$)
+    let start = line;
+    while (start >= 0) {
+      const l = editor.getLine(start).trim();
+      if (l.startsWith("```") || l === "$$" || l.startsWith("$$")) break;
+      start--;
+    }
+    
+    // 如果没找到开始标记, 返回当前行
+    if (start < 0) {
+      return { start: line, end: line, type: 'unknown' };
+    }
+    
+    // 判断块类型
+    const startLine = editor.getLine(start).trim();
+    const blockType = startLine.startsWith("```") ? 'code' : 'math';
+    
+    // 向下查找块结束标记
+    let end = start + 1;
+    while (end < total) {
+      const l = editor.getLine(end).trim();
+      if (blockType === 'code' && l.startsWith("```")) break;
+      if (blockType === 'math' && (l === "$$" || l.endsWith("$$"))) break;
+      end++;
+    }
+    
+    return { start, end, type: blockType };
   }
 
   // 提取代码块内容和模式
   extractBlock(editor, line) {
-    const { start, end } = this.getCodeBlockRange(editor, line);
+    const { start, end, type } = this.getCodeBlockRange(editor, line);
+    
+    // 有效性检查
+    if (start < 0 || end <= start) {
+      return { start: 0, end: 0, mode: 'chem', body: '' };
+    }
+    
     const firstLine = editor.getLine(start).trim();
-    const modeMatch = firstLine.match(/```(chem|tikz|miktex|ce)/);
-    const mode = modeMatch ? modeMatch[1] : "tikz";
-    let body = "";
+    
+    // 数学公式块
+    if (type === 'math') {
+      let body = '';
+      for (let i = start + 1; i < end; i++) {
+        body += editor.getLine(i) + (i < end - 1 ? '\n' : '');
+      }
+      return { start, end, mode: 'math', body };
+    }
+    
+    // 代码块
+    const modeMatch = firstLine.match(/```(chem|tikz|miktex|ce|molecule)/);
+    const mode = modeMatch ? modeMatch[1] : 'chem';
+    let body = '';
     for (let i = start + 1; i < end; i++) {
-      body += editor.getLine(i) + (i < end - 1 ? "\n" : "");
+      body += editor.getLine(i) + (i < end - 1 ? '\n' : '');
     }
     return { start, end, mode, body };
   }

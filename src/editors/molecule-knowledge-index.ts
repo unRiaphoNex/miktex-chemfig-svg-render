@@ -600,8 +600,11 @@ class MoleculeKnowledgeIndexPanel {
    * 显示详情模态框
    */
   showDetailModal(item) {
+    // 获取 app 对象
+    const app = this.plugin.app || (window.app);
+    
     // 创建详情模态框
-    const modal = new Modal(this.plugin.app);
+    const modal = new Modal(app);
     modal.contentEl.createEl("h2", { text: item.title });
     
     const meta = modal.contentEl.createDiv({ cls: "knowledge-detail-meta" });
@@ -630,8 +633,11 @@ class MoleculeKnowledgeIndexPanel {
     // 插入格式化的知识点到当前笔记
     const content = `### ${item.id}: ${item.title}\n\n${item.content}\n\n---\n`;
     
+    // 获取 app 对象
+    const app = this.plugin.app || (window.app);
+    
     // 获取当前编辑器
-    const activeEditor = this.plugin.app.workspace.activeEditor;
+    const activeEditor = app.workspace.activeEditor;
     if (activeEditor && activeEditor.editor) {
       activeEditor.editor.replaceSelection(content);
       new Notice(`已插入知识点: ${item.id}`, 2000);

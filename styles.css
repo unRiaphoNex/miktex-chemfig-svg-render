@@ -2742,3 +2742,233 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ============================================================
+   v17.1.0 UI 优化 - 学习自 codemyui.com 和 cssbuttons.io
+   ============================================================ */
+
+/* ---------- 高级按钮效果 ---------- */
+
+/* 按钮波纹效果 */
+.chemfig-btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.chemfig-btn-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.chemfig-btn-ripple:active::after {
+  width: 300px;
+  height: 300px;
+  opacity: 0;
+}
+
+/* 按钮渐变效果 */
+.chemfig-btn-gradient {
+  background: linear-gradient(135deg, var(--chemfig-primary), #a855f7);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.chemfig-btn-gradient:hover {
+  background: linear-gradient(135deg, var(--chemfig-primary-hover), #9333ea);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+}
+
+.chemfig-btn-gradient:active {
+  transform: translateY(0);
+}
+
+/* 卡片悬停效果 */
+.chemfig-card {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--chemfig-radius-lg);
+  padding: var(--chemfig-space-lg);
+  transition: all 0.3s ease;
+}
+
+.chemfig-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--chemfig-shadow-lg);
+  border-color: var(--chemfig-primary);
+}
+
+/* 输入框聚焦效果 */
+.chemfig-input {
+  background: var(--background-primary);
+  border: 2px solid var(--background-modifier-border);
+  border-radius: var(--chemfig-radius-md);
+  padding: var(--chemfig-space-sm) var(--chemfig-space-md);
+  transition: all 0.3s ease;
+}
+
+.chemfig-input:focus {
+  border-color: var(--chemfig-primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  outline: none;
+}
+
+/* 三点加载动画 */
+.chemfig-loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.chemfig-loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chemfig-primary);
+  animation: chemfig-bounce 1.4s ease-in-out infinite both;
+}
+
+.chemfig-loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.chemfig-loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes chemfig-bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* 模态框淡入效果 */
+.chemfig-modal-fade-in {
+  animation: chemfig-fade-in 0.3s ease;
+}
+
+@keyframes chemfig-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 卡片翻转效果 */
+.chemfig-flip-card {
+  perspective: 1000px;
+}
+
+.chemfig-flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.chemfig-flip-card.flipped .chemfig-flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.chemfig-flip-card-front,
+.chemfig-flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chemfig-flip-card-back {
+  transform: rotateY(180deg);
+}
+
+/* 成就徽章效果 */
+.chemfig-achievement-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  transition: all 0.3s ease;
+}
+
+.chemfig-achievement-badge:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* 配对正确效果 */
+.chemfig-game-correct {
+  animation: chemfig-correct-pop 0.5s ease;
+}
+
+@keyframes chemfig-correct-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 配对错误效果 */
+.chemfig-game-wrong {
+  animation: chemfig-wrong-shake 0.5s ease;
+}
+
+@keyframes chemfig-wrong-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* 自定义滚动条 */
+.chemfig-custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.chemfig-custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--background-modifier-border);
+  border-radius: 4px;
+}
+
+.chemfig-custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--chemfig-primary);
+  border-radius: 4px;
+}
+
+.chemfig-custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--chemfig-primary-hover);
+}

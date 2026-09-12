@@ -2193,6 +2193,7 @@ class MoleculeEditorModal extends Modal {
         { text: "🧠 官能团分析", icon: "🧠", action: () => this.openFunctionalGroupAnalysis() },
         { text: "🔄 逆合成分析", icon: "🔄", action: () => this.openRetrosynthesis() },
         { text: "🎮 配对游戏", icon: "🎮", action: () => this.openMatchingGame() },
+        { text: "📚 知识库索引", icon: "📚", action: () => this.openKnowledgeIndex() },
       ];
 
       for (const btn of learningButtons) {
@@ -2232,6 +2233,27 @@ class MoleculeEditorModal extends Modal {
     } catch (err) {
       console.error("[Chemfig-SVG] buildLearningSidebar error:", err);
     }
+  }
+
+  // v17.2.0: 打开知识库索引面板
+  openKnowledgeIndex() {
+    if (typeof MoleculeKnowledgeIndexPanel === "undefined") {
+      new Notice("知识库索引面板未加载", 2000);
+      return;
+    }
+
+    // 创建全屏模态框
+    const modal = new Modal(this.app);
+    modal.contentEl.createEl("h2", { text: "📚 知识库索引" });
+    
+    const container = modal.contentEl.createDiv({
+      cls: "knowledge-index-container",
+    });
+    
+    const panel = new MoleculeKnowledgeIndexPanel(container, this);
+    panel.init();
+    
+    modal.open();
   }
 
   // v2.0 迭代: 从外部数据库导入片段到本地库

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Obsidian 插件构建脚本 (V2.0: esbuild 转译 + 拼接)
  * 使用 esbuild 将 src/**\/*.ts 转译为 CJS, 再按依赖顺序拼接为单文件 main.js。
  * 保留共享作用域语义 (各模块顶层变量/函数/类在拼接后互相可见)。
@@ -86,6 +86,7 @@ const FILES = [
   "editors/chemfig-parser.ts",        // 手写 chemfig → 分子图 解析器
   "editors/molecule-editor/css.ts",  // 分子编辑器 CSS 样式
   "editors/molecule-editor.ts",       // 分子画布编辑器
+  "editors/molecule-knowledge-index.ts", // 分子编辑器知识库索引面板 (v17.2.0)
   "utils/latex-sanitizer.ts",         // LaTeX 输入清洗 (安全层)
   "services/temp-file-helper.ts",     // local 模式进程/临时文件管控
   "services/cache-manager.ts",        // SHA256 源码缓存管理器

@@ -20,7 +20,7 @@ const os = require("os");
 const crypto = require("crypto");
 
 // 正则常量
-const TIKZ_BLOCK_REG = /```(chem|tikz|miktex|ce)\s*\n([\s\S]*?)\n```/g;
+const TIKZ_BLOCK_REG = /```(chem|tikz|miktex|ce|molecule)\s*\n([\s\S]*?)\n```/g;
 const NAME_REG_STRICT = /^\s*%%\s*name\s*:\s*([\w-]+)\s*$/m;
 const NAME_REG_LEGACY = /^\s*%\s*NAME\s*:\s*(.+?)\s*$/m;
 

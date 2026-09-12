@@ -1157,4 +1157,54 @@ const MODES = {
       })),
     ],
   },
+  molecule: {
+    label: "molecule (可视化分子编辑器)",
+    lang: "molecule",
+    desc: `【molecule 模式 — 可视化分子编辑器】拖拽式绘制化学结构式，自动生成 chemfig 代码
+
+功能特点:
+  🎨 可视化画布: 左侧片段库拖拽到中间画布绘制结构
+  🧪 片段库: 预置常见官能团、环系、药物分子片段
+  🔧 工具面板: 右侧调整键长、键角、取代基、电荷等
+  ↩️ 历史栈: 支持撤销/重做/清空操作
+  📋 自动生成: 编辑完成自动生成 chemfig 代码
+
+使用方法:
+  1. 点击代码块右侧的"编辑"按钮打开分子编辑器
+  2. 从左侧片段库拖拽结构到画布
+  3. 使用右侧工具调整结构细节
+  4. 点击"保存"按钮自动生成 chemfig 代码
+
+支持的操作:
+  • 单击片段插入到画布
+  • 拖拽调整分子位置
+  • 滚轮缩放画布
+  • 右键删除选中元素
+  • 快捷键: Ctrl+Z 撤销, Ctrl+Y 重做
+
+🔄 模式切换:
+  • molecule → chem: 自动生成 chemfig 代码
+  • molecule → smiles: 自动生成 SMILES 字符串
+  • chem → molecule: 解析 chemfig 代码到画布`,
+    templates: [
+      { category: "苯环", name: "苯", code: "\\chemfig{*6(-=-=-=)}" },
+      { category: "苯环", name: "甲苯", code: "\\chemfig{*6(-=-(-CH_3)=-=)}" },
+      { category: "苯环", name: "苯酚", code: "\\chemfig{*6(-=-(-OH)=-=)}" },
+      { category: "苯环", name: "苯胺", code: "\\chemfig{*6(-=-(-NH_2)=-=)}" },
+      { category: "脂肪链", name: "甲烷", code: "\\chemfig{CH_4}" },
+      { category: "脂肪链", name: "乙烷", code: "\\chemfig{CH_3-CH_3}" },
+      { category: "脂肪链", name: "乙烯", code: "\\chemfig{CH_2=CH_2}" },
+      { category: "脂肪链", name: "乙炔", code: "\\chemfig{CH#CH}" },
+      { category: "官能团", name: "乙醇", code: "\\chemfig{CH_3-CH_2-OH}" },
+      { category: "官能团", name: "乙醛", code: "\\chemfig{CH_3-CHO}" },
+      { category: "官能团", name: "乙酸", code: "\\chemfig{CH_3-COOH}" },
+      { category: "官能团", name: "乙醚", code: "\\chemfig{CH_3-CH_2-O-CH_2-CH_3}" },
+      { category: "杂环", name: "呋喃", code: "\\chemfig{*5(-=-O-=-)}" },
+      { category: "杂环", name: "吡啶", code: "\\chemfig{*6(-=-N=-=-)}" },
+      { category: "杂环", name: "吡咯", code: "\\chemfig{*5(-=-NH-=-)}" },
+      { category: "药物", name: "阿司匹林", code: "\\chemfig{*6(-=-(-O-CO-CH_3)=-(-COOH)-)}" },
+      { category: "药物", name: "对乙酰氨基酚", code: "\\chemfig{*6(-=-(-OH)=-(-NH-CO-CH_3)-)}" },
+      { category: "药物", name: "布洛芬", code: "\\chemfig{*6(-=-(-CH(CH_3)-CH_2-CH(CH_3)_2)=-(-COOH)-)}" },
+    ],
+  },
 };

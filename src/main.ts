@@ -978,6 +978,37 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // 外部数据库查询
+      this.addCommand({
+        id: "query-external-database",
+        name: "外部化学数据库查询",
+        callback: async () => {
+          const name = prompt("请输入化合物名称或 IUPAC 名称:", "阿司匹林");
+          if (!name || !name.trim()) return;
+
+          new Notice(`正在查询 ${name}...`, 1500);
+          
+          try {
+            const db = new window.ExternalChemDatabase();
+            const result = await db.searchCompound(name.trim());
+            
+            // 显示结果
+            let message = `查询到 ${result.total} 个结果:\n\n`;
+            result.results.forEach((r, i) => {
+              message += `${i+1}. ${r.source}\n`;
+              if (r.smiles) message += `   SMILES: ${r.smiles}\n`;
+              if (r.formula) message += `   分子式: ${r.formula}\n`;
+              if (r.molecularWeight) message += `   分子量: ${r.molecularWeight}\n`;
+              message += "\n";
+            });
+
+            alert(message);
+          } catch (e) {
+            new Notice(`查询失败: ${e.message}`, 3000);
+          }
+        },
+      });
+
       // ========== v11.9.0: 从笔记导入卡片 ==========
       this.addCommand({
         id: "import-cards-from-note",

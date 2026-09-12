@@ -49,6 +49,9 @@ const FILES = [
   "features/learning/textbook-knowledge-base.ts", // 完整教材知识库 (v17.2.0)
   "features/learning/textbook-extended.ts", // 教材知识库扩展 (v17.2.0)
   "features/learning/textbook-expansion-2.ts", // 教材知识库二次扩展 (v17.2.0)
+  "features/learning/knowledge-search-panel.ts", // 知识库搜索面板 (v17.2.0)
+  "features/learning/knowledge-relations.ts", // 知识点关联管理 (v17.2.0)
+  "features/learning/knowledge-learning-manager.ts", // 知识库学习功能 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

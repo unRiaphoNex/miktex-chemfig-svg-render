@@ -88,6 +88,8 @@ class OCLLoader {
 
   /**
    * 加载 OCL
+   * 注意：OCL bundle 已通过 build.js 合并到 main.js 中，
+   * 直接检查全局变量即可，不需要动态导入。
    */
   static async load(): Promise<any> {
     return PackageManager.load('ocl', async () => {
@@ -96,10 +98,16 @@ class OCLLoader {
         return (window as any).OCL;
       }
 
-      // 动态加载 OCL bundle
-      const oclModule = await import('../../integrations/ocl.bundle.js');
-      (window as any).OCL = oclModule.default || oclModule;
-      return (window as any).OCL;
+      // 检查 OpenChemLib（OCL bundle 暴露的原始变量名）
+      if ((window as any).OpenChemLib) {
+        // 映射到 OCL 全局变量
+        (window as any).OCL = (window as any).OpenChemLib;
+        return (window as any).OCL;
+      }
+
+      // OCL 尚未加载（可能是 bundle 还未执行）
+      console.warn('[PackageManager] OCL 全局变量未找到，OCL 功能可能不可用');
+      return null;
     });
   }
 

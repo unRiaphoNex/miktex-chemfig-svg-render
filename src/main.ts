@@ -1126,17 +1126,36 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     this.structureLibrary = [];
   }
 
-  // 检测某行是否在代码块内 (向上找 ```, 支持任意语言标记)
+  // 检测某行是否在代码块或数学公式块内
   isInCodeBlock(editor, line) {
     let inBlock = false;
+    let blockType = null; // 'code' 或 'math'
+    
     for (let i = 0; i <= line; i++) {
-      const l = editor.getLine(i);
-      if (/^\s*```/.test(l)) {
-        inBlock = !inBlock;
+      const l = editor.getLine(i).trim();
+      if (/^```/.test(l)) {
+        if (!inBlock) {
+          inBlock = true;
+          blockType = 'code';
+        } else if (blockType === 'code') {
+          inBlock = false;
+          blockType = null;
+        }
+      } else if (/^\$\$/.test(l) || l === '$$') {
+        if (!inBlock) {
+          inBlock = true;
+          blockType = 'math';
+        } else if (blockType === 'math') {
+          inBlock = false;
+          blockType = null;
+        }
       }
     }
-    // 如果当前行本身是 ``` 行, 也算代码块区域 (方便右键)
-    if (/^\s*```/.test(editor.getLine(line))) inBlock = true;
+    
+    // 如果当前行本身是 ``` 或 $$ 行, 也算代码块区域 (方便右键)
+    const currentLine = editor.getLine(line).trim();
+    if (/^```/.test(currentLine) || /^\$\$/.test(currentLine)) inBlock = true;
+    
     return inBlock;
   }
 

@@ -91,7 +91,6 @@ const FILES = [
   "features/chemistry/reaction-conditions.ts", // 反应条件速查
   "features/chemistry/extended-reactions.ts", // 扩展反应条件 (v17.2.0)
   // ========== features: visualization/ ==========
-  "features/visualization/molecule-3d-viewer.ts", // 3D 分子可视化 (v12.0.0)
   // ========== features: update/ ==========
   "features/update/update-service.ts", // 在线更新服务
   "integrations/ocl-tooltips.ts",     // OpenChemLib 工具栏图标 -> 工具名映射

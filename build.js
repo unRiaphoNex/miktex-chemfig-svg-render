@@ -64,6 +64,8 @@ const FILES = [
   "features/learning/knowledge-network-visualizer.ts", // 知识点网络可视化 (v17.2.0)
   "features/learning/learning-report-generator.ts", // 学习报告生成 (v17.2.0)
   "features/learning/learning-reminder.ts", // 学习提醒功能 (v17.2.0)
+  "features/learning/shortcut-tooltip.ts", // 快捷键提示 UI (v17.2.0)
+  "features/learning/knowledge-sidebar-view.ts", // 知识库侧边栏 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

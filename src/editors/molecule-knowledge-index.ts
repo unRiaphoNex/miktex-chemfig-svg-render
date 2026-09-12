@@ -606,8 +606,8 @@ class MoleculeKnowledgeIndexPanel {
       const Modal = obsidian.Modal;
       const Notice = obsidian.Notice;
       
-      // 获取 app 对象
-      const app = this.plugin.app || this.plugin;
+      // 获取 app 对象 - 优先使用 window.app（Obsidian 全局）
+      const app = window.app || this.plugin.app || this.plugin;
       
       // 创建详情模态框
       const modal = new Modal(app);
@@ -650,8 +650,8 @@ class MoleculeKnowledgeIndexPanel {
       // 插入格式化的知识点到当前笔记
       const content = `### ${item.id}: ${item.title}\n\n${item.content}\n\n---\n`;
       
-      // 获取 app 对象
-      const app = this.plugin.app || this.plugin;
+      // 获取 app 对象 - 优先使用 window.app（Obsidian 全局）
+      const app = window.app || this.plugin.app || this.plugin;
       
       // 获取当前编辑器
       const activeEditor = app.workspace.activeEditor;

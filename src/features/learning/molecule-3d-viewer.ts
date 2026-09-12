@@ -375,6 +375,12 @@ class Molecule3DModal extends Modal {
       cls: "measure-btn",
     });
 
+    // 性质按钮
+    const propsBtn = controlBar.createEl("button", {
+      text: "📊 性质",
+      cls: "props-btn",
+    });
+
     // 旋转按钮
     const spinBtn = controlBar.createEl("button", {
       text: "🔄 旋转",
@@ -443,6 +449,30 @@ class Molecule3DModal extends Modal {
         this.measureBtn.addClass("active");
         this.measureEnabled = true;
         new Notice("测量模式：点击两个原子显示距离", 2000);
+      }
+    };
+
+    propsBtn.onclick = async () => {
+      const smiles = smilesInput.value.trim();
+      if (!smiles) {
+        new Notice("请先输入 SMILES 结构", 2000);
+        return;
+      }
+
+      try {
+        // 计算分子性质
+        const properties = await MolecularPropertiesCalculator.calculateFromSmiles(smiles);
+        
+        // 显示性质报告
+        if (!this.propsPanel) {
+          this.propsPanel = contentEl.createDiv({ cls: "mol-properties-panel" });
+        }
+        this.propsPanel.innerHTML = MolecularPropertiesCalculator.generateReportHTML(properties);
+        this.propsPanel.toggle(!this.propsPanel.isShown);
+        
+        propsBtn.toggleClass("active", this.propsPanel.isShown);
+      } catch (e) {
+        new Notice(`性质计算失败: ${e.message}`, 3000);
       }
     };
 

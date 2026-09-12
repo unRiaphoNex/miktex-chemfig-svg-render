@@ -1,6 +1,6 @@
 // ========== 分子编辑器知识库索引面板 (v17.2.0) ==========
-// 在分子编辑器中加入知识库索引系统
-// 支持按索引编号查询、搜索知识点
+// 优化版：添加 CSS 动画、UI 美化
+// 参考: uiverse.io, ant-design, freefrontend.org
 
 class MoleculeKnowledgeIndexPanel {
   constructor(container, plugin) {
@@ -9,6 +9,7 @@ class MoleculeKnowledgeIndexPanel {
     this.searchInput = null;
     this.resultsContainer = null;
     this.selectedType = "all";
+    this.isLoading = false;
   }
 
   /**
@@ -16,6 +17,373 @@ class MoleculeKnowledgeIndexPanel {
    */
   init() {
     this.render();
+    this.injectStyles();
+  }
+
+  /**
+   * 注入 CSS 样式
+   */
+  injectStyles() {
+    // 检查是否已注入
+    if (document.getElementById("knowledge-index-styles")) return;
+
+    const style = document.createElement("style");
+    style.id = "knowledge-index-styles";
+    style.textContent = `
+      /* ========== 知识库索引面板样式 ========== */
+      .knowledge-index-panel {
+        padding: 16px;
+        animation: knowledgeFadeIn 0.4s ease-out;
+      }
+
+      @keyframes knowledgeFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* 标题 */
+      .knowledge-index-title {
+        margin: 0 0 16px 0;
+        font-size: 18px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: titleGlow 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes titleGlow {
+        from { filter: drop-shadow(0 0 2px rgba(102, 126, 234, 0.3)); }
+        to { filter: drop-shadow(0 0 8px rgba(118, 75, 162, 0.5)); }
+      }
+
+      /* 搜索框 */
+      .knowledge-index-search {
+        position: relative;
+        margin-bottom: 12px;
+      }
+
+      .knowledge-index-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 14px;
+        background: #fafafa;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+      }
+
+      .knowledge-index-input:focus {
+        border-color: #667eea;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .knowledge-index-search::before {
+        content: "🔍";
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      /* 类型筛选 */
+      .knowledge-index-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .knowledge-index-filter-btn {
+        padding: 6px 14px;
+        border: 2px solid #e0e0e0;
+        border-radius: 20px;
+        background: #fff;
+        color: #666;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .knowledge-index-filter-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.4s ease, height 0.4s ease;
+      }
+
+      .knowledge-index-filter-btn:hover::before {
+        width: 200px;
+        height: 200px;
+      }
+
+      .knowledge-index-filter-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      }
+
+      .knowledge-index-filter-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      /* 结果区域 */
+      .knowledge-index-results {
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .knowledge-index-results::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .knowledge-index-results::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+
+      .knowledge-index-results::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+
+      /* 结果项 */
+      .knowledge-index-item {
+        padding: 14px;
+        margin-bottom: 10px;
+        background: #fff;
+        border: 1px solid #e8e8e8;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideInRight 0.4s ease-out;
+        position: relative;
+        overflow: hidden;
+      }
+
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+
+      .knowledge-index-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: linear-gradient(180deg, #667eea, #764ba2);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+      }
+
+      .knowledge-index-item:hover::before {
+        transform: scaleY(1);
+      }
+
+      .knowledge-index-item:hover {
+        border-color: #667eea;
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12);
+        transform: translateY(-2px);
+      }
+
+      /* 项头部 */
+      .knowledge-index-item-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .knowledge-index-id {
+        padding: 3px 8px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: 'Monaco', 'Consolas', monospace;
+        letter-spacing: 0.5px;
+      }
+
+      .knowledge-index-item-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      /* 元信息 */
+      .knowledge-index-meta {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        color: #888;
+      }
+
+      .knowledge-index-book {
+        padding: 2px 8px;
+        background: #f5f5f5;
+        border-radius: 4px;
+      }
+
+      .knowledge-index-chapter {
+        padding: 2px 8px;
+        background: #f0f4ff;
+        color: #667eea;
+        border-radius: 4px;
+      }
+
+      /* 内容预览 */
+      .knowledge-index-preview {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+
+      /* 操作按钮 */
+      .knowledge-index-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .knowledge-index-action-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .knowledge-index-action-btn:first-child {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+      }
+
+      .knowledge-index-action-btn:last-child {
+        background: #f5f5f5;
+        color: #666;
+      }
+
+      .knowledge-index-action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      /* 空状态 */
+      .knowledge-index-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+        animation: bounceIn 0.5s ease-out;
+      }
+
+      @keyframes bounceIn {
+        0% { opacity: 0; transform: scale(0.8); }
+        50% { transform: scale(1.05); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+
+      .knowledge-index-empty::before {
+        content: '🔍';
+        display: block;
+        font-size: 48px;
+        margin-bottom: 16px;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+
+      /* 加载动画 */
+      .knowledge-index-loading {
+        text-align: center;
+        padding: 40px;
+      }
+
+      .knowledge-index-loading::before {
+        content: '';
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        border: 3px solid #f3f3f3;
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* 关键词标签 */
+      .knowledge-keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+      }
+
+      .keyword-tag {
+        padding: 4px 10px;
+        background: linear-gradient(135deg, #f0f4ff, #e6e9ff);
+        color: #667eea;
+        border-radius: 16px;
+        font-size: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .keyword-tag:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        transform: scale(1.05);
+      }
+
+      /* 统计信息 */
+      .knowledge-index-stats {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: #f8f9ff;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        font-size: 12px;
+        color: #667eea;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    `;
+
+    document.head.appendChild(style);
   }
 
   /**
@@ -25,18 +393,27 @@ class MoleculeKnowledgeIndexPanel {
     const { container } = this;
     container.empty();
 
+    // 添加主容器类
+    container.addClass("knowledge-index-panel");
+
     // 标题
     container.createEl("h4", {
       text: "📚 知识库索引",
       cls: "knowledge-index-title",
     });
 
+    // 统计信息
+    const totalKnowledge = this.getAllKnowledge().length;
+    const statsDiv = container.createDiv({ cls: "knowledge-index-stats" });
+    statsDiv.createSpan({ text: `📊 共 ${totalKnowledge} 个知识点` });
+    statsDiv.createSpan({ text: "🔍 支持模糊搜索" });
+
     // 搜索框
     const searchBox = container.createDiv({ cls: "knowledge-index-search" });
     
     this.searchInput = searchBox.createEl("input", {
       type: "text",
-      placeholder: "搜索知识点或输入索引编号...",
+      placeholder: "搜索知识点或输入索引编号 (如: ORG-001)...",
       cls: "knowledge-index-input",
     });
 
@@ -85,31 +462,38 @@ class MoleculeKnowledgeIndexPanel {
   searchKnowledge() {
     const query = this.searchInput.value.trim().toLowerCase();
     
-    // 从所有数据库中搜索
-    const allKnowledge = this.getAllKnowledge();
-    let results = allKnowledge;
+    // 显示加载动画
+    this.resultsContainer.empty();
+    this.resultsContainer.createDiv({ cls: "knowledge-index-loading" });
 
-    // 按类型筛选
-    if (this.selectedType !== "all") {
-      results = results.filter((item) => 
-        item.id.startsWith(this.selectedType)
-      );
-    }
+    // 模拟异步搜索（优化动画效果）
+    setTimeout(() => {
+      // 从所有数据库中搜索
+      const allKnowledge = this.getAllKnowledge();
+      let results = allKnowledge;
 
-    // 按关键词搜索
-    if (query) {
-      results = results.filter((item) => {
-        return (
-          item.id.toLowerCase().includes(query) ||
-          item.title.toLowerCase().includes(query) ||
-          item.content.toLowerCase().includes(query) ||
-          (item.keywords && item.keywords.some((k) => k.toLowerCase().includes(query)))
+      // 按类型筛选
+      if (this.selectedType !== "all") {
+        results = results.filter((item) => 
+          item.id.startsWith(this.selectedType)
         );
-      });
-    }
+      }
 
-    // 显示结果
-    this.renderResults(results.slice(0, 50)); // 限制显示50条
+      // 按关键词搜索
+      if (query) {
+        results = results.filter((item) => {
+          return (
+            item.id.toLowerCase().includes(query) ||
+            item.title.toLowerCase().includes(query) ||
+            item.content.toLowerCase().includes(query) ||
+            (item.keywords && item.keywords.some((k) => k.toLowerCase().includes(query)))
+          );
+        });
+      }
+
+      // 显示结果
+      this.renderResults(results.slice(0, 50)); // 限制显示50条
+    }, 200);
   }
 
   /**
@@ -121,6 +505,9 @@ class MoleculeKnowledgeIndexPanel {
       typeof EXTENDED_TEXTBOOK_KNOWLEDGE !== "undefined" ? EXTENDED_TEXTBOOK_KNOWLEDGE : {},
       typeof TEXTBOOK_KNOWLEDGE_EXPANSION_2 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_2 : {},
       typeof TEXTBOOK_KNOWLEDGE_EXPANSION_3 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_3 : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_4 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_4 : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_5 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_5 : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_6 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_6 : {},
     ];
 
     const results = [];
@@ -128,6 +515,7 @@ class MoleculeKnowledgeIndexPanel {
     allDatabases.forEach((db) => {
       Object.keys(db).forEach((bookName) => {
         const book = db[bookName];
+        if (!book || !book.bookCode || !book.chapters) return;
         const bookCode = book.bookCode;
 
         book.chapters.forEach((chapter) => {
@@ -161,15 +549,18 @@ class MoleculeKnowledgeIndexPanel {
     }
 
     // 结果列表
-    results.forEach((item) => {
+    results.forEach((item, index) => {
       const resultItem = this.resultsContainer.createDiv({
         cls: "knowledge-index-item",
       });
 
+      // 添加延迟动画
+      resultItem.style.animationDelay = `${index * 0.05}s`;
+
       // 索引编号 + 标题
       const header = resultItem.createDiv({ cls: "knowledge-index-item-header" });
       header.createSpan({ text: item.id, cls: "knowledge-index-id" });
-      header.createSpan({ text: item.title, cls: "knowledge-index-title" });
+      header.createSpan({ text: item.title, cls: "knowledge-index-item-title" });
 
       // 书籍和章节
       const meta = resultItem.createDiv({ cls: "knowledge-index-meta" });

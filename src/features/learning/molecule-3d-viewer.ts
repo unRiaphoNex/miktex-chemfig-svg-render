@@ -301,4 +301,5 @@ class Molecule3DModal extends Modal {
 }
 
 // 导出全局变量
-// Molecule3DViewer, Molecule3DModal
+window.Molecule3DModalViewer = Molecule3DModalViewer;
+window.Molecule3DModal = Molecule3DModal;

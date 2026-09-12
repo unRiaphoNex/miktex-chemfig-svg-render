@@ -1,4 +1,4 @@
-// ========== 深化外部数据库集成 (v17.2.0) ==========
+﻿// ========== 深化外部数据库集成 (v17.2.0) ==========
 // 支持更多外部数据库、更丰富的化合物信息
 // 支持批量查询、高级搜索、化合物性质预测
 
@@ -434,7 +434,7 @@ class CompoundDetailModal extends Modal {
       
       const status = this.compound.lipinski.passes ? "✅ 通过" : "⚠️ 不通过";
       lipinskiEl.createDiv({ text: status, cls: "lipinski-status" });
-      lipinskiEl.createP({ text: this.compound.lipinski.description });
+      lipinskiEl.createEl("p", { text: this.compound.lipinski.description });
       
       if (this.compound.lipinski.violations.length > 0) {
         const violationsList = lipinskiEl.createUl();
@@ -445,7 +445,7 @@ class CompoundDetailModal extends Modal {
     }
 
     // 来源
-    contentEl.createP({ text: `数据来源: ${this.compound.source || "PubChem"}` });
+    contentEl.createEl("p", { text: `数据来源: ${this.compound.source || "PubChem"}` });
   }
 
   async onClose() {

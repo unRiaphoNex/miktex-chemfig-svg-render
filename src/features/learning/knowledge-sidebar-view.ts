@@ -1,4 +1,4 @@
-// ========== 知识库侧边栏 (v17.2.0) ==========
+﻿// ========== 知识库侧边栏 (v17.2.0) ==========
 // Obsidian 侧边栏视图
 // 显示知识库搜索、学习进度、统计等功能
 
@@ -209,7 +209,7 @@ class KnowledgeSidebarView extends ItemView {
 
     // 详情内容
     this.contentArea.createH3({ text: knowledge.title });
-    this.contentArea.createP({ text: `${knowledge.bookName} - ${knowledge.chapter}` });
+    this.contentArea.createEl("p", { text: `${knowledge.bookName} - ${knowledge.chapter}` });
     
     if (knowledge.keywords && knowledge.keywords.length > 0) {
       const keywordsEl = this.contentArea.createDiv({ cls: "sidebar-keywords" });
@@ -218,7 +218,7 @@ class KnowledgeSidebarView extends ItemView {
       });
     }
 
-    this.contentArea.createP({ text: knowledge.content });
+    this.contentArea.createEl("p", { text: knowledge.content });
 
     // 关联内容
     const relations = getKnowledgeRelations(knowledge.id);
@@ -226,14 +226,14 @@ class KnowledgeSidebarView extends ItemView {
     if (relations.relatedCompounds.length > 0) {
       this.contentArea.createH4({ text: "相关化合物:" });
       relations.relatedCompounds.forEach((c) => {
-        this.contentArea.createP({ text: `- ${c}` });
+        this.contentArea.createEl("p", { text: `- ${c}` });
       });
     }
 
     if (relations.relatedDrugs.length > 0) {
       this.contentArea.createH4({ text: "相关药物:" });
       relations.relatedDrugs.forEach((d) => {
-        this.contentArea.createP({ text: `- ${d}` });
+        this.contentArea.createEl("p", { text: `- ${d}` });
       });
     }
   }
@@ -268,9 +268,9 @@ class KnowledgeSidebarView extends ItemView {
     const learningManager = new KnowledgeLearningManager(this.plugin);
     const stats = learningManager.getStats();
 
-    progress.createP({ text: `总学习: ${stats.total}` });
-    progress.createP({ text: `已掌握: ${stats.mastered} (${stats.masterRate}%)` });
-    progress.createP({ text: `待复习: ${stats.review}` });
+    progress.createEl("p", { text: `总学习: ${stats.total}` });
+    progress.createEl("p", { text: `已掌握: ${stats.mastered} (${stats.masterRate}%)` });
+    progress.createEl("p", { text: `待复习: ${stats.review}` });
 
     // 快捷操作
     const actions = this.contentArea.createDiv({ cls: "sidebar-actions" });

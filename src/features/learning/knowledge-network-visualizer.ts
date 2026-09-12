@@ -1,4 +1,4 @@
-// ========== 知识点网络可视化 (v17.2.0) ==========
+﻿// ========== 知识点网络可视化 (v17.2.0) ==========
 // 使用 SVG 可视化展示知识点之间的关联
 
 class KnowledgeNetworkVisualizer {
@@ -162,22 +162,22 @@ class KnowledgeNetworkVisualizer {
     const detailPanel = this.container.createDiv({ cls: "network-node-detail" });
     
     detailPanel.createH4({ text: node.title });
-    detailPanel.createP({ text: `类型: ${node.type}` });
-    detailPanel.createP({ text: `ID: ${node.id}` });
+    detailPanel.createEl("p", { text: `类型: ${node.type}` });
+    detailPanel.createEl("p", { text: `ID: ${node.id}` });
 
     // 显示关联
     const relations = getKnowledgeRelations(node.id);
     if (relations.relatedCompounds.length > 0) {
       detailPanel.createH5({ text: "相关化合物:" });
       relations.relatedCompounds.forEach((c) => {
-        detailPanel.createP({ text: c });
+        detailPanel.createEl("p", { text: c });
       });
     }
 
     if (relations.relatedDrugs.length > 0) {
       detailPanel.createH5({ text: "相关药物:" });
       relations.relatedDrugs.forEach((d) => {
-        detailPanel.createP({ text: d });
+        detailPanel.createEl("p", { text: d });
       });
     }
   }

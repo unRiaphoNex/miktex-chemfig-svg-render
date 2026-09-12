@@ -1,4 +1,4 @@
-// ========== 知识库搜索优化 (v17.2.0) ==========
+﻿// ========== 知识库搜索优化 (v17.2.0) ==========
 // 全文搜索、语义搜索、模糊搜索
 // 支持中文分词、拼音搜索、同义词搜索
 
@@ -302,7 +302,7 @@ class KnowledgeSmartSearchModal extends Modal {
     // 统计信息
     const stats = this.searchEngine.getSearchStats();
     const statsDiv = contentEl.createDiv({ cls: "search-stats" });
-    statsDiv.createP({ text: `已索引 ${stats.indexedKnowledge} 个知识点 | ${stats.totalKeywords} 个关键词` });
+    statsDiv.createEl("p", { text: `已索引 ${stats.indexedKnowledge} 个知识点 | ${stats.totalKeywords} 个关键词` });
   }
 
   /**

@@ -1,4 +1,4 @@
-// ========== 知识点关联网络 (v17.2.0) ==========
+﻿// ========== 知识点关联网络 (v17.2.0) ==========
 // 建立知识点之间的关联网络
 // 支持可视化展示、关联推荐
 
@@ -390,7 +390,7 @@ class KnowledgeRelationNetworkModal extends Modal {
     // 统计信息
     const stats = this.network.getRelationStats();
     const statsDiv = contentEl.createDiv({ cls: "relation-stats" });
-    statsDiv.createP({ text: `总知识点: ${stats.totalKnowledge} | 总关联: ${stats.totalRelations} | 平均关联度: ${stats.avgRelations}` });
+    statsDiv.createEl("p", { text: `总知识点: ${stats.totalKnowledge} | 总关联: ${stats.totalRelations} | 平均关联度: ${stats.avgRelations}` });
 
     // 搜索事件
     searchBtn.onclick = () => {

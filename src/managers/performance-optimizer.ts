@@ -7,65 +7,7 @@
  * 参考: https://github.com/st3v3nmw/obsidian-spaced-repetition
  */
 
-/**
- * LRU 缓存实现
- */
-class LRUCache<K, V> {
-  private cache: Map<K, V>;
-  private maxSize: number;
-
-  constructor(maxSize: number = 1000) {
-    this.cache = new Map();
-    this.maxSize = maxSize;
-  }
-
-  get(key: K): V | undefined {
-    if (!this.cache.has(key)) return undefined;
-    
-    // 重新插入到末尾（最近使用）
-    const value = this.cache.get(key)!;
-    this.cache.delete(key);
-    this.cache.set(key, value);
-    return value;
-  }
-
-  set(key: K, value: V): void {
-    // 如果已存在，先删除
-    if (this.cache.has(key)) {
-      this.cache.delete(key);
-    }
-    
-    // 如果超过最大大小，删除最久未使用的
-    if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value;
-      if (firstKey !== undefined) {
-        this.cache.delete(firstKey);
-      }
-    }
-    
-    this.cache.set(key, value);
-  }
-
-  has(key: K): boolean {
-    return this.cache.has(key);
-  }
-
-  delete(key: K): boolean {
-    return this.cache.delete(key);
-  }
-
-  clear(): void {
-    this.cache.clear();
-  }
-
-  size(): number {
-    return this.cache.size;
-  }
-
-  keys(): IterableIterator<K> {
-    return this.cache.keys();
-  }
-}
+// 注意: LRUCache 已经在 services/cache.ts 中定义，这里直接使用
 
 /**
  * FSRS 算法缓存优化
@@ -88,42 +30,35 @@ class FSRSCacheOptimizer {
   }
 
   /**
-   * 生成缓存键
+   * 缓存评级结果
    */
-  private makeCacheKey(...args: any[]): string {
-    return args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join('|');
+  cacheRating(stability: number, difficulty: number, rating: number, newStability: number): void {
+    const key = `${stability.toFixed(4)}:${difficulty.toFixed(4)}:${rating}`;
+    this.ratingCache.set(key, newStability);
   }
 
   /**
-   * 获取评级缓存
+   * 获取缓存的评级结果
    */
-  getCachedRating(difficulty: number, stability: number, hoursElapsed: number): number | undefined {
-    const key = this.makeCacheKey('rating', difficulty, stability, hoursElapsed);
+  getCachedRating(stability: number, difficulty: number, rating: number): number | undefined {
+    const key = `${stability.toFixed(4)}:${difficulty.toFixed(4)}:${rating}`;
     return this.ratingCache.get(key);
   }
 
   /**
-   * 缓存评级结果
+   * 缓存间隔计算结果
    */
-  cacheRating(difficulty: number, stability: number, hoursElapsed: number, rating: number): void {
-    const key = this.makeCacheKey('rating', difficulty, stability, hoursElapsed);
-    this.ratingCache.set(key, rating);
-  }
-
-  /**
-   * 获取间隔缓存
-   */
-  getCachedInterval(difficulty: number, stability: number, targetRetention: number): number | undefined {
-    const key = this.makeCacheKey('interval', difficulty, stability, targetRetention);
-    return this.intervalCache.get(key);
-  }
-
-  /**
-   * 缓存间隔结果
-   */
-  cacheInterval(difficulty: number, stability: number, targetRetention: number, interval: number): void {
-    const key = this.makeCacheKey('interval', difficulty, stability, targetRetention);
+  cacheInterval(stability: number, targetRetention: number, interval: number): void {
+    const key = `${stability.toFixed(4)}:${targetRetention.toFixed(2)}`;
     this.intervalCache.set(key, interval);
+  }
+
+  /**
+   * 获取缓存的间隔计算结果
+   */
+  getCachedInterval(stability: number, targetRetention: number): number | undefined {
+    const key = `${stability.toFixed(4)}:${targetRetention.toFixed(2)}`;
+    return this.intervalCache.get(key);
   }
 
   /**
@@ -132,7 +67,6 @@ class FSRSCacheOptimizer {
   clearCache(): void {
     this.ratingCache.clear();
     this.intervalCache.clear();
-    console.log('[FSRSCacheOptimizer] Cache cleared');
   }
 
   /**
@@ -149,43 +83,36 @@ class FSRSCacheOptimizer {
 /**
  * 化合物数据库查询优化器
  */
-class CompoundDBOptimizer {
-  private static instance: CompoundDBOptimizer;
-  private searchIndex: Map<string, any[]>;
+class CompoundDbOptimizer {
+  private static instance: CompoundDbOptimizer;
   private smilesIndex: Map<string, any>;
   private nameIndex: Map<string, any>;
   private formulaIndex: Map<string, any[]>;
   private searchCache: LRUCache<string, any[]>;
 
   private constructor() {
-    this.searchIndex = new Map();
     this.smilesIndex = new Map();
     this.nameIndex = new Map();
     this.formulaIndex = new Map();
     this.searchCache = new LRUCache(200);
   }
 
-  static getInstance(): CompoundDBOptimizer {
+  static getInstance(): CompoundDbOptimizer {
     if (!this.instance) {
-      this.instance = new CompoundDBOptimizer();
+      this.instance = new CompoundDbOptimizer();
     }
     return this.instance;
   }
 
   /**
    * 构建索引
-   * @param compounds 化合物数组
    */
   buildIndex(compounds: any[]): void {
-    console.log(`[CompoundDBOptimizer] Building index for ${compounds.length} compounds...`);
-    
-    this.searchIndex.clear();
     this.smilesIndex.clear();
     this.nameIndex.clear();
     this.formulaIndex.clear();
-    this.searchCache.clear();
 
-    for (const compound of compounds) {
+    compounds.forEach((compound) => {
       // SMILES 索引
       if (compound.smiles) {
         this.smilesIndex.set(compound.smiles, compound);
@@ -193,94 +120,69 @@ class CompoundDBOptimizer {
 
       // 名称索引
       if (compound.name) {
-        const lowerName = compound.name.toLowerCase();
-        this.nameIndex.set(lowerName, compound);
-        
-        // 分词索引
-        const words = lowerName.split(/\s+/);
-        for (const word of words) {
-          if (!this.searchIndex.has(word)) {
-            this.searchIndex.set(word, []);
-          }
-          this.searchIndex.get(word)!.push(compound);
-        }
+        this.nameIndex.set(compound.name.toLowerCase(), compound);
       }
 
       // 分子式索引
-      if (compound.molecularFormula) {
-        const formula = compound.molecularFormula.toUpperCase();
-        if (!this.formulaIndex.has(formula)) {
-          this.formulaIndex.set(formula, []);
+      if (compound.formula) {
+        if (!this.formulaIndex.has(compound.formula)) {
+          this.formulaIndex.set(compound.formula, []);
         }
-        this.formulaIndex.get(formula)!.push(compound);
+        this.formulaIndex.get(compound.formula)!.push(compound);
       }
-    }
+    });
 
-    console.log(`[CompoundDBOptimizer] Index built: ${this.smilesIndex.size} SMILES, ${this.nameIndex.size} names, ${this.formulaIndex.size} formulas`);
+    console.log(`[CompoundDbOptimizer] 索引构建完成: ${compounds.length} 个化合物`);
   }
 
   /**
-   * 按 SMILES 查找
+   * 按 SMILES 查询
    */
-  findBySmiles(smiles: string): any | undefined {
+  getBySmiles(smiles: string): any | undefined {
     return this.smilesIndex.get(smiles);
   }
 
   /**
-   * 按名称查找
+   * 按名称查询
    */
-  findByName(name: string): any | undefined {
+  getByName(name: string): any | undefined {
     return this.nameIndex.get(name.toLowerCase());
   }
 
   /**
-   * 按分子式查找
+   * 按分子式查询
    */
-  findByFormula(formula: string): any[] {
-    return this.formulaIndex.get(formula.toUpperCase()) || [];
+  getByFormula(formula: string): any[] {
+    return this.formulaIndex.get(formula) || [];
   }
 
   /**
-   * 搜索化合物
-   * @param query 搜索查询
+   * 搜索（带缓存）
    */
   search(query: string): any[] {
     // 检查缓存
     const cached = this.searchCache.get(query);
-    if (cached) {
-      return cached;
-    }
+    if (cached) return cached;
 
+    // 执行搜索
+    const results: any[] = [];
     const lowerQuery = query.toLowerCase();
-    const results = new Set<any>();
 
-    // 精确匹配名称
-    const exactMatch = this.findByName(lowerQuery);
-    if (exactMatch) {
-      results.add(exactMatch);
-    }
-
-    // 精确匹配分子式
-    const formulaMatches = this.findByFormula(query);
-    for (const match of formulaMatches) {
-      results.add(match);
-    }
-
-    // 模糊搜索
-    for (const [keyword, compounds] of this.searchIndex.entries()) {
-      if (keyword.includes(lowerQuery) || lowerQuery.includes(keyword)) {
-        for (const compound of compounds) {
-          results.add(compound);
-        }
+    // 遍历所有索引
+    for (const compound of this.nameIndex.values()) {
+      if (
+        compound.name?.toLowerCase().includes(lowerQuery) ||
+        compound.smiles?.toLowerCase().includes(lowerQuery) ||
+        compound.formula?.toLowerCase().includes(lowerQuery)
+      ) {
+        results.push(compound);
       }
     }
 
-    const resultArray = Array.from(results);
-    
     // 缓存结果
-    this.searchCache.set(query, resultArray);
+    this.searchCache.set(query, results);
 
-    return resultArray;
+    return results;
   }
 
   /**
@@ -288,23 +190,6 @@ class CompoundDBOptimizer {
    */
   clearSearchCache(): void {
     this.searchCache.clear();
-  }
-
-  /**
-   * 获取统计信息
-   */
-  getStats(): {
-    smilesIndexSize: number;
-    nameIndexSize: number;
-    formulaIndexSize: number;
-    searchCacheSize: number;
-  } {
-    return {
-      smilesIndexSize: this.smilesIndex.size,
-      nameIndexSize: this.nameIndex.size,
-      formulaIndexSize: this.formulaIndex.size,
-      searchCacheSize: this.searchCache.size(),
-    };
   }
 }
 
@@ -329,54 +214,38 @@ class SVGRenderCache {
   /**
    * 生成缓存键
    */
-  private makeCacheKey(smiles: string, width: number, height: number): string {
-    return `${smiles}|${width}|${height}`;
+  private getKey(smiles: string, width: number, height: number): string {
+    return `${smiles}:${width}x${height}`;
   }
 
   /**
    * 获取缓存的 SVG
    */
-  getCachedSVG(smiles: string, width: number, height: number): string | undefined {
-    const key = this.makeCacheKey(smiles, width, height);
-    return this.cache.get(key);
+  get(smiles: string, width: number, height: number): string | undefined {
+    return this.cache.get(this.getKey(smiles, width, height));
   }
 
   /**
    * 缓存 SVG
    */
-  cacheSVG(smiles: string, width: number, height: number, svg: string): void {
-    const key = this.makeCacheKey(smiles, width, height);
-    this.cache.set(key, svg);
+  set(smiles: string, width: number, height: number, svg: string): void {
+    this.cache.set(this.getKey(smiles, width, height), svg);
   }
 
   /**
    * 清空缓存
    */
-  clearCache(): void {
+  clear(): void {
     this.cache.clear();
-    console.log('[SVGRenderCache] Cache cleared');
   }
 
   /**
-   * 获取缓存统计
+   * 获取缓存大小
    */
-  getStats(): { cacheSize: number } {
-    return {
-      cacheSize: this.cache.size(),
-    };
+  size(): number {
+    return this.cache.size();
   }
 }
 
-// 导出
-export {
-  LRUCache,
-  FSRSCacheOptimizer,
-  CompoundDBOptimizer,
-  SVGRenderCache,
-};
-
-// 全局变量（兼容旧代码）
-(globalThis as any).LRUCache = LRUCache;
-(globalThis as any).FSRSCacheOptimizer = FSRSCacheOptimizer;
-(globalThis as any).CompoundDBOptimizer = CompoundDBOptimizer;
-(globalThis as any).SVGRenderCache = SVGRenderCache;
+// 导出全局变量
+// FSRSCacheOptimizer, CompoundDbOptimizer, SVGRenderCache

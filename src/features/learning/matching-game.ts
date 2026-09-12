@@ -2,7 +2,7 @@
 // 学习辅助: 多种类型的配对练习
 
 // ========== 官能团配对数据 ==========
-const FUNCTIONAL_GROUPS = [
+const MATCHING_GAME_FUNCTIONAL_GROUPS = [
   { id: "hydroxyl", name: "羟基", formula: "-OH", example: "乙醇 CH3CH2OH" },
   { id: "carbonyl", name: "羰基", formula: "C=O", example: "丙酮 CH3COCH3" },
   { id: "carboxyl", name: "羧基", formula: "-COOH", example: "乙酸 CH3COOH" },
@@ -18,7 +18,7 @@ const FUNCTIONAL_GROUPS = [
 ];
 
 // ========== 反应条件配对数据 ==========
-const REACTION_CONDITIONS = [
+const MATCHING_GAME_REACTION_CONDITIONS = [
   { id: "h2-pd", name: "H2/Pd", type: "催化氢化", example: "烯烃加氢生成烷烃" },
   { id: "kmno4", name: "KMnO4", type: "氧化反应", example: "烯烃氧化生成酮/羧酸" },
   { id: "nabh4", name: "NaBH4", type: "还原反应", example: "醛酮还原生成醇" },
@@ -30,7 +30,7 @@ const REACTION_CONDITIONS = [
 ];
 
 // ========== 化合物分类配对数据 ==========
-const COMPOUND_CATEGORIES = [
+const MATCHING_GAME_COMPOUND_CATEGORIES = [
   { id: "alcohol", name: "乙醇", category: "醇类", formula: "CH3CH2OH" },
   { id: "acetic-acid", name: "乙酸", category: "羧酸", formula: "CH3COOH" },
   { id: "acetone", name: "丙酮", category: "酮类", formula: "CH3COCH3" },
@@ -77,19 +77,19 @@ class MatchingGameModal extends Modal {
         title = "🎯 官能团配对游戏";
         leftLabel = "官能团名称";
         rightLabel = "结构式";
-        gameData = FUNCTIONAL_GROUPS;
+        gameData = MATCHING_GAME_FUNCTIONAL_GROUPS;
         break;
       case GameType.REACTION_CONDITION:
         title = "⚗️ 反应条件配对游戏";
         leftLabel = "反应条件";
         rightLabel = "反应类型";
-        gameData = REACTION_CONDITIONS;
+        gameData = MATCHING_GAME_REACTION_CONDITIONS;
         break;
       case GameType.COMPOUND_CATEGORY:
         title = "🧪 化合物分类配对游戏";
         leftLabel = "化合物名称";
         rightLabel = "分类";
-        gameData = COMPOUND_CATEGORIES;
+        gameData = MATCHING_GAME_COMPOUND_CATEGORIES;
         break;
     }
 
@@ -161,14 +161,7 @@ class MatchingGameModal extends Modal {
 
     // 根据游戏类型设置显示内容
     leftItems.forEach((item) => {
-      let displayText = "";
-      if (this.gameType === GameType.FUNCTIONAL_GROUP) {
-        displayText = item.name;
-      } else if (this.gameType === GameType.REACTION_CONDITION) {
-        displayText = item.name;
-      } else if (this.gameType === GameType.COMPOUND_CATEGORY) {
-        displayText = item.name;
-      }
+      let displayText = item.name;
 
       const btn = leftCol.createEl("button", {
         text: displayText,
@@ -315,5 +308,5 @@ class MatchingGameModal extends Modal {
   }
 }
 
-// 导出
-// FUNCTIONAL_GROUPS, MatchingGameModal, GameType
+// 导出全局变量
+// MATCHING_GAME_FUNCTIONAL_GROUPS, MATCHING_GAME_REACTION_CONDITIONS, MATCHING_GAME_COMPOUND_CATEGORIES, MatchingGameModal, GameType

@@ -206,6 +206,108 @@ const KNOWLEDGE_RELATIONS = {
     relatedReactions: ["三羧酸循环"],
     relatedDrugs: [],
   },
+
+  // ========== 三次扩展知识点关联 ==========
+  "ORG-1101": {
+    relatedCompounds: ["乙醇", "异丙醇", "叔丁醇"],
+    relatedReactions: ["醇的分类"],
+    relatedDrugs: [],
+  },
+  "ORG-1103": {
+    relatedCompounds: ["乙醇", "异丙醇", "苯酚"],
+    relatedReactions: ["醇氧化", "酚氧化"],
+    relatedDrugs: [],
+  },
+  "ORG-1104": {
+    relatedCompounds: ["苯酚", "对甲苯酚", "硝基苯酚"],
+    relatedReactions: ["酚的酸性"],
+    relatedDrugs: [],
+  },
+  "ORG-1203": {
+    relatedCompounds: ["甲醛", "乙醛", "丙酮"],
+    relatedReactions: ["亲核加成", "HCN加成", "NaHSO3加成", "格氏反应"],
+    relatedDrugs: [],
+  },
+  "ORG-1204": {
+    relatedCompounds: ["乙醛", "苯甲醛"],
+    relatedReactions: ["Tollens反应", "Fehling反应"],
+    relatedDrugs: [],
+  },
+  "ORG-1206": {
+    relatedCompounds: ["乙醛", "丙醛"],
+    relatedReactions: ["羟醛缩合"],
+    relatedDrugs: [],
+  },
+  "ORG-1301": {
+    relatedCompounds: ["乙酸", "苯甲酸", "水杨酸"],
+    relatedReactions: ["羧酸酸性"],
+    relatedDrugs: ["阿司匹林"],
+  },
+  "ORG-1302": {
+    relatedCompounds: ["乙酸酐", "乙酰氯", "乙酸乙酯", "乙酰胺"],
+    relatedReactions: ["水解", "醇解", "氨解"],
+    relatedDrugs: [],
+  },
+  "DRUG-701": {
+    relatedCompounds: ["硝苯地平", "维拉帕米", "地尔硫卓"],
+    relatedReactions: [],
+    relatedDrugs: ["硝苯地平", "尼莫地平", "维拉帕米", "地尔硫卓"],
+  },
+  "DRUG-702": {
+    relatedCompounds: ["卡托普利", "依那普利", "氯沙坦"],
+    relatedReactions: [],
+    relatedDrugs: ["卡托普利", "依那普利", "氯沙坦", "缬沙坦"],
+  },
+  "DRUG-703": {
+    relatedCompounds: ["普萘洛尔", "美托洛尔"],
+    relatedReactions: [],
+    relatedDrugs: ["普萘洛尔", "美托洛尔"],
+  },
+  "DRUG-704": {
+    relatedCompounds: ["洛伐他汀", "辛伐他汀", "阿托伐他汀"],
+    relatedReactions: [],
+    relatedDrugs: ["洛伐他汀", "辛伐他汀", "阿托伐他汀"],
+  },
+  "DRUG-801": {
+    relatedCompounds: ["西咪替丁", "雷尼替丁", "奥美拉唑"],
+    relatedReactions: [],
+    relatedDrugs: ["西咪替丁", "雷尼替丁", "奥美拉唑", "兰索拉唑"],
+  },
+  "PHARM-1001": {
+    relatedCompounds: ["氢氯噻嗪", "卡托普利", "硝苯地平"],
+    relatedReactions: [],
+    relatedDrugs: ["氢氯噻嗪", "卡托普利", "依那普利", "硝苯地平", "美托洛尔"],
+  },
+  "PHARM-1101": {
+    relatedCompounds: ["奎尼丁", "利多卡因", "胺碘酮", "普萘洛尔"],
+    relatedReactions: [],
+    relatedDrugs: ["奎尼丁", "利多卡因", "胺碘酮", "普萘洛尔"],
+  },
+  "BIO-801": {
+    relatedCompounds: ["葡萄糖", "丙酮酸", "ATP"],
+    relatedReactions: ["糖酵解"],
+    relatedDrugs: [],
+  },
+  "BIO-802": {
+    relatedCompounds: ["乙酰CoA", "CO2", "ATP"],
+    relatedReactions: ["三羧酸循环"],
+    relatedDrugs: [],
+  },
+  "BIO-803": {
+    relatedCompounds: ["乳酸", "甘油", "葡萄糖"],
+    relatedReactions: ["糖异生"],
+    relatedDrugs: [],
+  },
+  "BIO-901": {
+    relatedCompounds: ["脂肪酸", "乙酰CoA", "FADH2", "NADH"],
+    relatedReactions: ["脂肪酸β-氧化"],
+    relatedDrugs: [],
+  },
+  "BIO-902": {
+    relatedCompounds: ["乙酰乙酸", "β-羟丁酸", "丙酮"],
+    relatedReactions: ["酮体代谢"],
+    relatedDrugs: [],
+  },
 };
 
 /**

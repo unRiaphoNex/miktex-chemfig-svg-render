@@ -59,6 +59,11 @@ const FILES = [
   "features/learning/search-utils.ts", // 搜索工具（模糊/同义词/拼音） (v17.2.0)
   "features/learning/learning-mode-switcher.ts", // 学习模式切换 (v17.2.0)
   "features/learning/shortcut-manager.ts", // 快捷键支持 (v17.2.0)
+  "features/learning/textbook-expansion-3.ts", // 教材知识库三次扩展 (v17.2.0)
+  "features/learning/knowledge-importer.ts", // 知识点导入功能 (v17.2.0)
+  "features/learning/knowledge-network-visualizer.ts", // 知识点网络可视化 (v17.2.0)
+  "features/learning/learning-report-generator.ts", // 学习报告生成 (v17.2.0)
+  "features/learning/learning-reminder.ts", // 学习提醒功能 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

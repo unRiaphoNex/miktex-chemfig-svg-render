@@ -91,8 +91,8 @@ const FILES = [
   "integrations/ocl.bundle.js",       // OpenChemLib (IIFE 全局, 生成产物, 原样拷贝)
   "editors/chemfig-parser.ts",        // 手写 chemfig → 分子图 解析器
   "editors/molecule-editor/css.ts",  // 分子编辑器 CSS 样式
-  "editors/molecule-editor.ts",       // 分子画布编辑器
   "editors/molecule-knowledge-index.ts", // 分子编辑器知识库索引面板 (v17.2.0)
+  "editors/molecule-editor.ts",       // 分子画布编辑器
   "utils/latex-sanitizer.ts",         // LaTeX 输入清洗 (安全层)
   "services/temp-file-helper.ts",     // local 模式进程/临时文件管控
   "services/cache-manager.ts",        // SHA256 源码缓存管理器

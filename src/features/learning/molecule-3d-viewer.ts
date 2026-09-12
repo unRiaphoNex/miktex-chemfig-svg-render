@@ -124,6 +124,20 @@ class Molecule3DModalViewer {
           colorscheme: this.options.colorScheme,
         });
         break;
+
+      // 新增样式
+      case "licorice":
+        this.viewer.setStyle({}, {
+          stick: { radius: 0.1, colorscheme: this.options.colorScheme },
+        });
+        break;
+
+      case "hyperball":
+        this.viewer.setStyle({}, {
+          stick: { radius: 0.2, colorscheme: this.options.colorScheme },
+          sphere: { scale: 0.5 },
+        });
+        break;
     }
 
     this.viewer.render();
@@ -143,6 +157,16 @@ class Molecule3DModalViewer {
   setColorScheme(scheme) {
     this.options.colorScheme = scheme;
     this.applyStyle();
+  }
+
+  /**
+   * 设置背景颜色
+   */
+  setBackgroundColor(color) {
+    if (this.viewer) {
+      this.viewer.setBackgroundColor(color);
+      this.viewer.render();
+    }
   }
 
   /**
@@ -175,6 +199,114 @@ class Molecule3DModalViewer {
       link.href = dataURI;
       link.click();
     }
+  }
+
+  /**
+   * 启用距离测量模式
+   * 点击两个原子显示距离
+   */
+  enableDistanceMeasurement() {
+    if (!this.viewer) return;
+    
+    this.measureMode = true;
+    this.firstAtom = null;
+    this.distanceLabels = [];
+
+    // 绑定点击事件
+    this.viewer.setClickable({}, true, (atom) => {
+      if (!this.measureMode) return;
+
+      if (!this.firstAtom) {
+        // 第一次点击 - 选择第一个原子
+        this.firstAtom = atom;
+        // 高亮第一个原子
+        this.viewer.setStyle({ atomindex: atom.index }, {
+          stick: { radius: 0.15 },
+          sphere: { scale: 0.5, color: "red" },
+        });
+        this.viewer.render();
+      } else {
+        // 第二次点击 - 计算距离
+        const distance = this.calculateDistance(this.firstAtom, atom);
+        
+        // 创建距离标签
+        const label = this.viewer.addLabel(`${distance.toFixed(2)} Å`, {
+          position: { x: (this.firstAtom.x + atom.x) / 2, y: (this.firstAtom.y + atom.y) / 2, z: (this.firstAtom.z + atom.z) / 2 },
+          fontSize: 14,
+          fontColor: "red",
+          backgroundColor: "white",
+          backgroundOpacity: 0.8,
+        });
+        this.distanceLabels.push(label);
+
+        // 绘制距离线
+        this.viewer.addLine({
+          start: { x: this.firstAtom.x, y: this.firstAtom.y, z: this.firstAtom.z },
+          end: { x: atom.x, y: atom.y, z: atom.z },
+          color: "red",
+          linewidth: 2,
+        });
+
+        // 重置第一个原子
+        this.firstAtom = null;
+        this.applyStyle(); // 恢复原始样式
+      }
+    });
+  }
+
+  /**
+   * 禁用距离测量模式
+   */
+  disableDistanceMeasurement() {
+    this.measureMode = false;
+    this.firstAtom = null;
+    if (this.viewer) {
+      this.viewer.setClickable({}, false);
+      // 清除所有距离标签和线
+      this.clearMeasurements();
+    }
+  }
+
+  /**
+   * 清除所有测量标记
+   */
+  clearMeasurements() {
+    if (this.viewer) {
+      // 重新渲染以清除线和标签
+      this.applyStyle();
+      this.distanceLabels = [];
+    }
+  }
+
+  /**
+   * 计算两个原子之间的距离
+   */
+  calculateDistance(atom1, atom2) {
+    const dx = atom1.x - atom2.x;
+    const dy = atom1.y - atom2.y;
+    const dz = atom1.z - atom2.z;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  /**
+   * 启用原子信息显示
+   * 点击原子显示详细信息
+   */
+  enableAtomInfo(onClick) {
+    if (!this.viewer) return;
+
+    this.viewer.setClickable({}, true, (atom) => {
+      const info = {
+        element: atom.elem,
+        index: atom.index,
+        x: atom.x.toFixed(3),
+        y: atom.y.toFixed(3),
+        z: atom.z.toFixed(3),
+        residue: atom.resn || "N/A",
+        chain: atom.chain || "N/A",
+      };
+      if (onClick) onClick(info);
+    });
   }
 
   /**
@@ -228,6 +360,20 @@ class Molecule3DModal extends Modal {
     modelSelect.createEl("option", { text: "空间填充", value: "sphere" });
     modelSelect.createEl("option", { text: "卡通模型", value: "cartoon" });
     modelSelect.createEl("option", { text: "表面模型", value: "surface" });
+    modelSelect.createEl("option", { text: "细棍模型", value: "licorice" });
+    modelSelect.createEl("option", { text: "超球棍", value: "hyperball" });
+
+    // 背景颜色
+    const bgSelect = controlBar.createEl("select", { cls: "bg-select" });
+    bgSelect.createEl("option", { text: "⚪ 白色", value: "white" });
+    bgSelect.createEl("option", { text: "⚫ 黑色", value: "black" });
+    bgSelect.createEl("option", { text: "⬜ 透明", value: "transparent" });
+
+    // 测量工具
+    const measureBtn = controlBar.createEl("button", {
+      text: "📏 测量",
+      cls: "measure-btn",
+    });
 
     // 旋转按钮
     const spinBtn = controlBar.createEl("button", {
@@ -246,6 +392,10 @@ class Molecule3DModal extends Modal {
       text: "📷 导出",
       cls: "export-btn",
     });
+
+    // 原子信息面板
+    this.infoPanel = contentEl.createDiv({ cls: "atom-info-panel" });
+    this.infoPanel.hide();
 
     // 3D 容器
     this.viewerContainer = contentEl.createDiv({ cls: "3d-viewer-container" });
@@ -279,6 +429,23 @@ class Molecule3DModal extends Modal {
       this.viewer.setModel(modelSelect.value);
     };
 
+    bgSelect.onchange = () => {
+      this.viewer.setBackgroundColor(bgSelect.value);
+    };
+
+    measureBtn.onclick = () => {
+      if (this.measureEnabled) {
+        this.viewer.disableDistanceMeasurement();
+        this.measureBtn.removeClass("active");
+        this.measureEnabled = false;
+      } else {
+        this.viewer.enableDistanceMeasurement();
+        this.measureBtn.addClass("active");
+        this.measureEnabled = true;
+        new Notice("测量模式：点击两个原子显示距离", 2000);
+      }
+    };
+
     spinBtn.onclick = () => {
       this.viewer.spin();
     };
@@ -290,6 +457,19 @@ class Molecule3DModal extends Modal {
     exportBtn.onclick = () => {
       this.viewer.exportImage();
     };
+
+    // 启用原子信息显示
+    this.viewer.enableAtomInfo((info) => {
+      this.infoPanel.show();
+      this.infoPanel.innerHTML = `
+        <strong>原子信息</strong><br>
+        元素: ${info.element}<br>
+        索引: ${info.index}<br>
+        坐标: (${info.x}, ${info.y}, ${info.z})<br>
+        残基: ${info.residue}<br>
+        链: ${info.chain}
+      `;
+    });
   }
 
   async onClose() {

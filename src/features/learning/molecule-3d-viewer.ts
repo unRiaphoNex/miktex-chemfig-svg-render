@@ -660,6 +660,12 @@ class Molecule3DModal extends Modal {
       cls: "export-btn",
     });
 
+    // 收藏按钮
+    const favoriteBtn = controlBar.createEl("button", {
+      text: "⭐ 收藏",
+      cls: "favorite-btn",
+    });
+
     // 原子信息面板
     this.infoPanel = contentEl.createDiv({ cls: "atom-info-panel" });
     this.infoPanel.hide();
@@ -794,6 +800,34 @@ class Molecule3DModal extends Modal {
 
     exportBtn.onclick = () => {
       this.viewer.exportImage();
+    };
+
+    favoriteBtn.onclick = () => {
+      const smiles = smilesInput.value.trim();
+      if (!smiles) {
+        new Notice("请先输入 SMILES 结构", 2000);
+        return;
+      }
+
+      // 从 localStorage 读取收藏列表
+      const favorites = JSON.parse(localStorage.getItem("molecule3d_favorites") || "[]");
+      
+      // 检查是否已收藏
+      if (favorites.find(f => f.smiles === smiles)) {
+        new Notice("该分子已在收藏列表中", 2000);
+        return;
+      }
+
+      // 添加到收藏
+      favorites.push({
+        smiles: smiles,
+        timestamp: Date.now(),
+        name: `分子 ${favorites.length + 1}`,
+      });
+      
+      localStorage.setItem("molecule3d_favorites", JSON.stringify(favorites));
+      new Notice(`已收藏: ${smiles}`, 2000);
+      favoriteBtn.addClass("active");
     };
 
     // 启用原子信息显示

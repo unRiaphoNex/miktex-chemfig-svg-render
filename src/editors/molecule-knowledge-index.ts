@@ -600,49 +600,59 @@ class MoleculeKnowledgeIndexPanel {
    * 显示详情模态框
    */
   showDetailModal(item) {
-    // 获取 app 对象
-    const app = this.plugin.app || (window.app);
-    
-    // 创建详情模态框
-    const modal = new Modal(app);
-    modal.contentEl.createEl("h2", { text: item.title });
-    
-    const meta = modal.contentEl.createDiv({ cls: "knowledge-detail-meta" });
-    meta.createSpan({ text: `索引: ${item.id}`, cls: "detail-id" });
-    meta.createSpan({ text: `书籍: ${item.bookName}`, cls: "detail-book" });
-    meta.createSpan({ text: `章节: 第 ${item.chapter} 章`, cls: "detail-chapter" });
-    
-    modal.contentEl.createEl("h3", { text: "内容" });
-    modal.contentEl.createP({ text: item.content });
+    try {
+      // 获取 app 对象 - this.plugin 是 MoleculeEditorModal 实例，继承自 Modal，有 app 属性
+      const app = this.plugin.app || this.plugin;
+      
+      // 创建详情模态框
+      const modal = new Modal(app);
+      modal.contentEl.createEl("h2", { text: item.title });
+      
+      const meta = modal.contentEl.createDiv({ cls: "knowledge-detail-meta" });
+      meta.createSpan({ text: `索引: ${item.id}`, cls: "detail-id" });
+      meta.createSpan({ text: `书籍: ${item.bookName}`, cls: "detail-book" });
+      meta.createSpan({ text: `章节: 第 ${item.chapter} 章`, cls: "detail-chapter" });
+      
+      modal.contentEl.createEl("h3", { text: "内容" });
+      modal.contentEl.createP({ text: item.content });
 
-    if (item.keywords && item.keywords.length > 0) {
-      modal.contentEl.createEl("h3", { text: "关键词" });
-      const keywordsDiv = modal.contentEl.createDiv({ cls: "knowledge-keywords" });
-      item.keywords.forEach((kw) => {
-        keywordsDiv.createSpan({ text: kw, cls: "keyword-tag" });
-      });
+      if (item.keywords && item.keywords.length > 0) {
+        modal.contentEl.createEl("h3", { text: "关键词" });
+        const keywordsDiv = modal.contentEl.createDiv({ cls: "knowledge-keywords" });
+        item.keywords.forEach((kw) => {
+          keywordsDiv.createSpan({ text: kw, cls: "keyword-tag" });
+        });
+      }
+
+      modal.open();
+    } catch (e) {
+      console.error("showDetailModal error:", e);
+      new Notice("打开详情失败: " + e.message, 3000);
     }
-
-    modal.open();
   }
 
   /**
    * 插入到笔记
    */
   insertToNote(item) {
-    // 插入格式化的知识点到当前笔记
-    const content = `### ${item.id}: ${item.title}\n\n${item.content}\n\n---\n`;
-    
-    // 获取 app 对象
-    const app = this.plugin.app || (window.app);
-    
-    // 获取当前编辑器
-    const activeEditor = app.workspace.activeEditor;
-    if (activeEditor && activeEditor.editor) {
-      activeEditor.editor.replaceSelection(content);
-      new Notice(`已插入知识点: ${item.id}`, 2000);
-    } else {
-      new Notice("请先打开一个笔记编辑器", 2000);
+    try {
+      // 插入格式化的知识点到当前笔记
+      const content = `### ${item.id}: ${item.title}\n\n${item.content}\n\n---\n`;
+      
+      // 获取 app 对象
+      const app = this.plugin.app || this.plugin;
+      
+      // 获取当前编辑器
+      const activeEditor = app.workspace.activeEditor;
+      if (activeEditor && activeEditor.editor) {
+        activeEditor.editor.replaceSelection(content);
+        new Notice(`已插入知识点: ${item.id}`, 2000);
+      } else {
+        new Notice("请先打开一个笔记编辑器", 2000);
+      }
+    } catch (e) {
+      console.error("insertToNote error:", e);
+      new Notice("插入笔记失败: " + e.message, 3000);
     }
   }
 

@@ -232,73 +232,148 @@ class Molecule3DModalViewer {
     if (!this.viewer) return;
     
     this.measureMode = true;
+    this.measureType = "distance"; // distance / angle / dihedral
     this.firstAtom = null;
+    this.secondAtom = null;
+    this.measurePoints = [];
     this.distanceLabels = [];
 
     // 绑定点击事件
     this.viewer.setClickable({}, true, (atom) => {
       if (!this.measureMode) return;
 
-      if (!this.firstAtom) {
-        // 第一次点击 - 选择第一个原子
-        this.firstAtom = atom;
-        // 高亮第一个原子
-        this.viewer.setStyle({ atomindex: atom.index }, {
-          stick: { radius: 0.15 },
-          sphere: { scale: 0.5, color: "red" },
-        });
-        this.viewer.render();
-      } else {
-        // 第二次点击 - 计算距离
-        const distance = this.calculateDistance(this.firstAtom, atom);
-        
-        // 创建距离标签
-        const label = this.viewer.addLabel(`${distance.toFixed(2)} Å`, {
-          position: { x: (this.firstAtom.x + atom.x) / 2, y: (this.firstAtom.y + atom.y) / 2, z: (this.firstAtom.z + atom.z) / 2 },
-          fontSize: 14,
-          fontColor: "red",
-          backgroundColor: "white",
-          backgroundOpacity: 0.8,
-        });
-        this.distanceLabels.push(label);
+      this.measurePoints.push(atom);
 
-        // 绘制距离线
-        this.viewer.addLine({
-          start: { x: this.firstAtom.x, y: this.firstAtom.y, z: this.firstAtom.z },
-          end: { x: atom.x, y: atom.y, z: atom.z },
-          color: "red",
-          linewidth: 2,
-        });
+      // 高亮当前选中的原子
+      this.viewer.setStyle({ atomindex: atom.index }, {
+        stick: { radius: 0.15 },
+        sphere: { scale: 0.5, color: "yellow" },
+      });
+      this.viewer.render();
 
-        // 重置第一个原子
-        this.firstAtom = null;
-        this.applyStyle(); // 恢复原始样式
+      // 根据测量类型检查是否完成
+      if (this.measureType === "distance" && this.measurePoints.length === 2) {
+        this.calculateAndDrawDistance(this.measurePoints[0], this.measurePoints[1]);
+        this.measurePoints = [];
+      } else if (this.measureType === "angle" && this.measurePoints.length === 3) {
+        this.calculateAndDrawAngle(this.measurePoints[0], this.measurePoints[1], this.measurePoints[2]);
+        this.measurePoints = [];
+      } else if (this.measureType === "dihedral" && this.measurePoints.length === 4) {
+        this.calculateAndDrawDihedral(this.measurePoints[0], this.measurePoints[1], this.measurePoints[2], this.measurePoints[3]);
+        this.measurePoints = [];
       }
     });
   }
 
   /**
-   * 禁用距离测量模式
+   * 设置测量类型
    */
-  disableDistanceMeasurement() {
-    this.measureMode = false;
-    this.firstAtom = null;
-    if (this.viewer) {
-      this.viewer.setClickable({}, false);
-      // 清除所有距离标签和线
-      this.clearMeasurements();
-    }
+  setMeasureType(type) {
+    this.measureType = type;
+    this.measurePoints = [];
   }
 
   /**
-   * 清除所有测量标记
+   * 计算并绘制距离
    */
-  clearMeasurements() {
-    if (this.viewer) {
-      // 重新渲染以清除线和标签
-      this.applyStyle();
-      this.distanceLabels = [];
-    }
+  calculateAndDrawDistance(atom1, atom2) {
+    const distance = this.calculateDistance(atom1, atom2);
+    
+    // 创建距离标签
+    const label = this.viewer.addLabel(`${distance.toFixed(2)} Å`, {
+      position: { x: (atom1.x + atom2.x) / 2, y: (atom1.y + atom2.y) / 2, z: (atom1.z + atom2.z) / 2 },
+      fontSize: 14,
+      fontColor: "red",
+      backgroundColor: "white",
+      backgroundOpacity: 0.8,
+    });
+    this.distanceLabels.push(label);
+
+    // 绘制距离线
+    this.viewer.addLine({
+      start: { x: atom1.x, y: atom1.y, z: atom1.z },
+      end: { x: atom2.x, y: atom2.y, z: atom2.z },
+      color: "red",
+      linewidth: 2,
+    });
+
+    this.applyStyle(); // 恢复原始样式
+  }
+
+  /**
+   * 计算并绘制角度
+   */
+  calculateAndDrawAngle(atom1, atom2, atom3) {
+    const angle = this.calculateAngle(atom1, atom2, atom3);
+    
+    // 在中间原子处显示角度标签
+    const label = this.viewer.addLabel(`${angle.toFixed(1)}°`, {
+      position: { x: atom2.x, y: atom2.y, z: atom2.z },
+      fontSize: 14,
+      fontColor: "blue",
+      backgroundColor: "white",
+      backgroundOpacity: 0.8,
+    });
+    this.distanceLabels.push(label);
+
+    // 绘制角度线
+    this.viewer.addLine({
+      start: { x: atom1.x, y: atom1.y, z: atom1.z },
+      end: { x: atom2.x, y: atom2.y, z: atom2.z },
+      color: "blue",
+      linewidth: 2,
+    });
+    this.viewer.addLine({
+      start: { x: atom2.x, y: atom2.y, z: atom2.z },
+      end: { x: atom3.x, y: atom3.y, z: atom3.z },
+      color: "blue",
+      linewidth: 2,
+    });
+
+    this.applyStyle(); // 恢复原始样式
+  }
+
+  /**
+   * 计算并绘制二面角
+   */
+  calculateAndDrawDihedral(atom1, atom2, atom3, atom4) {
+    const dihedral = this.calculateDihedral(atom1, atom2, atom3, atom4);
+    
+    // 在中间位置显示二面角标签
+    const midX = (atom2.x + atom3.x) / 2;
+    const midY = (atom2.y + atom3.y) / 2;
+    const midZ = (atom2.z + atom3.z) / 2;
+    
+    const label = this.viewer.addLabel(`${dihedral.toFixed(1)}°`, {
+      position: { x: midX, y: midY, z: midZ },
+      fontSize: 14,
+      fontColor: "green",
+      backgroundColor: "white",
+      backgroundOpacity: 0.8,
+    });
+    this.distanceLabels.push(label);
+
+    // 绘制二面角线
+    this.viewer.addLine({
+      start: { x: atom1.x, y: atom1.y, z: atom1.z },
+      end: { x: atom2.x, y: atom2.y, z: atom2.z },
+      color: "green",
+      linewidth: 2,
+    });
+    this.viewer.addLine({
+      start: { x: atom2.x, y: atom2.y, z: atom2.z },
+      end: { x: atom3.x, y: atom3.y, z: atom3.z },
+      color: "green",
+      linewidth: 3,
+    });
+    this.viewer.addLine({
+      start: { x: atom3.x, y: atom3.y, z: atom3.z },
+      end: { x: atom4.x, y: atom4.y, z: atom4.z },
+      color: "green",
+      linewidth: 2,
+    });
+
+    this.applyStyle(); // 恢复原始样式
   }
 
   /**
@@ -309,6 +384,98 @@ class Molecule3DModalViewer {
     const dy = atom1.y - atom2.y;
     const dz = atom1.z - atom2.z;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  /**
+   * 计算三个原子之间的角度
+   */
+  calculateAngle(atom1, atom2, atom3) {
+    // 向量 atom2->atom1 和 atom2->atom3
+    const v1 = {
+      x: atom1.x - atom2.x,
+      y: atom1.y - atom2.y,
+      z: atom1.z - atom2.z,
+    };
+    const v2 = {
+      x: atom3.x - atom2.x,
+      y: atom3.y - atom2.y,
+      z: atom3.z - atom2.z,
+    };
+
+    // 计算点积
+    const dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    
+    // 计算模长
+    const mag1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);
+    const mag2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z);
+
+    // 计算角度（弧度转角度）
+    const cosAngle = dot / (mag1 * mag2);
+    const angle = Math.acos(Math.max(-1, Math.min(1, cosAngle))) * 180 / Math.PI;
+    
+    return angle;
+  }
+
+  /**
+   * 计算四个原子之间的二面角
+   */
+  calculateDihedral(atom1, atom2, atom3, atom4) {
+    // 计算三个向量
+    const b1 = {
+      x: atom2.x - atom1.x,
+      y: atom2.y - atom1.y,
+      z: atom2.z - atom1.z,
+    };
+    const b2 = {
+      x: atom3.x - atom2.x,
+      y: atom3.y - atom2.y,
+      z: atom3.z - atom2.z,
+    };
+    const b3 = {
+      x: atom4.x - atom3.x,
+      y: atom4.y - atom3.y,
+      z: atom4.z - atom3.z,
+    };
+
+    // 计算法向量
+    const n1 = this.crossProduct(b1, b2);
+    const n2 = this.crossProduct(b2, b3);
+
+    // 计算二面角
+    const m1 = this.crossProduct(n1, this.normalize(b2));
+    const x = this.dotProduct(n1, n2);
+    const y = this.dotProduct(m1, n2);
+
+    let angle = Math.atan2(y, x) * 180 / Math.PI;
+    if (angle < 0) angle += 360;
+
+    return angle;
+  }
+
+  /**
+   * 计算叉积
+   */
+  crossProduct(a, b) {
+    return {
+      x: a.y * b.z - a.z * b.y,
+      y: a.z * b.x - a.x * b.z,
+      z: a.x * b.y - a.y * b.x,
+    };
+  }
+
+  /**
+   * 计算点积
+   */
+  dotProduct(a, b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+  }
+
+  /**
+   * 归一化向量
+   */
+  normalize(v) {
+    const mag = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    return { x: v.x / mag, y: v.y / mag, z: v.z / mag };
   }
 
   /**
@@ -411,6 +578,12 @@ class Molecule3DModal extends Modal {
       cls: "measure-btn",
     });
 
+    // 测量类型选择
+    const measureTypeSelect = controlBar.createEl("select", { cls: "measure-type-select" });
+    measureTypeSelect.createEl("option", { text: "距离", value: "distance" });
+    measureTypeSelect.createEl("option", { text: "角度", value: "angle" });
+    measureTypeSelect.createEl("option", { text: "二面角", value: "dihedral" });
+
     // 性质按钮
     const propsBtn = controlBar.createEl("button", {
       text: "📊 性质",
@@ -510,9 +683,20 @@ class Molecule3DModal extends Modal {
         this.measureEnabled = false;
       } else {
         this.viewer.enableDistanceMeasurement();
+        this.viewer.setMeasureType(measureTypeSelect.value);
         this.measureBtn.addClass("active");
         this.measureEnabled = true;
-        new Notice("测量模式：点击两个原子显示距离", 2000);
+        
+        const typeText = measureTypeSelect.options[measureTypeSelect.selectedIndex].text;
+        new Notice(`测量模式：${typeText}，点击原子开始`, 2000);
+      }
+    };
+
+    measureTypeSelect.onchange = () => {
+      if (this.measureEnabled) {
+        this.viewer.setMeasureType(measureTypeSelect.value);
+        const typeText = measureTypeSelect.options[measureTypeSelect.selectedIndex].text;
+        new Notice(`已切换到：${typeText}测量`, 1500);
       }
     };
 

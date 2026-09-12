@@ -955,6 +955,25 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // 2D 结构渲染器
+      this.addCommand({
+        id: "render-2d-structure",
+        name: "2D 结构渲染 (从 SMILES)",
+        callback: () => {
+          const smiles = prompt("请输入 SMILES 结构:", "c1ccccc1");
+          if (smiles && smiles.trim()) {
+            // 在笔记中插入
+            const activeFile = this.app.workspace.getActiveFile();
+            if (activeFile) {
+              const editor = this.app.workspace.activeEditor?.editor;
+              if (editor) {
+                window.Structure2DRenderer.insertToNote(editor, smiles.trim());
+              }
+            }
+          }
+        },
+      });
+
       // ========== v11.9.0: 从笔记导入卡片 ==========
       this.addCommand({
         id: "import-cards-from-note",

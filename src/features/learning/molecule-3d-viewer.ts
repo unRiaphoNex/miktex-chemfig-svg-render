@@ -666,6 +666,12 @@ class Molecule3DModal extends Modal {
       cls: "favorite-btn",
     });
 
+    // 收藏列表按钮
+    const favoritesListBtn = controlBar.createEl("button", {
+      text: "📋 列表",
+      cls: "favorites-list-btn",
+    });
+
     // 原子信息面板
     this.infoPanel = contentEl.createDiv({ cls: "atom-info-panel" });
     this.infoPanel.hide();
@@ -830,6 +836,10 @@ class Molecule3DModal extends Modal {
       favoriteBtn.addClass("active");
     };
 
+    favoritesListBtn.onclick = () => {
+      this.showFavoritesList(smilesInput);
+    };
+
     // 启用原子信息显示
     this.viewer.enableAtomInfo((info) => {
       this.infoPanel.show();
@@ -883,6 +893,68 @@ class Molecule3DModal extends Modal {
 
     this.scope = this.contentEl;
     this.scope.addEventListener("keydown", handleKeydown);
+  }
+
+  /**
+   * 显示收藏列表
+   */
+  showFavoritesList(smilesInput) {
+    // 读取收藏列表
+    const favorites = JSON.parse(localStorage.getItem("molecule3d_favorites") || "[]");
+    
+    if (favorites.length === 0) {
+      new Notice("收藏列表为空", 2000);
+      return;
+    }
+
+    // 创建模态框显示收藏列表
+    const { Modal } = require("obsidian");
+    const listModal = new Modal(this.app);
+    listModal.setTitle("⭐ 收藏的分子");
+    
+    const content = listModal.contentEl;
+    content.empty();
+
+    // 创建列表
+    const listEl = content.createDiv({ cls: "favorites-list" });
+    
+    favorites.forEach((fav, index) => {
+      const item = listEl.createDiv({ cls: "favorite-item" });
+      
+      // SMILES 文本
+      const smilesText = item.createSpan({ cls: "favorite-smiles" });
+      smilesText.textContent = fav.smiles;
+      smilesText.title = fav.smiles;
+      
+      // 加载按钮
+      const loadBtn = item.createEl("button", { text: "加载", cls: "load-fav-btn" });
+      loadBtn.onclick = () => {
+        smilesInput.value = fav.smiles;
+        // 触发加载
+        smilesInput.dispatchEvent(new Event("change"));
+        listModal.close();
+      };
+
+      // 删除按钮
+      const deleteBtn = item.createEl("button", { text: "删除", cls: "delete-fav-btn" });
+      deleteBtn.onclick = () => {
+        favorites.splice(index, 1);
+        localStorage.setItem("molecule3d_favorites", JSON.stringify(favorites));
+        item.remove();
+        new Notice("已删除", 1500);
+      };
+    });
+
+    // 清空按钮
+    const clearBtn = content.createEl("button", { text: "🗑️ 清空所有", cls: "clear-all-btn" });
+    clearBtn.style.marginTop = "12px";
+    clearBtn.onclick = () => {
+      localStorage.removeItem("molecule3d_favorites");
+      listModal.close();
+      new Notice("已清空收藏列表", 2000);
+    };
+
+    listModal.open();
   }
 
   async onClose() {

@@ -250,6 +250,31 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 设置预设视角
+   */
+  setPresetView(view) {
+    if (!this.viewer) return;
+
+    // 视角预设：前/后/左/右/上/下
+    const views = {
+      front: { x: 0, y: 0, z: 1 },
+      back: { x: 0, y: 0, z: -1 },
+      left: { x: -1, y: 0, z: 0 },
+      right: { x: 1, y: 0, z: 0 },
+      top: { x: 0, y: 1, z: 0 },
+      bottom: { x: 0, y: -1, z: 0 },
+    };
+
+    const direction = views[view];
+    if (direction) {
+      // 旋转到指定视角
+      this.viewer.setView(direction);
+      this.viewer.zoomTo();
+      this.viewer.render();
+    }
+  }
+
+  /**
    * 导出为图片
    */
   exportImage() {
@@ -654,6 +679,16 @@ class Molecule3DModal extends Modal {
       cls: "reset-btn",
     });
 
+    // 视角预设
+    const viewSelect = controlBar.createEl("select", { cls: "view-select" });
+    viewSelect.createEl("option", { text: "🎯 视角", value: "" });
+    viewSelect.createEl("option", { text: "⬆️ 前", value: "front" });
+    viewSelect.createEl("option", { text: "⬇️ 后", value: "back" });
+    viewSelect.createEl("option", { text: "⬅️ 左", value: "left" });
+    viewSelect.createEl("option", { text: "➡️ 右", value: "right" });
+    viewSelect.createEl("option", { text: "⬆️ 上", value: "top" });
+    viewSelect.createEl("option", { text: "⬇️ 下", value: "bottom" });
+
     // 导出按钮
     const exportBtn = controlBar.createEl("button", {
       text: "📷 导出",
@@ -802,6 +837,12 @@ class Molecule3DModal extends Modal {
 
     resetBtn.onclick = () => {
       this.viewer.resetView();
+    };
+
+    viewSelect.onchange = () => {
+      if (viewSelect.value) {
+        this.viewer.setPresetView(viewSelect.value);
+      }
     };
 
     exportBtn.onclick = () => {

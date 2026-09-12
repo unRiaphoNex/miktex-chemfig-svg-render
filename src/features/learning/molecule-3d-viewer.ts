@@ -248,8 +248,15 @@ class Molecule3DModalViewer {
    * 从 SMILES 加载分子
    */
   async loadFromSmiles(smiles) {
+    // 确保 OCL 已加载
     if (typeof OCL === "undefined") {
-      throw new Error("OCL 未加载");
+      if (typeof OCLLoader !== "undefined") {
+        this.showLoadingIndicator("加载 OCL 库...");
+        await OCLLoader.load();
+        this.hideLoadingIndicator();
+      } else {
+        throw new Error("OCL 加载器未找到");
+      }
     }
 
     this.showLoadingIndicator("生成 3D 结构中...");

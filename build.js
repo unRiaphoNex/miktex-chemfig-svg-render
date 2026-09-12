@@ -81,6 +81,7 @@ const FILES = [
   "features/learning/molecule-comparison.ts", // 分子结构比较 (v17.4.0)
   "features/learning/trajectory-player.ts", // 分子轨迹播放器 (v17.4.0)
   "features/learning/structure-2d-renderer.ts", // 2D结构渲染器 (v17.5.0)
+  "features/learning/knowledge-link-manager.ts", // 知识关联系统 (v17.5.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

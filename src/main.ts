@@ -35,6 +35,10 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
       this.settingsManager = new SettingsManager(this);
       this.templateBrowser = new TemplateBrowser(this);
 
+      // v17.5.0: 知识关联系统 - 化合物名自动高亮
+      this.knowledgeLinkManager = new KnowledgeLinkManager(this);
+      console.log("[Chemfig-SVG] 知识关联系统已初始化");
+
       // 加载用户自定义模板 (通过 TemplateBrowser)
       await this.templateBrowser.loadCustom();
       this.customTemplates = this.templateBrowser.customTemplates;

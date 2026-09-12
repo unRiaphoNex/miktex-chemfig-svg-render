@@ -647,17 +647,24 @@ class MoleculeKnowledgeIndexPanel {
       // 直接从 obsidian 获取 Notice
       const Notice = require("obsidian").Notice;
       
-      // 插入格式化的知识点到当前笔记
-      const content = `### ${item.id}: ${item.title}\n\n${item.content}\n\n---\n`;
-      
       // 获取 app 对象 - 优先使用 window.app（Obsidian 全局）
       const app = window.app || this.plugin.app || this.plugin;
       
       // 获取当前编辑器
       const activeEditor = app.workspace.activeEditor;
       if (activeEditor && activeEditor.editor) {
+        // 构建插入内容：标题 + 代码块（chemfig 模式）+ 说明
+        const tripleBacktick = "```";
+        let content = "### " + item.id + ": " + item.title + "\n\n";
+        content += tripleBacktick + "chem\n" + tripleBacktick + "\n\n";
+        content += "**内容**: " + item.content + "\n\n";
+        if (item.keywords && item.keywords.length > 0) {
+          content += "**关键词**: " + item.keywords.join(", ") + "\n\n";
+        }
+        content += "---\n";
+        
         activeEditor.editor.replaceSelection(content);
-        new Notice(`已插入知识点: ${item.id}`, 2000);
+        new Notice("已插入知识点: " + item.id, 2000);
       } else {
         new Notice("请先打开一个笔记编辑器", 2000);
       }

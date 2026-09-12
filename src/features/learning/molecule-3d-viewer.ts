@@ -161,6 +161,28 @@ class Molecule3DModalViewer {
           sphere: { scale: 0.5 },
         });
         break;
+
+      // 蛋白质专用样式
+      case "ribbon":
+        // 丝带模型 - 显示蛋白质二级结构
+        this.viewer.setStyle({}, {
+          cartoon: { color: "spectrum", arrows: true },
+        });
+        break;
+
+      case "chain":
+        // 按链着色 - 不同链用不同颜色
+        this.viewer.setStyle({}, {
+          cartoon: { color: "chain" },
+        });
+        break;
+
+      case "residue":
+        // 按残基类型着色
+        this.viewer.setStyle({}, {
+          cartoon: { color: "residue" },
+        });
+        break;
     }
 
     this.viewer.render();
@@ -628,6 +650,11 @@ class Molecule3DModal extends Modal {
     modelSelect.createEl("option", { text: "表面模型", value: "surface" });
     modelSelect.createEl("option", { text: "细棍模型", value: "licorice" });
     modelSelect.createEl("option", { text: "超球棍", value: "hyperball" });
+    // 蛋白质专用
+    modelSelect.createEl("option", { text: "--- 蛋白质 ---", value: "" });
+    modelSelect.createEl("option", { text: "🎗️ 丝带模型", value: "ribbon" });
+    modelSelect.createEl("option", { text: "🔗 按链着色", value: "chain" });
+    modelSelect.createEl("option", { text: "🧬 按残基着色", value: "residue" });
 
     // 背景颜色
     const bgSelect = controlBar.createEl("select", { cls: "bg-select" });

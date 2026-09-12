@@ -333,28 +333,12 @@ class AdvancedExternalDBService {
    * 获取化合物的 3D 结构
    */
   async get3DStructure(smiles) {
-    if (typeof OCL === "undefined") {
-      throw new Error("OCL 未加载");
-    }
-
-    try {
-      const mol = OCL.Molecule.fromSmiles(smiles);
-      
-      // 生成 3D 坐标
-      // OCL 正确的 API 是 generateCoordinates，不是 add3DCoordinates
-      mol.generateCoordinates('mmff94');
-      
-      // 导出为 MOL 文件
-      const molFile = mol.toMolfile();
-      
-      return {
-        smiles: smiles,
-        molFile: molFile,
-      };
-    } catch (e) {
-      console.error("[AdvancedDB] 3D 结构生成失败:", e);
-      throw e;
-    }
+    // OCL 不支持生成 3D 坐标，直接返回 SMILES
+    // 3Dmol.js 会自动从 SMILES 生成 3D 结构
+    return {
+      smiles: smiles,
+      molFile: null, // 不需要 MOL 文件
+    };
   }
 
   /**

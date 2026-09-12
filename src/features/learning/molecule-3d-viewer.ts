@@ -262,16 +262,29 @@ class Molecule3DModalViewer {
     this.showLoadingIndicator("生成 3D 结构中...");
 
     try {
-      // 使用 OCL 生成 3D 坐标
-      const mol = OCL.Molecule.fromSmiles(smiles);
-      // OCL 正确的 API 是 generateCoordinates，不是 add3DCoordinates
-      mol.generateCoordinates('mmff94');
-      const molFile = mol.toMolfile();
-
-      this.loadFromMolFile(molFile);
+      // OCL 不支持生成 3D 坐标，直接将 SMILES 传给 3Dmol.js
+      // 3Dmol.js 会自动从 SMILES 生成 3D 结构
+      this.loadFromSmiles(smiles);
     } finally {
       this.hideLoadingIndicator();
     }
+  }
+
+  /**
+   * 从 SMILES 加载分子
+   */
+  loadFromSmiles(smiles) {
+    if (!this.viewer) {
+      throw new Error("Viewer 未初始化");
+    }
+
+    this.viewer.clear();
+    
+    // 3Dmol.js 支持直接从 SMILES 加载分子
+    this.viewer.addModel(smiles, "smi");
+    this.viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.25 } });
+    this.viewer.zoomTo();
+    this.viewer.render();
   }
 
   /**

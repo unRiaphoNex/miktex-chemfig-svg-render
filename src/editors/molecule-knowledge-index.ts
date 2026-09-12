@@ -601,7 +601,12 @@ class MoleculeKnowledgeIndexPanel {
    */
   showDetailModal(item) {
     try {
-      // 获取 app 对象 - this.plugin 是 MoleculeEditorModal 实例，继承自 Modal，有 app 属性
+      // 直接从 obsidian 获取 Modal 和 Notice，避免作用域问题
+      const obsidian = require("obsidian");
+      const Modal = obsidian.Modal;
+      const Notice = obsidian.Notice;
+      
+      // 获取 app 对象
       const app = this.plugin.app || this.plugin;
       
       // 创建详情模态框
@@ -627,7 +632,10 @@ class MoleculeKnowledgeIndexPanel {
       modal.open();
     } catch (e) {
       console.error("showDetailModal error:", e);
-      new Notice("打开详情失败: " + e.message, 3000);
+      try {
+        const Notice = require("obsidian").Notice;
+        new Notice("打开详情失败: " + e.message, 3000);
+      } catch (_) {}
     }
   }
 
@@ -636,6 +644,9 @@ class MoleculeKnowledgeIndexPanel {
    */
   insertToNote(item) {
     try {
+      // 直接从 obsidian 获取 Notice
+      const Notice = require("obsidian").Notice;
+      
       // 插入格式化的知识点到当前笔记
       const content = `### ${item.id}: ${item.title}\n\n${item.content}\n\n---\n`;
       
@@ -652,7 +663,10 @@ class MoleculeKnowledgeIndexPanel {
       }
     } catch (e) {
       console.error("insertToNote error:", e);
-      new Notice("插入笔记失败: " + e.message, 3000);
+      try {
+        const Notice = require("obsidian").Notice;
+        new Notice("插入笔记失败: " + e.message, 3000);
+      } catch (_) {}
     }
   }
 

@@ -202,6 +202,44 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 设置旋转速度
+   */
+  setSpinSpeed(speed) {
+    if (this.viewer) {
+      this.viewer.spin({"speed": speed});
+    }
+  }
+
+  /**
+   * 显示/隐藏坐标轴
+   */
+  showAxes(show = true) {
+    if (this.viewer) {
+      if (show) {
+        this.viewer.addAxis({});
+      } else {
+        // 清除并重新渲染以移除坐标轴
+        this.applyStyle();
+      }
+      this.viewer.render();
+    }
+  }
+
+  /**
+   * 显示/隐藏网格
+   */
+  showGrid(show = true) {
+    if (this.viewer) {
+      if (show) {
+        this.viewer.addGrid({});
+      } else {
+        this.applyStyle();
+      }
+      this.viewer.render();
+    }
+  }
+
+  /**
    * 重置视图
    */
   resetView() {
@@ -572,6 +610,12 @@ class Molecule3DModal extends Modal {
     bgSelect.createEl("option", { text: "⚫ 黑色", value: "black" });
     bgSelect.createEl("option", { text: "⬜ 透明", value: "transparent" });
 
+    // 旋转速度
+    const speedSelect = controlBar.createEl("select", { cls: "speed-select" });
+    speedSelect.createEl("option", { text: "🐢 慢速", value: "1" });
+    speedSelect.createEl("option", { text: "🐇 中速", value: "5" });
+    speedSelect.createEl("option", { text: "🚀 快速", value: "15" });
+
     // 测量工具
     const measureBtn = controlBar.createEl("button", {
       text: "📏 测量",
@@ -674,6 +718,10 @@ class Molecule3DModal extends Modal {
 
     bgSelect.onchange = () => {
       this.viewer.setBackgroundColor(bgSelect.value);
+    };
+
+    speedSelect.onchange = () => {
+      this.viewer.setSpinSpeed(parseInt(speedSelect.value));
     };
 
     measureBtn.onclick = () => {

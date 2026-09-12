@@ -686,4 +686,4 @@ class MoleculeKnowledgeIndexPanel {
 }
 
 // 导出全局变量
-// MoleculeKnowledgeIndexPanel
+window.MoleculeKnowledgeIndexPanel = MoleculeKnowledgeIndexPanel;

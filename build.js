@@ -52,6 +52,8 @@ const FILES = [
   "features/learning/knowledge-search-panel.ts", // 知识库搜索面板 (v17.2.0)
   "features/learning/knowledge-relations.ts", // 知识点关联管理 (v17.2.0)
   "features/learning/knowledge-learning-manager.ts", // 知识库学习功能 (v17.2.0)
+  "features/learning/learning-card-system.ts", // 学习卡片系统 (v17.2.0)
+  "features/learning/knowledge-export-stats.ts", // 知识库导出和统计 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

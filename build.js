@@ -54,6 +54,8 @@ const FILES = [
   "features/learning/knowledge-learning-manager.ts", // 知识库学习功能 (v17.2.0)
   "features/learning/learning-card-system.ts", // 学习卡片系统 (v17.2.0)
   "features/learning/knowledge-export-stats.ts", // 知识库导出和统计 (v17.2.0)
+  "features/learning/learning-calendar-mistakes.ts", // 学习日历和错题本 (v17.2.0)
+  "features/learning/achievements-goals.ts", // 成就系统和学习目标 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

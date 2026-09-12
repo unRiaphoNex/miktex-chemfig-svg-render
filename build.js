@@ -60,6 +60,8 @@ const FILES = [
   "features/learning/learning-mode-switcher.ts", // 学习模式切换 (v17.2.0)
   "features/learning/shortcut-manager.ts", // 快捷键支持 (v17.2.0)
   "features/learning/textbook-expansion-3.ts", // 教材知识库三次扩展 (v17.2.0)
+  "features/learning/textbook-expansion-4.ts", // 知识库扩展 4 (v17.2.0)
+  "features/learning/textbook-expansion-5.ts", // 知识库扩展 5 (v17.2.0)
   "features/learning/knowledge-importer.ts", // 知识点导入功能 (v17.2.0)
   "features/learning/knowledge-network-visualizer.ts", // 知识点网络可视化 (v17.2.0)
   "features/learning/learning-report-generator.ts", // 学习报告生成 (v17.2.0)

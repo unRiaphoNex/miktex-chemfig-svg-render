@@ -1009,6 +1009,23 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         },
       });
 
+      // NGL 大分子查看器
+      this.addCommand({
+        id: "open-ngl-viewer",
+        name: "NGL 大分子查看器 (PDB)",
+        callback: () => {
+          if (typeof NGLViewerModal !== "undefined") {
+            const pdbId = prompt("请输入 PDB ID (如: 1AKE):", "1AKE");
+            if (pdbId && pdbId.trim()) {
+              const modal = new NGLViewerModal(this.app, pdbId.trim());
+              modal.open();
+            }
+          } else {
+            new Notice("NGL Viewer 未加载", 2000);
+          }
+        },
+      });
+
       // ========== v11.9.0: 从笔记导入卡片 ==========
       this.addCommand({
         id: "import-cards-from-note",

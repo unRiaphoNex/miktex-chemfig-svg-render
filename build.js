@@ -108,7 +108,9 @@ const FILES = [
 ];
 
 function buildOnce() {
-  let output = "";
+  // 在文件最开头声明 OCL 变量，避免 OCL is not defined 错误
+  let output = "var OCL; // 全局 OCL 变量声明，后续由 ocl-global-map.js 赋值\
+";
   for (const file of FILES) {
     const filePath = path.join(SRC_DIR, file);
     if (!fs.existsSync(filePath)) {

@@ -635,11 +635,17 @@ class Molecule3DModal extends Modal {
       cls: "file-input",
     });
     fileInput.style.display = "none";
-    fileInput.accept = ".mol,.sdf,.pdb,.xyz,.cif";
+    fileInput.accept = ".mol,.sdf,.pdb,.xyz,.cif,.xtc,.dcd";
 
     const uploadBtn = controlBar.createEl("button", {
       text: "📁 上传文件",
       cls: "upload-btn",
+    });
+
+    // 轨迹播放按钮
+    const trajectoryBtn = controlBar.createEl("button", {
+      text: "🎬 轨迹",
+      cls: "trajectory-btn",
     });
 
     // 模型切换
@@ -751,6 +757,14 @@ class Molecule3DModal extends Modal {
     this.viewer = new Molecule3DViewer(this.viewerContainer);
     await this.viewer.init();
 
+    // 初始化轨迹播放器
+    this.trajectoryPlayer = new window.TrajectoryPlayer(this.viewer);
+
+    // 轨迹控制栏
+    this.trajectoryControls = contentEl.createDiv({ cls: "trajectory-controls" });
+    this.trajectoryControls.hide();
+    this.createTrajectoryControls(this.trajectoryControls);
+
     // 如果有 SMILES，自动加载
     if (this.smiles) {
       try {
@@ -788,7 +802,17 @@ class Molecule3DModal extends Modal {
         // 根据文件类型确定格式
         let format = "mol";
         if (ext === "pdb") format = "pdb";
-        else if (ext === "xyz") format = "xyz";
+        else if (ext === "xyz") {
+          // 检查是否是轨迹文件（多帧）
+          const frameCount = this.trajectoryPlayer.loadFromXYZ(text);
+          if (frameCount > 1) {
+            new Notice(`已加载轨迹: ${file.name} (${frameCount} 帧)`, 2000);
+            this.showTrajectoryControls();
+            return;
+          } else {
+            format = "xyz";
+          }
+        }
         else if (ext === "sdf") format = "sdf";
         else if (ext === "cif") format = "cif";
 
@@ -797,6 +821,12 @@ class Molecule3DModal extends Modal {
         new Notice(`已加载: ${file.name}`, 2000);
       } catch (err) {
         new Notice(`文件加载失败: ${err.message}`, 3000);
+      }
+    };
+
+    trajectoryBtn.onclick = () => {
+      if (this.trajectoryControls) {
+        this.trajectoryControls.toggle(!this.trajectoryControls.isShown);
       }
     };
 
@@ -978,10 +1008,87 @@ class Molecule3DModal extends Modal {
   }
 
   /**
+   * 创建轨迹控制栏
+   */
+  createTrajectoryControls(container) {
+    // 播放/暂停按钮
+    this.playBtn = container.createEl("button", { text: "▶️ 播放", cls: "play-btn" });
+    this.playBtn.onclick = () => {
+      if (this.trajectoryPlayer.isPlaying) {
+        this.trajectoryPlayer.pause();
+        this.playBtn.textContent = "▶️ 播放";
+      } else {
+        this.trajectoryPlayer.play();
+        this.playBtn.textContent = "⏸️ 暂停";
+      }
+    };
+
+    // 停止按钮
+    const stopBtn = container.createEl("button", { text: "⏹️ 停止", cls: "stop-btn" });
+    stopBtn.onclick = () => {
+      this.trajectoryPlayer.stop();
+      this.playBtn.textContent = "▶️ 播放";
+      this.updateFrameInfo();
+    };
+
+    // 上一帧
+    const prevBtn = container.createEl("button", { text: "⏮️", cls: "prev-btn" });
+    prevBtn.onclick = () => {
+      this.trajectoryPlayer.prevFrame();
+      this.updateFrameInfo();
+    };
+
+    // 下一帧
+    const nextBtn = container.createEl("button", { text: "⏭️", cls: "next-btn" });
+    nextBtn.onclick = () => {
+      this.trajectoryPlayer.nextFrame();
+      this.updateFrameInfo();
+    };
+
+    // 帧信息
+    this.frameInfo = container.createSpan({ cls: "frame-info" });
+    this.frameInfo.textContent = "帧: 0 / 0";
+
+    // 速度控制
+    const speedLabel = container.createSpan({ text: "速度:" });
+    const speedSlider = container.createEl("input", {
+      type: "range",
+      cls: "speed-slider",
+    });
+    speedSlider.min = "0.5";
+    speedSlider.max = "5";
+    speedSlider.step = "0.5";
+    speedSlider.value = "1";
+    speedSlider.oninput = () => {
+      this.trajectoryPlayer.setSpeed(parseFloat(speedSlider.value));
+    };
+  }
+
+  /**
+   * 更新帧信息显示
+   */
+  updateFrameInfo() {
+    if (this.frameInfo && this.trajectoryPlayer) {
+      const current = this.trajectoryPlayer.getCurrentFrame() + 1;
+      const total = this.trajectoryPlayer.getFrameCount();
+      this.frameInfo.textContent = `帧: ${current} / ${total}`;
+    }
+  }
+
+  /**
+   * 显示轨迹控制栏
+   */
+  showTrajectoryControls() {
+    if (this.trajectoryControls) {
+      this.trajectoryControls.show();
+      this.updateFrameInfo();
+    }
+  }
+
+  /**
    * 显示收藏列表
    */
-  showFavoritesList(smilesInput) {
-    // 读取收藏列表
+  showFavoritesList(smilesInput) {    // 读取收藏列表
     const favorites = JSON.parse(localStorage.getItem("molecule3d_favorites") || "[]");
     
     if (favorites.length === 0) {

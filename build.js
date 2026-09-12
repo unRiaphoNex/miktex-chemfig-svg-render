@@ -48,6 +48,7 @@ const FILES = [
   "features/learning/knowledge-base.ts",  // 知识库模块 (v17.2.0)
   "features/learning/textbook-knowledge-base.ts", // 完整教材知识库 (v17.2.0)
   "features/learning/textbook-extended.ts", // 教材知识库扩展 (v17.2.0)
+  "features/learning/textbook-expansion-2.ts", // 教材知识库二次扩展 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES

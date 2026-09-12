@@ -45,10 +45,13 @@ const FILES = [
   "features/learning/knowledge-linking.ts", // 知识关联 (v15.6.0)
   "features/learning/retrosynthesis.ts", // 反向合成分析 (v15.6.0)
   "features/learning/learning-widgets.ts", // 学习日历 & 错题本 (v17.1.0)
+  "features/learning/knowledge-base.ts",  // 知识库模块 (v17.2.0)
   // ========== features: chemistry/ ==========
   "features/chemistry/smiles-renderer.ts", // SMILES 纯前端渲染
   "features/chemistry/iupac-converter.ts", // IUPAC 名称转 SMILES
+  "features/chemistry/extended-compounds.ts", // 扩展化合物数据库 (v17.2.0)
   "features/chemistry/reaction-conditions.ts", // 反应条件速查
+  "features/chemistry/extended-reactions.ts", // 扩展反应条件 (v17.2.0)
   // ========== features: visualization/ ==========
   "features/visualization/molecule-3d-viewer.ts", // 3D 分子可视化 (v12.0.0)
   // ========== features: update/ ==========

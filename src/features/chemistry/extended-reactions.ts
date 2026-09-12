@@ -1,0 +1,186 @@
+// ========== 扩展反应条件数据库 (v17.2.0) ==========
+// 从药物合成反应教材提取的反应条件
+
+const EXTENDED_REACTION_CONDITIONS = [
+  // ========== 酰化反应 ==========
+  {
+    id: "acetylation-acid",
+    name: "酸酐酰化",
+    reagents: ["乙酸酐", "浓硫酸"],
+    reactant: "醇 / 酚 / 胺",
+    product: "酯 / 酰胺",
+    mechanism: "亲核酰基取代",
+    notes: "阿司匹林合成反应，水杨酸 + 乙酸酐 → 阿司匹林",
+    example: "水杨酸 + 乙酸酐 → 阿司匹林",
+    bookSource: "药物合成反应（第四版）",
+  },
+  {
+    id: "fischer-esterification",
+    name: "Fischer 酯化",
+    reagents: ["羧酸", "醇", "浓硫酸", "加热"],
+    reactant: "羧酸 + 醇",
+    product: "酯",
+    mechanism: "亲核酰基取代",
+    notes: "可逆反应，酸催化，需除去水推动平衡",
+    example: "乙酸 + 乙醇 → 乙酸乙酯",
+    bookSource: "有机化学（第六版）",
+  },
+  
+  // ========== 还原反应 ==========
+  {
+    id: "nabh4-reduction",
+    name: "NaBH4 还原",
+    reagents: ["NaBH4", "MeOH 或 EtOH"],
+    reactant: "醛 / 酮",
+    product: "醇",
+    mechanism: "负氢转移",
+    notes: "温和还原剂，不还原酯和羧酸",
+    example: "丙酮 + NaBH4 → 异丙醇",
+    bookSource: "药物合成反应（第四版）",
+  },
+  {
+    id: "lialh4-reduction",
+    name: "LiAlH4 还原",
+    reagents: ["LiAlH4", "无水醚", "然后 H2O"],
+    reactant: "羧酸 / 酯 / 酰胺",
+    product: "醇 / 胺",
+    mechanism: "负氢转移",
+    notes: "强还原剂，还原所有羰基化合物",
+    example: "乙酸 + LiAlH4 → 乙醇",
+    bookSource: "药物合成反应（第四版）",
+  },
+  {
+    id: "catalytic-hydrogenation-benzene",
+    name: "苯环催化加氢",
+    reagents: ["H2", "Ni", "高温高压"],
+    reactant: "苯环",
+    product: "环己烷",
+    mechanism: "催化加氢",
+    notes: "需要剧烈条件，一般催化剂难还原苯环",
+    example: "苯 + 3H2 → 环己烷",
+    bookSource: "有机化学（第六版）",
+  },
+  
+  // ========== 氧化反应 ==========
+  {
+    id: "jones-oxidation",
+    name: "Jones 氧化",
+    reagents: ["CrO3", "H2SO4", "丙酮"],
+    reactant: "伯醇 / 仲醇",
+    product: "羧酸 / 酮",
+    mechanism: "氧化",
+    notes: "强氧化剂，伯醇直接氧化到羧酸",
+    example: "乙醇 + Jones → 乙酸",
+    bookSource: "药物合成反应（第四版）",
+  },
+  {
+    id: "pcc-oxidation",
+    name: "PCC 氧化",
+    reagents: ["PCC", "CH2Cl2"],
+    reactant: "伯醇 / 仲醇",
+    product: "醛 / 酮",
+    mechanism: "氧化",
+    notes: "温和氧化剂，伯醇停在醛",
+    example: "乙醇 + PCC → 乙醛",
+    bookSource: "药物合成反应（第四版）",
+  },
+  {
+    id: "tollen-reagent",
+    name: "Tollens 试剂",
+    reagents: ["Ag(NH3)2OH"],
+    reactant: "醛",
+    product: "羧酸 (银镜)",
+    mechanism: "氧化",
+    notes: "鉴别醛和酮，醛能发生银镜反应",
+    example: "乙醛 + Tollens → 乙酸 + Ag↓",
+    bookSource: "有机化学（第六版）",
+  },
+  
+  // ========== 卤代反应 ==========
+  {
+    id: "free-radical-halogenation",
+    name: "自由基卤代",
+    reagents: ["Cl2 或 Br2", "光照 (hν)"],
+    reactant: "烷烃",
+    product: "卤代烷",
+    mechanism: "自由基取代",
+    notes: "光照引发，产物复杂（混合物）",
+    example: "甲烷 + Cl2/hν → 氯甲烷 + HCl",
+    bookSource: "有机化学（第六版）",
+  },
+  {
+    id: "hell-volhard-zelinskii",
+    name: "Hell-Volhard-Zelinskii 反应",
+    reagents: ["Br2", "P", "然后 H2O"],
+    reactant: "羧酸 (α-H)",
+    product: "α-溴代羧酸",
+    mechanism: "α-卤代",
+    notes: "羧酸 α-卤代，制备 α-氨基酸的重要方法",
+    example: "乙酸 + Br2/P → 溴乙酸",
+    bookSource: "药物合成反应（第四版）",
+  },
+  
+  // ========== 缩合反应 ==========
+  {
+    id: "aldol-condensation",
+    name: "羟醛缩合",
+    reagents: ["稀 NaOH", "然后加热"],
+    reactant: "醛 / 酮 (有 α-H)",
+    product: "β-羟基醛/酮 → α,β-不饱和醛/酮",
+    mechanism: "亲核加成",
+    notes: "两分子醛/酮缩合，形成 C-C 键",
+    example: "乙醛 + 乙醛 → 3-羟基丁醛 → 巴豆醛",
+    bookSource: "有机化学（第六版）",
+  },
+  {
+    id: "grignard-reaction",
+    name: "格氏反应",
+    reagents: ["1. RMgX", "2. H3O+"],
+    reactant: "醛 / 酮 / 酯",
+    product: "醇 (伯/仲/叔)",
+    mechanism: "亲核加成",
+    notes: "最重要的 C-C 键形成反应之一",
+    example: "甲醛 + CH3MgBr → 乙醇",
+    bookSource: "有机化学（第六版）",
+  },
+  {
+    id: "friedel-crafts",
+    name: "Friedel-Crafts 反应",
+    reagents: ["RX 或 RCOX", "AlCl3"],
+    reactant: "芳烃",
+    product: "烷基苯 / 酰基苯",
+    mechanism: "亲电取代",
+    notes: "芳环上引入烷基或酰基",
+    example: "苯 + CH3Cl/AlCl3 → 甲苯",
+    bookSource: "有机化学（第六版）",
+  },
+  
+  // ========== 杂环合成 ==========
+  {
+    id: "paal-knorr",
+    name: "Paal-Knorr 合成",
+    reagents: ["1,4-二羰基化合物", "NH3 或 RNH2"],
+    reactant: "1,4-二酮",
+    product: "吡咯",
+    mechanism: "环化",
+    notes: "合成吡咯环的重要方法",
+    example: "2,5-己二酮 + NH3 → 2,5-二甲基吡咯",
+    bookSource: "药物合成反应（第四版）",
+  },
+  
+  // ========== 重排反应 ==========
+  {
+    id: "pinacol-rearrangement",
+    name: "Pinacol 重排",
+    reagents: ["H+", "加热"],
+    reactant: "邻二醇",
+    product: "酮 (频哪酮)",
+    mechanism: "重排",
+    notes: "碳正离子重排，生成更稳定的碳正离子",
+    example: "频哪醇 → 频哪酮",
+    bookSource: "有机化学（第六版）",
+  },
+];
+
+// 导出全局变量
+// EXTENDED_REACTION_CONDITIONS

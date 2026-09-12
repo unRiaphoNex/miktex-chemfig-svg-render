@@ -619,7 +619,7 @@ class MoleculeKnowledgeIndexPanel {
       meta.createSpan({ text: `章节: 第 ${item.chapter} 章`, cls: "detail-chapter" });
       
       modal.contentEl.createEl("h3", { text: "内容" });
-      modal.contentEl.createP({ text: item.content });
+      modal.contentEl.createEl("p", { text: item.content });
 
       if (item.keywords && item.keywords.length > 0) {
         modal.contentEl.createEl("h3", { text: "关键词" });

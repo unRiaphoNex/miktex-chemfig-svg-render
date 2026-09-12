@@ -695,6 +695,12 @@ class Molecule3DModal extends Modal {
       cls: "export-btn",
     });
 
+    // 全屏按钮
+    const fullscreenBtn = controlBar.createEl("button", {
+      text: "⛶ 全屏",
+      cls: "fullscreen-btn",
+    });
+
     // 收藏按钮
     const favoriteBtn = controlBar.createEl("button", {
       text: "⭐ 收藏",
@@ -847,6 +853,14 @@ class Molecule3DModal extends Modal {
 
     exportBtn.onclick = () => {
       this.viewer.exportImage();
+    };
+
+    fullscreenBtn.onclick = () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        this.viewerContainer.requestFullscreen();
+      }
     };
 
     favoriteBtn.onclick = () => {

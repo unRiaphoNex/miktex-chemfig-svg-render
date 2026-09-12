@@ -26,3 +26,4 @@ export { createLearningSidebar, createLearningButton } from './components/Learni
 export { createCompoundSidebar, createCompoundItem, createCategoryTitle } from './components/CompoundSidebar';
 export { createFloatingToolbar, createToolbarGroup, createToolbarDivider, createToolButton } from './components/FloatingToolbar';
 export { createCanvasArea, createColumnsLayout } from './components/CanvasArea';
+export { LearningModuleManager } from './components/LearningModule';

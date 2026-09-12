@@ -23,6 +23,12 @@ const FILES = [
   "utils/constants.ts",               // 工具类与正则常量 (PerfMonitor, UI, VirtualList等)
   "state/settings-manager.ts",        // 设置管理器
   "state/environment-manager.ts",     // 编译环境管理器
+  // ========== managers: 统一包管理器/事件钩子/代码片段 ==========
+  "managers/package-manager.ts",       // 统一包管理器 (PackageManager)
+  "managers/event-hooks.ts",           // 事件钩子系统 (EventHooks)
+  "managers/snippet-manager.ts",       // 代码片段系统 (SnippetManager)
+  "managers/performance-optimizer.ts",  // 性能优化模块 (LRU/FSRS/SVG缓存)
+  "managers/toolbar-config.ts",         // 工具栏配置 (配置驱动 UI)
   "ui/modals/template-browser.ts",    // 模板浏览器
   "services/cache.ts",                // LRU缓存、编译队列、性能报告
   "editors/cm6.ts",                   // CM6 Live Preview (实验性)
@@ -49,6 +55,7 @@ const FILES = [
   "integrations/ocl-tooltips.ts",     // OpenChemLib 工具栏图标 -> 工具名映射
   "integrations/ocl.bundle.js",       // OpenChemLib (IIFE 全局, 生成产物, 原样拷贝)
   "editors/chemfig-parser.ts",        // 手写 chemfig → 分子图 解析器
+  "editors/molecule-editor/css.ts",  // 分子编辑器 CSS 样式
   "editors/molecule-editor.ts",       // 分子画布编辑器
   "utils/latex-sanitizer.ts",         // LaTeX 输入清洗 (安全层)
   "services/temp-file-helper.ts",     // local 模式进程/临时文件管控

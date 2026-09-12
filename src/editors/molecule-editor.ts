@@ -1013,7 +1013,8 @@ class MoleculeEditorModal extends Modal {
   async onOpen() {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.addClass("chem-modal-root molecule-editor-modal");
+    contentEl.addClass("chem-modal-root");
+    contentEl.addClass("molecule-editor-modal");
 
     contentEl.createEl("h2", { text: "分子结构式编辑器" });
     contentEl.createEl("p", {
@@ -1105,85 +1106,9 @@ class MoleculeEditorModal extends Modal {
       this.setStatus("删除模式：点击要删除的原子/键");
     };
 
-    // 分隔线
-    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
 
-    // 键工具组
-    const bondGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
-    const bonds = [
-      { icon: "─", label: "单键", type: 1 },
-      { icon: "＝", label: "双键", type: 2 },
-      { icon: "≡", label: "三键", type: 3 },
-    ];
-    bonds.forEach(b => {
-      const btn = bondGroup.createEl("button", {
-        text: b.icon,
-        cls: "chem-modal-tool-btn molecule-editor-tool-btn",
-      });
-      btn.title = b.label;
-      btn.onclick = () => {
-        this._setActiveTool(btn);
-        this.setStatus(b.label + "模式：在两个原子间点击创建" + b.label);
-        this._simulateOclToolClick("bond", b.type);
-      };
-    });
 
     // 分隔线
-    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
-
-    // 原子工具组
-    const atomGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
-    const atoms = [
-      { symbol: "C", label: "碳" },
-      { symbol: "N", label: "氮" },
-      { symbol: "O", label: "氧" },
-      { symbol: "S", label: "硫" },
-      { symbol: "P", label: "磷" },
-      { symbol: "Si", label: "硅" },
-      { symbol: "F", label: "氟" },
-      { symbol: "Cl", label: "氯" },
-      { symbol: "Br", label: "溴" },
-      { symbol: "I", label: "碘" },
-      { symbol: "H", label: "氢" },
-    ];
-    atoms.forEach(a => {
-      const btn = atomGroup.createEl("button", {
-        text: a.symbol,
-        cls: "chem-modal-tool-btn molecule-editor-tool-btn",
-      });
-      btn.title = a.label + "原子";
-      btn.onclick = () => {
-        this._setActiveTool(btn);
-        this.setStatus(a.label + "原子：点击画布添加" + a.label + "原子");
-        this._simulateOclToolClick("atom", a.symbol);
-      };
-    });
-
-    // 分隔线
-    toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
-
-    // 模板工具组
-    const tplGroup = toolbarTop.createDiv("chem-modal-toolbar-group molecule-editor-tool-group");
-    const templates = [
-      { icon: "⬡", label: "苯环", smiles: "c1ccccc1" },
-      { icon: "⬢", label: "环己烷", smiles: "C1CCCCC1" },
-      { icon: "⬟", label: "环戊烷", smiles: "C1CCCC1" },
-    ];
-    templates.forEach(t => {
-      const btn = tplGroup.createEl("button", {
-        text: t.icon,
-        cls: "chem-modal-tool-btn molecule-editor-tool-btn",
-      });
-      btn.title = t.label;
-      btn.onclick = () => {
-        try {
-          const mol = getOCL().Molecule.fromSmiles(t.smiles);
-          this.loadMolecule(mol, "已载入模板: " + t.label);
-        } catch (e) {
-          this.setStatus("模板加载失败: " + e.message);
-        }
-      };
-    });
 
     // 分隔线
     toolbarTop.createDiv("chem-modal-toolbar-divider toolbar-divider");
@@ -1314,6 +1239,14 @@ class MoleculeEditorModal extends Modal {
       setTimeout(() => addOclToolbarTooltips(this.editorContainer), 120);
       this.setupCanvasGestures();
       this.setupKeyboardShortcuts();
+
+      // v17.1.0: 触发画布初始化事件
+      try {
+        const hooks = (globalThis as any).EventHookManager.getInstance();
+        hooks.emitCanvasInit(this.editor);
+      } catch (e) {
+        console.warn('[MoleculeEditor] Event hooks not available:', e);
+      }
 
       // v10.15.9: 绑定画布结构变化事件，自动记录历史栈
       try {
@@ -3937,6 +3870,15 @@ class MoleculeEditorModal extends Modal {
     
     function dragMouseDown(e) {
       e = e || window.event;
+      
+      // 只在空白处拖动，不阻止按钮点击
+      if (e.target.tagName === 'BUTTON' ||
+          e.target.closest('button') ||
+          e.target.tagName === 'INPUT' ||
+          e.target.closest('input')) {
+        return;
+      }
+      
       e.preventDefault();
       // 获取鼠标光标位置
       pos3 = e.clientX;
@@ -5142,6 +5084,11 @@ class MoleculeEditorModal extends Modal {
       }
       this._autocompleteCleanup = null;
     }
+    // 清理历史防抖定时器
+    if (this._historyDebounce) {
+      clearTimeout(this._historyDebounce);
+      this._historyDebounce = null;
+    }
     try {
       if (this.editor && typeof this.editor.destroy === "function") this.editor.destroy();
     } catch (e) {
@@ -5178,6 +5125,17 @@ function stripSmilesMetas(source) {
 
 // SMILES -> OCL 前端 SVG（纯前端即时渲染，无需 MikTeX）
 function renderSmilesSvg(smiles, w, h) {
+  // 生成缓存键
+  const cacheKey = `${smiles}_${w}x${h}`;
+  
+  // 检查缓存
+  if (svgRenderCache.has(cacheKey)) {
+    // LRU: 移到最新
+    const cached = svgRenderCache.get(cacheKey);
+    svgRenderCache.delete(cacheKey);
+    svgRenderCache.set(cacheKey, cached);
+    return cached;
+  }
   if (!smiles || !smiles.trim()) {
     return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:24px;">◇</div>';
   }
@@ -5322,14 +5280,13 @@ class SmilesSearchModal extends Modal {
 // 5. 响应式布局
 
 // 从重构后的模块导入 CSS
-import { MOLECULE_EDITOR_CSS as MOLECULE_EDITOR_REFINED_CSS } from './molecule-editor/css';
 
 
 // 自动注入 CSS
 if (typeof document !== "undefined" && !document.getElementById("molecule-editor-refined-css")) {
   const style = document.createElement("style");
   style.id = "molecule-editor-refined-css";
-  style.textContent = MOLECULE_EDITOR_REFINED_CSS;
+  style.textContent = MOLECULE_EDITOR_CSS;
   document.head.appendChild(style);
 }
 

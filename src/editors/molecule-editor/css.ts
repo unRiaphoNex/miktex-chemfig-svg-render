@@ -118,7 +118,7 @@ export const MOLECULE_EDITOR_CSS = `
   border-radius: 20px !important;
   font-size: 13px !important;
   background: var(--background-secondary) !important;
-  transition: all 0.15s ease !important;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
   box-sizing: border-box !important;
 }
 
@@ -152,22 +152,24 @@ export const MOLECULE_EDITOR_CSS = `
 
 /* ===== 悬浮工具栏 ===== */
 .chem-modal-toolbar {
-  position: absolute !important;
-  top: 16px !important;
-  left: 16px !important;
-  z-index: 9999 !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: 100 !important;
   background: var(--background-primary) !important;
-  border: 1px solid var(--background-modifier-border) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  padding: 6px 12px !important;
-  backdrop-filter: blur(8px) !important;
-  width: 640px !important;
-  max-width: calc(100% - 32px) !important;
-  cursor: move !important;
+  border: none !important;
+  border-top: 1px solid var(--background-modifier-border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 16px !important;
+  backdrop-filter: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  cursor: default !important;
   user-select: none !important;
-  transition: box-shadow 0.2s ease !important;
+  transition: none !important;
   box-sizing: border-box !important;
+  order: 999 !important;
 }
 
 .chem-modal-toolbar--dragging {
@@ -209,7 +211,7 @@ export const MOLECULE_EDITOR_CSS = `
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.15s ease !important;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 .chem-modal-tool-btn:hover {
@@ -238,7 +240,7 @@ export const MOLECULE_EDITOR_CSS = `
   border-radius: 6px !important;
   cursor: pointer !important;
   text-align: left !important;
-  transition: all 0.15s ease !important;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -258,7 +260,7 @@ export const MOLECULE_EDITOR_CSS = `
   border: 1px solid var(--background-modifier-border) !important;
   border-radius: 6px !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 .chem-modal-compound-item:hover {
@@ -416,7 +418,7 @@ export const MOLECULE_EDITOR_CSS = `
   border-radius: 20px !important;
   font-size: 13px !important;
   background: var(--background-secondary) !important;
-  transition: all 0.15s ease !important;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
   box-sizing: border-box !important;
 }
 
@@ -445,22 +447,25 @@ export const MOLECULE_EDITOR_CSS = `
 }
 
 .molecule-editor-floating-toolbar {
-  position: absolute !important;
-  top: 16px !important;
-  left: 16px !important;
-  z-index: 9999 !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: 100 !important;
   background: var(--background-primary) !important;
-  border: 1px solid var(--background-modifier-border) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  padding: 6px 12px !important;
-  backdrop-filter: blur(8px) !important;
-  width: 640px !important;
-  max-width: calc(100% - 32px) !important;
-  cursor: move !important;
+  border: none !important;
+  border-top: 1px solid var(--background-modifier-border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 16px !important;
+  backdrop-filter: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  cursor: default !important;
   user-select: none !important;
-  transition: box-shadow 0.2s ease !important;
+  transition: none !important;
   box-sizing: border-box !important;
+  margin: 0 !important;
+  order: 999 !important;
 }
 
 .molecule-editor-toolbar-top {
@@ -497,7 +502,7 @@ export const MOLECULE_EDITOR_CSS = `
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.15s ease !important;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 .molecule-editor-tool-btn:hover {
@@ -517,7 +522,7 @@ export const MOLECULE_EDITOR_CSS = `
   border-radius: 6px !important;
   cursor: pointer !important;
   font-size: 12px !important;
-  transition: all 0.2s !important;
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
   color: var(--text-normal) !important;
 }
 
@@ -555,5 +560,12 @@ export const MOLECULE_EDITOR_CSS = `
 .molecule-editor-side .sidebar-body::-webkit-scrollbar-thumb:hover,
 .molecule-editor-learning-sidebar .sidebar-body::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted) !important;
+}
+
+/* 性能优化: 硬件加速提示 */
+.chem-modal-tool-btn,
+.chem-modal-compound-item,
+.chem-modal-toolbar-group {
+  will-change: transform, opacity !important;
 }
 `;

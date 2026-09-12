@@ -958,8 +958,8 @@ class Molecule3DModal extends Modal {
     // 3D 容器
     this.viewerContainer = contentEl.createDiv({ cls: "3d-viewer-container" });
 
-    // 初始化 viewer
-    this.viewer = new Molecule3DViewer(this.viewerContainer);
+    // 初始化 viewer - 使用新版 Molecule3DModalViewer
+    this.viewer = new Molecule3DModalViewer(this.viewerContainer);
     await this.viewer.init();
 
     // 初始化轨迹播放器

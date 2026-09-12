@@ -15,6 +15,112 @@ class Molecule3DModalViewer {
     this.viewer = null;
     this.currentMol = null;
     this.atomCount = 0;
+    this.loadingIndicator = null;
+  }
+
+  /**
+   * 显示加载进度条
+   */
+  showLoadingIndicator(text = "加载分子结构中...") {
+    // 移除已有进度条
+    this.hideLoadingIndicator();
+
+    // 创建进度条容器
+    this.loadingIndicator = document.createElement("div");
+    this.loadingIndicator.className = "chem-3d-loading";
+    this.loadingIndicator.innerHTML = `
+      <div class="loading-spinner"></div>
+      <div class="loading-text">${text}</div>
+      <div class="loading-progress">
+        <div class="progress-bar"></div>
+      </div>
+    `;
+
+    // 样式
+    this.loadingIndicator.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      border-radius: 8px;
+    `;
+
+    this.container.style.position = "relative";
+    this.container.appendChild(this.loadingIndicator);
+
+    // 添加 CSS 动画
+    this.injectLoadingStyles();
+  }
+
+  /**
+   * 隐藏加载进度条
+   */
+  hideLoadingIndicator() {
+    if (this.loadingIndicator) {
+      this.loadingIndicator.remove();
+      this.loadingIndicator = null;
+    }
+  }
+
+  /**
+   * 注入加载样式
+   */
+  injectLoadingStyles() {
+    if (document.getElementById("chem-3d-loading-styles")) return;
+
+    const style = document.createElement("style");
+    style.id = "chem-3d-loading-styles";
+    style.textContent = `
+      .chem-3d-loading .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid var(--background-modifier-border);
+        border-top-color: var(--interactive-accent);
+        border-radius: 50%;
+        animation: chem-spin 0.8s linear infinite;
+        margin-bottom: 16px;
+      }
+
+      .chem-3d-loading .loading-text {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+
+      .chem-3d-loading .loading-progress {
+        width: 200px;
+        height: 4px;
+        background: var(--background-modifier-border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .chem-3d-loading .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--interactive-accent), var(--interactive-accent-hover));
+        border-radius: 2px;
+        animation: chem-progress 1.5s ease-in-out infinite;
+      }
+
+      @keyframes chem-spin {
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes chem-progress {
+        0% { width: 0%; margin-left: 0; }
+        50% { width: 60%; margin-left: 20%; }
+        100% { width: 0%; margin-left: 100%; }
+      }
+    `;
+
+    document.head.appendChild(style);
   }
 
   /**
@@ -146,12 +252,18 @@ class Molecule3DModalViewer {
       throw new Error("OCL 未加载");
     }
 
-    // 使用 OCL 生成 3D 坐标
-    const mol = OCL.Molecule.fromSmiles(smiles);
-    mol.add3DCoordinates();
-    const molFile = mol.toMolfile();
+    this.showLoadingIndicator("生成 3D 结构中...");
 
-    this.loadFromMolFile(molFile);
+    try {
+      // 使用 OCL 生成 3D 坐标
+      const mol = OCL.Molecule.fromSmiles(smiles);
+      mol.add3DCoordinates();
+      const molFile = mol.toMolfile();
+
+      this.loadFromMolFile(molFile);
+    } finally {
+      this.hideLoadingIndicator();
+    }
   }
 
   /**

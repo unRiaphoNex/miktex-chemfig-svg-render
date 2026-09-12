@@ -808,6 +808,47 @@ class Molecule3DModal extends Modal {
         链: ${info.chain}
       `;
     });
+
+    // 快捷键支持
+    this.registerShortcuts(smilesInput, loadBtn, spinBtn, resetBtn, exportBtn, measureBtn, propsBtn);
+  }
+
+  /**
+   * 注册快捷键
+   */
+  registerShortcuts(smilesInput, loadBtn, spinBtn, resetBtn, exportBtn, measureBtn, propsBtn) {
+    const handleKeydown = (e) => {
+      // Ctrl+O: 打开文件
+      if (e.ctrlKey && e.key === "o") {
+        e.preventDefault();
+        this.contentEl.querySelector(".file-input").click();
+      }
+      // Ctrl+E: 导出图片
+      else if (e.ctrlKey && e.key === "e") {
+        e.preventDefault();
+        this.viewer.exportImage();
+      }
+      // Space: 切换旋转
+      else if (e.code === "Space" && e.target.tagName !== "INPUT") {
+        e.preventDefault();
+        spinBtn.click();
+      }
+      // R: 重置视图
+      else if (e.key === "r" && e.target.tagName !== "INPUT") {
+        resetBtn.click();
+      }
+      // M: 测量模式
+      else if (e.key === "m" && e.target.tagName !== "INPUT") {
+        measureBtn.click();
+      }
+      // P: 性质面板
+      else if (e.key === "p" && e.target.tagName !== "INPUT") {
+        propsBtn.click();
+      }
+    };
+
+    this.scope = this.contentEl;
+    this.scope.addEventListener("keydown", handleKeydown);
   }
 
   async onClose() {

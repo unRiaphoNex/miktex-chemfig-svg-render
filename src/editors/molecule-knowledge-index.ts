@@ -32,8 +32,15 @@ class MoleculeKnowledgeIndexPanel {
     style.textContent = `
       /* ========== 知识库索引面板样式 ========== */
       .knowledge-index-panel {
-        padding: 16px;
+        padding: 24px;
         animation: knowledgeFadeIn 0.4s ease-out;
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       @keyframes knowledgeFadeIn {

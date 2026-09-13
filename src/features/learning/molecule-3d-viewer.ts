@@ -392,6 +392,47 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 从 PDB ID 加载蛋白质结构
+   */
+  async loadFromPDB(pdbId) {
+    if (!this.viewer) {
+      throw new Error("Viewer 未初始化");
+    }
+
+    this.showLoadingIndicator("从 PDB 数据库加载中...");
+
+    try {
+      // 从 RCSB PDB 下载结构
+      const url = `https://files.rcsb.org/view/${pdbId.toUpperCase()}.pdb`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`PDB ID 未找到: ${pdbId}`);
+      }
+
+      const pdbText = await response.text();
+      
+      this.viewer.clear();
+      this.viewer.addModel(pdbText, "pdb");
+      
+      // 蛋白质默认使用卡通模型
+      this.viewer.setStyle({}, {
+        cartoon: { color: "spectrum" },
+      });
+      
+      this.viewer.zoomTo();
+      this.viewer.render();
+
+      this.currentMol = pdbText;
+      this.options.model = "cartoon";
+
+      new Notice(`已加载 PDB: ${pdbId.toUpperCase()}`, 2000);
+    } finally {
+      this.hideLoadingIndicator();
+    }
+  }
+
+  /**
    * 应用显示样式
    */
   applyStyle() {
@@ -930,6 +971,18 @@ class Molecule3DModal extends Modal {
       cls: "load-btn",
     });
 
+    // PDB ID 输入
+    const pdbInput = controlBar.createEl("input", {
+      type: "text",
+      placeholder: "PDB ID (如 1AKE)...",
+      cls: "pdb-input",
+    });
+
+    const pdbLoadBtn = controlBar.createEl("button", {
+      text: "🔬 PDB",
+      cls: "pdb-load-btn",
+    });
+
     // 文件上传按钮
     const fileInput = controlBar.createEl("input", {
       type: "file",
@@ -1084,6 +1137,21 @@ class Molecule3DModal extends Modal {
         await this.viewer.loadFromSmiles(smiles);
       } catch (e) {
         new Notice(`加载失败: ${e.message}`, 3000);
+      }
+    };
+
+    // PDB 加载
+    pdbLoadBtn.onclick = async () => {
+      const pdbId = pdbInput.value.trim();
+      if (!pdbId) {
+        new Notice("请输入 PDB ID", 2000);
+        return;
+      }
+
+      try {
+        await this.viewer.loadFromPDB(pdbId);
+      } catch (e) {
+        new Notice(`PDB 加载失败: ${e.message}`, 3000);
       }
     };
 

@@ -6,6 +6,10 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     try {
       console.log("[Chemfig-SVG v10.15] 加载中...");
 
+      // v17.7.0: 自动启动桥接服务
+      this.bridgeProcess = null;
+      await this.autoStartBridgeService();
+
       // v10.14.0: 使用 EnvironmentManager 管理编译环境
       this.envManager = new EnvironmentManager();
       this.envManager.initLazy();
@@ -1174,7 +1178,80 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
     }
   }
 
+  // v17.7.0: 自动启动桥接服务
+  async autoStartBridgeService() {
+    try {
+      // 检查是否启用桥接代理
+      if (this.renderBackend !== "bridge") {
+        console.log("[Chemfig-SVG] 桥接代理未启用，跳过自动启动");
+        return;
+      }
+
+      const bridgeUrl = this.bridgeUrl || "http://127.0.0.1:9123";
+      const port = bridgeUrl.match(/:(\d+)/)?.[1] || "9123";
+
+      // 先检查桥接服务是否已经在运行
+      try {
+        const r = await requestUrl({ url: bridgeUrl + "/api/health", method: "GET" });
+        if (r.status === 200) {
+          console.log("[Chemfig-SVG] 桥接服务已在运行");
+          return;
+        }
+      } catch (e) {
+        // 服务未运行，继续启动
+      }
+
+      // 启动桥接服务
+      const { execFile } = require("child_process");
+      const bridgePath = "D:\\code\\chem-studio\\miktex-bridge\\server.js";
+      
+      this.bridgeProcess = execFile(
+        "node",
+        [bridgePath],
+        {
+          cwd: "D:\\code\\chem-studio\\miktex-bridge",
+          windowsHide: true,
+          env: { ...process.env, PORT: port }
+        }
+      );
+
+      this.bridgeProcess.stdout?.on("data", (data) => {
+        console.log("[Bridge]", data.toString().trim());
+      });
+
+      this.bridgeProcess.stderr?.on("data", (data) => {
+        console.error("[Bridge Error]", data.toString().trim());
+      });
+
+      // 等待服务启动
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // 验证服务是否启动成功
+      try {
+        const r = await requestUrl({ url: bridgeUrl + "/api/health", method: "GET" });
+        if (r.status === 200) {
+          console.log("[Chemfig-SVG] 桥接服务自动启动成功");
+          new Notice("✅ 桥接服务已自动启动", 3000);
+        }
+      } catch (e) {
+        console.warn("[Chemfig-SVG] 桥接服务自动启动失败:", e.message);
+      }
+    } catch (e) {
+      console.error("[Chemfig-SVG] 自动启动桥接服务失败:", e);
+    }
+  }
+
   onunload() {
+    // 清理桥接服务进程
+    if (this.bridgeProcess) {
+      try {
+        this.bridgeProcess.kill();
+        console.log("[Chemfig-SVG] 桥接服务已停止");
+      } catch (e) {
+        // 忽略
+      }
+    }
+    
     // 清理防抖定时器
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     // 停止信号轮询 (设置标志位, 递归 setTimeout 会自动退出)

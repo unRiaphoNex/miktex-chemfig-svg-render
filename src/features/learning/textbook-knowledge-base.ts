@@ -1536,6 +1536,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "NaBH₄：温和，只还原醛酮；LiAlH₄：强，还原醛酮羧酸酯；Clemmensen：Zn-Hg/HCl，羰基→亚甲基。",
             keywords: ["还原反应", "催化加氢", "NaBH4", "LiAlH4"],
           },
+          {
+            id: "SYNTH-402",
+            title: "选择性还原",
+            content: "选择性还原：控制反应条件，只还原特定官能团。",
+            formula: "",
+            mechanism: "NaBH₄：只还原醛酮，不还原酯、羧酸、酰胺。LiAlH₄：还原醛酮、羧酸、酯、酰胺。催化加氢：双键>三键>芳环。",
+            conditions: "Lindlar催化剂：炔烃→顺式烯烃。Rosenmund还原：酰氯→醛。Wolff-Kishner还原：羰基→亚甲基。",
+            keywords: ["选择性还原", "NaBH4", "Lindlar", "Rosenmund"],
+          },
         ],
       },
       {

@@ -127,6 +127,28 @@ class Molecule3DModalViewer {
         outline-offset: -10px;
         background: var(--background-modifier-hover);
       }
+
+      /* 性能状态栏 */
+      .3d-status-bar {
+        display: flex;
+        gap: 20px;
+        padding: 8px 16px;
+        background: var(--background-secondary);
+        border-top: 1px solid var(--background-modifier-border);
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .status-item span {
+        font-weight: 600;
+        color: var(--text-normal);
+      }
     `;
 
     document.head.appendChild(style);
@@ -1204,6 +1226,14 @@ class Molecule3DModal extends Modal {
     // 3D 容器
     this.viewerContainer = contentEl.createDiv({ cls: "3d-viewer-container" });
 
+    // 性能状态栏
+    this.statusBar = contentEl.createDiv({ cls: "3d-status-bar" });
+    this.statusBar.innerHTML = `
+      <span class="status-item">原子: <span class="atom-count">-</span></span>
+      <span class="status-item">FPS: <span class="fps-count">-</span></span>
+      <span class="status-item">模式: <span class="current-mode">-</span></span>
+    `;
+
     // 初始化 viewer - 使用新版 Molecule3DModalViewer
     this.viewer = new Molecule3DModalViewer(this.viewerContainer);
     await this.viewer.init();
@@ -1223,6 +1253,7 @@ class Molecule3DModal extends Modal {
     if (this.smiles) {
       try {
         await this.viewer.loadFromSmiles(this.smiles);
+        this.updateStatusBar();
       } catch (e) {
         new Notice(`加载失败: ${e.message}`, 3000);
       }
@@ -1235,6 +1266,7 @@ class Molecule3DModal extends Modal {
 
       try {
         await this.viewer.loadFromSmiles(smiles);
+        this.updateStatusBar();
       } catch (e) {
         new Notice(`加载失败: ${e.message}`, 3000);
       }
@@ -1250,6 +1282,7 @@ class Molecule3DModal extends Modal {
 
       try {
         await this.viewer.loadFromPDB(pdbId);
+        this.updateStatusBar();
       } catch (e) {
         new Notice(`PDB 加载失败: ${e.message}`, 3000);
       }
@@ -1527,6 +1560,37 @@ class Molecule3DModal extends Modal {
 
     this.scope = this.contentEl;
     this.scope.addEventListener("keydown", handleKeydown);
+  }
+
+  /**
+   * 更新状态栏
+   */
+  updateStatusBar() {
+    if (!this.statusBar || !this.viewer) return;
+
+    // 更新原子数
+    const atomCount = this.viewer.atomCount || 0;
+    this.statusBar.querySelector(".atom-count").textContent = atomCount;
+
+    // 更新当前模式
+    const mode = this.viewer.options?.model || "stick";
+    this.statusBar.querySelector(".current-mode").textContent = mode;
+
+    // FPS 监控（每秒更新一次）
+    if (!this.fpsStartTime) {
+      this.fpsStartTime = performance.now();
+      this.fpsFrameCount = 0;
+    }
+
+    this.fpsFrameCount++;
+    const elapsed = performance.now() - this.fpsStartTime;
+
+    if (elapsed >= 1000) {
+      const fps = Math.round((this.fpsFrameCount * 1000) / elapsed);
+      this.statusBar.querySelector(".fps-count").textContent = fps;
+      this.fpsStartTime = performance.now();
+      this.fpsFrameCount = 0;
+    }
   }
 
   /**

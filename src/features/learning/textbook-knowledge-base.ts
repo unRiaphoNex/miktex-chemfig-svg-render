@@ -696,8 +696,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "在合成混醚时，必须选择适当的原料组合。也可使用磺酸酯或硫酸酯类化合物代替卤代烷进行反应。",
             keywords: ["Williamson合成法", "S_N2", "醇钠", "卤代烷"],
           },
-        ],
-      },
           {
             id: "ORG-906",
             title: "羟醛缩合反应",

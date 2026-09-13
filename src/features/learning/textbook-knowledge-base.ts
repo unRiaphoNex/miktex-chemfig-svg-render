@@ -1467,6 +1467,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "Friedel-Crafts：AlCl₃ 催化；N-烃化：碱催化；O-烃化：Williamson 合成，NaH 或 NaOH。",
             keywords: ["烃化反应", "C-烃化", "N-烃化", "O-烃化"],
           },
+          {
+            id: "SYNTH-102",
+            title: "Friedel-Crafts 反应",
+            content: "芳香环上的亲电取代反应，引入烷基或酰基。",
+            formula: "",
+            mechanism: "Friedel-Crafts 烷基化：芳烃 + 卤代烷/烯烃 + AlCl₃ → 烷基芳烃。Friedel-Crafts 酰基化：芳烃 + 酰卤/酸酐 + AlCl₃ → 芳酮。",
+            conditions: "AlCl₃ 催化，CS₂ 或硝基苯溶剂。注意：烷基化易发生多烷基化和重排；酰基化不重排，产物单一。",
+            keywords: ["Friedel-Crafts", "烷基化", "酰基化", "芳环", "亲电取代"],
+          },
         ],
       },
       {

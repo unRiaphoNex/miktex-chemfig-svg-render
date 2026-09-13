@@ -993,7 +993,22 @@ class MoleculeKnowledgeIndexPanel {
       // 显示加载状态
       svgContainer.innerHTML = '<div style="color: #999; font-size: 14px;">正在渲染...</div>';
       
-      // 清理和规范化化学式代码
+      // 判断是否为完整反应式（包含 + 或 →）
+      const isReaction = formulaCode.includes("+") || formulaCode.includes("→") || formulaCode.includes("\\xrightarrow") || formulaCode.includes("\\xleftarrow");
+      
+      if (isReaction) {
+        // 完整反应式：直接显示格式化文本（chemfig 不支持反应箭头）
+        const displayCode = formulaCode
+          .replace(/\\chemfig\{/g, "")
+          .replace(/\\}/g, "")
+          .replace(/\}/g, "")
+          .replace(/\\xrightarrow\{([^}]*)\}/g, " → $1 ")
+          .replace(/\\xleftarrow\{([^}]*)\}/g, " ← $1 ");
+        svgContainer.innerHTML = '<div style="font-family: monospace; font-size: 16px; text-align: center; color: #333; padding: 8px;">' + displayCode + '</div>';
+        return;
+      }
+      
+      // 单个分子结构：清理并渲染
       const cleanedCode = this.cleanChemfigCode(formulaCode);
       
       // 优先使用 this.plugin.bridgeClient（直接渲染，返回 SVG 字符串）

@@ -245,35 +245,28 @@ class Molecule3DModalViewer {
   }
 
   /**
-   * 从 SMILES 加载分子
+   * 从 SMILES 加载分子（异步包装）
    */
   async loadFromSmiles(smiles) {
-    // 确保 OCL 已加载
-    if (typeof OCL === "undefined") {
-      if (typeof OCLLoader !== "undefined") {
-        this.showLoadingIndicator("加载 OCL 库...");
-        await OCLLoader.load();
-        this.hideLoadingIndicator();
-      } else {
-        throw new Error("OCL 加载器未找到");
-      }
-    }
-
     this.showLoadingIndicator("生成 3D 结构中...");
 
     try {
-      // OCL 不支持生成 3D 坐标，直接将 SMILES 传给 3Dmol.js
-      // 3Dmol.js 会自动从 SMILES 生成 3D 结构
-      this.loadFromSmiles(smiles);
+      // 确保 viewer 已初始化
+      if (!this.viewer) {
+        await this.initViewer();
+      }
+
+      // 直接从 SMILES 加载到 3Dmol.js
+      this.renderSmiles(smiles);
     } finally {
       this.hideLoadingIndicator();
     }
   }
 
   /**
-   * 从 SMILES 加载分子
+   * 渲染 SMILES 分子
    */
-  loadFromSmiles(smiles) {
+  renderSmiles(smiles) {
     if (!this.viewer) {
       throw new Error("Viewer 未初始化");
     }
@@ -282,9 +275,71 @@ class Molecule3DModalViewer {
     
     // 3Dmol.js 支持直接从 SMILES 加载分子
     this.viewer.addModel(smiles, "smi");
-    this.viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.25 } });
+    this.setDisplayStyle(this.options.model);
     this.viewer.zoomTo();
     this.viewer.render();
+  }
+
+  /**
+   * 设置显示样式
+   */
+  setDisplayStyle(model) {
+    if (!this.viewer) return;
+
+    this.options.model = model;
+
+    switch (model) {
+      case "stick":
+        this.viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.25 } });
+        break;
+      case "sphere":
+        this.viewer.setStyle({}, { sphere: { scale: 0.3 } });
+        break;
+      case "line":
+        this.viewer.setStyle({}, { line: {} });
+        break;
+      case "cartoon":
+        this.viewer.setStyle({}, { cartoon: { color: "spectrum" } });
+        break;
+      case "surface":
+        this.viewer.setStyle({}, { stick: { radius: 0.1 } });
+        this.viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.5 });
+        break;
+      default:
+        this.viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.25 } });
+    }
+
+    this.viewer.render();
+  }
+
+  /**
+   * 自动旋转
+   */
+  setAutoRotate(enabled) {
+    if (!this.viewer) return;
+
+    if (enabled) {
+      this.viewer.spin("y", 1);
+    } else {
+      this.viewer.spin(false);
+    }
+  }
+
+  /**
+   * 重置视角
+   */
+  resetView() {
+    if (!this.viewer) return;
+    this.viewer.zoomTo();
+    this.viewer.render();
+  }
+
+  /**
+   * 截图
+   */
+  screenshot() {
+    if (!this.viewer) return null;
+    return this.viewer.pngImage();
   }
 
   /**

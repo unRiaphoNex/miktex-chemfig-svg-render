@@ -1190,6 +1190,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "",
             keywords: ["不良反应", "副反应", "毒性反应", "变态反应"],
           },
+          {
+            id: "PHARM-004",
+            title: "药物剂量与效应关系",
+            content: "量效关系：药物剂量与效应的关系。",
+            formula: "",
+            mechanism: "量效曲线：最小有效量、最大效应（效能）、效价强度、半数有效量（ED50）、半数致死量（LD50）。治疗指数=LD50/ED50。",
+            conditions: "治疗指数越大越安全。安全范围=LD5/ED95。",
+            keywords: ["量效关系", "效能", "效价强度", "治疗指数"],
+          },
         ],
       },
       {

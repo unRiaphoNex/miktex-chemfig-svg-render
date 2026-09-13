@@ -1647,6 +1647,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             keywords: ["催化反应", "催化氢化", "Pd/C", "加氢"],
           },
           {
+            id: "SYNTH-703",
+            title: "不对称催化",
+            content: "不对称催化：手性催化剂诱导产生单一对映体。",
+            formula: "",
+            mechanism: "手性配体：BINAP、DIOP。金属：Rh、Ru、Ir。不对称氢化、不对称环氧化（Sharpless）。",
+            conditions: "Sharpless不对称环氧化：Ti(OiPr)₄+酒石酸二乙酯+TBHP。Sharpless不对称双羟基化：OsO₄+手性配体。",
+            keywords: ["不对称催化", "手性", "BINAP", "Sharpless"],
+          },
+          {
             id: "SYNTH-702",
             title: "相转移催化",
             content: "相转移催化剂（PTC）：季铵盐、冠醚。",

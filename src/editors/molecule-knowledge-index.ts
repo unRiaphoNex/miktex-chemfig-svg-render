@@ -998,12 +998,15 @@ class MoleculeKnowledgeIndexPanel {
       
       if (isReaction) {
         // 完整反应式：直接显示格式化文本（chemfig 不支持反应箭头）
-        const displayCode = formulaCode
-          .replace(/\\chemfig\{/g, "")
-          .replace(/\\}/g, "")
-          .replace(/\}/g, "")
-          .replace(/\\xrightarrow\{([^}]*)\}/g, " → $1 ")
-          .replace(/\\xleftarrow\{([^}]*)\}/g, " ← $1 ");
+        // 注意：顺序很重要，先处理 \xrightarrow，再去掉 \chemfig 的括号
+        let displayCode = formulaCode;
+        // 1. 先处理反应箭头
+        displayCode = displayCode.replace(/\\xrightarrow\{([^}]*)\}/g, " → $1 ");
+        displayCode = displayCode.replace(/\\xleftarrow\{([^}]*)\}/g, " ← $1 ");
+        // 2. 再去掉 \chemfig{...} 的括号
+        displayCode = displayCode.replace(/\\chemfig\{/g, "");
+        displayCode = displayCode.replace(/\\}/g, "");
+        displayCode = displayCode.replace(/\}/g, "");
         svgContainer.innerHTML = '<div style="font-family: monospace; font-size: 16px; text-align: center; color: #333; padding: 8px;">' + displayCode + '</div>';
         return;
       }

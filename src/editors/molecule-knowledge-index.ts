@@ -546,6 +546,154 @@ class MoleculeKnowledgeIndexPanel {
         transform: scale(1.08) rotate(-2deg);
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
       }
+
+      /* ========== 列表页进一步优化（参考 galaxy） ========== */
+      
+      /* 搜索框微光效果 */
+      .knowledge-index-search {
+        position: relative;
+      }
+
+      .knowledge-index-search::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        z-index: -1;
+        transition: opacity 0.3s ease;
+        filter: blur(12px);
+      }
+
+      .knowledge-index-input:focus ~ .knowledge-index-search::after,
+      .knowledge-index-search:focus-within::after {
+        opacity: 1;
+      }
+
+      /* 结果项渐变边框 */
+      .knowledge-index-item {
+        background: #fff;
+        border: 1px solid transparent;
+        background-clip: padding-box;
+        position: relative;
+      }
+
+      .knowledge-index-item::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        padding: 1px;
+        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      .knowledge-index-item:hover::before {
+        opacity: 1;
+      }
+
+      /* 操作按钮增强 */
+      .knowledge-index-action-btn {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .knowledge-index-action-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.4s ease, height 0.4s ease;
+      }
+
+      .knowledge-index-action-btn:hover::before {
+        width: 200px;
+        height: 200px;
+      }
+
+      .knowledge-index-action-btn:first-child {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      }
+
+      .knowledge-index-action-btn:first-child:hover {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        transform: translateY(-2px);
+      }
+
+      /* 统计信息增强 */
+      .knowledge-index-stats {
+        background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+        border: 1px solid #e8e9ff;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .knowledge-index-stats::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        animation: statsShimmer 2s linear infinite;
+        background-size: 200% 100%;
+      }
+
+      @keyframes statsShimmer {
+        from { background-position: 0% 0; }
+        to { background-position: 200% 0; }
+      }
+
+      /* 空状态增强 */
+      .knowledge-index-empty {
+        background: linear-gradient(135deg, #f8f9ff, #fff5f5);
+        border-radius: 16px;
+        margin: 20px 0;
+      }
+
+      /* 加载动画增强 */
+      .knowledge-index-loading::before {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+      }
+
+      /* 分类标签颜色编码 */
+      .knowledge-index-id[data-id^="ORG"] {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+
+      .knowledge-index-id[data-id^="DRUG"] {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+      }
+
+      .knowledge-index-id[data-id^="PHARM"] {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+      }
+
+      .knowledge-index-id[data-id^="SYNTH"] {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+      }
+
+      .knowledge-index-id[data-id^="BIO"] {
+        background: linear-gradient(135deg, #fa709a, #fee140);
+      }
     `;
 
     document.head.appendChild(style);

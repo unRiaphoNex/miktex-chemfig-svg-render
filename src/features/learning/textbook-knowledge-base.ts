@@ -294,14 +294,7 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-            id: "ORG-208",
-            title: "烯烃的聚合反应",
-            content: "加聚反应。乙烯 → 聚乙烯，丙烯 → 聚丙烯。",
-            formula: "\\chemfig{n CH_2=CH_2} \\xrightarrow{催化剂} \\chemfig{(-CH_2-CH_2-)}_n",
-            mechanism: "连锁聚合反应：引发剂产生活性中心（自由基或离子），引发单体加成，链增长，链终止。",
-            conditions: "催化剂（Ziegler-Natta 或过氧化物），高温高压。",
-            keywords: ["聚合", "加聚", "聚乙烯", "聚丙烯"],
-          },
+      {
         ],
       },
       {

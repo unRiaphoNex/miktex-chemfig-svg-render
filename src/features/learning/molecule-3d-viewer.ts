@@ -690,10 +690,20 @@ class Molecule3DModalViewer {
 
   /**
    * 导出为图片
+   * @param width 自定义宽度（可选）
+   * @param height 自定义高度（可选）
    */
-  exportImage() {
+  exportImage(width, height) {
     if (this.viewer) {
-      const dataURI = this.viewer.pngURI();
+      let dataURI;
+
+      // 如果指定了尺寸，使用自定义尺寸
+      if (width && height) {
+        dataURI = this.viewer.pngURI(width, height);
+      } else {
+        dataURI = this.viewer.pngURI();
+      }
+
       const link = document.createElement("a");
       link.download = "molecule-3d.png";
       link.href = dataURI;

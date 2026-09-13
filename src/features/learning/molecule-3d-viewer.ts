@@ -16,6 +16,72 @@ class Molecule3DViewer {
     this.cache = new Map();
     this.maxCacheSize = 20;
     this.measurements = [];
+    this.loadingOverlay = null;
+  }
+
+  // ========== 加载进度条 ==========
+
+  showLoadingProgress(message = "正在加载...") {
+    // 创建加载遮罩
+    this.loadingOverlay = document.createElement("div");
+    this.loadingOverlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      border-radius: 8px;
+    `;
+    
+    // 加载动画
+    const spinner = document.createElement("div");
+    spinner.style.cssText = `
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    `;
+    
+    // 加载文本
+    const text = document.createElement("div");
+    text.textContent = message;
+    text.style.cssText = `
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    `;
+    
+    // 添加动画样式
+    if (!document.getElementById("3d-viewer-loading-style")) {
+      const style = document.createElement("style");
+      style.id = "3d-viewer-loading-style";
+      style.textContent = `
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    this.loadingOverlay.appendChild(spinner);
+    this.loadingOverlay.appendChild(text);
+    this.container.appendChild(this.loadingOverlay);
+  }
+
+  hideLoadingProgress() {
+    if (this.loadingOverlay) {
+      this.loadingOverlay.remove();
+      this.loadingOverlay = null;
+    }
   }
 
   // ========== 初始化 ==========
@@ -62,9 +128,15 @@ class Molecule3DViewer {
   }
 
   async loadFromPDB(pdbId) {
+    // 显示加载进度条
+    this.showLoadingProgress(`正在加载 PDB: ${pdbId.toUpperCase()}`);
+    
     const url = `https://files.rcsb.org/view/${pdbId.toUpperCase()}.pdb`;
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`PDB ID 未找到: ${pdbId}`);
+    if (!response.ok) {
+      this.hideLoadingProgress();
+      throw new Error(`PDB ID 未找到: ${pdbId}`);
+    }
 
     const pdbText = await response.text();
     this.viewer.clear();
@@ -76,6 +148,9 @@ class Molecule3DViewer {
     this.currentMol = pdbText;
     const model = this.viewer.getModel();
     this.atomCount = model ? model.numAtoms() : 0;
+    
+    // 隐藏加载进度条
+    this.hideLoadingProgress();
   }
 
   loadFromText(text, format = "mol") {

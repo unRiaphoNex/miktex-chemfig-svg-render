@@ -295,9 +295,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
         ],
       },
       {
-        ],
-      },
-      {
         chapter: "第四章 炔烃和二烯烃",
         sections: [
           {

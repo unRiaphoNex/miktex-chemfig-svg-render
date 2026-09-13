@@ -722,6 +722,53 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 显示氢键（自动检测）
+   */
+  showHydrogenBonds() {
+    if (!this.viewer || !this.currentMol) return;
+
+    // 简化版氢键检测：N-H...O 距离 < 3.5 Å
+    const atoms = this.currentMol.atoms;
+    const hbonds = [];
+
+    for (let i = 0; i < atoms.length; i++) {
+      for (let j = i + 1; j < atoms.length; j++) {
+        const a1 = atoms[i];
+        const a2 = atoms[j];
+
+        // 检查是否是 N-H...O 模式
+        if (
+          (a1.elem === "N" && a2.elem === "O") ||
+          (a1.elem === "O" && a2.elem === "N")
+        ) {
+          const dist = Math.sqrt(
+            Math.pow(a1.x - a2.x, 2) +
+            Math.pow(a1.y - a2.y, 2) +
+            Math.pow(a1.z - a2.z, 2)
+          );
+          if (dist < 3.5) {
+            hbonds.push({ a1, a2 });
+          }
+        }
+      }
+    }
+
+    // 绘制氢键线
+    hbonds.forEach((hb) => {
+      this.viewer.addLine({
+        start: { x: hb.a1.x, y: hb.a1.y, z: hb.a1.z },
+        end: { x: hb.a2.x, y: hb.a2.y, z: hb.a2.z },
+        color: "cyan",
+        linewidth: 2,
+        dashed: true,
+      });
+    });
+
+    this.viewer.render();
+    new Notice(`检测到 ${hbonds.length} 个氢键`, 2000);
+  }
+
+  /**
    * 设置表面透明度
    * @param opacity 0-1
    */

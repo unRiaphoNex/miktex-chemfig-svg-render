@@ -591,12 +591,9 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
       },
       {
         chapter: "第九章 醇和酚",
-            mechanism: "格氏试剂是强亲核试剂和强碱。与醛反应生成伯醇，与酮反应生成仲醇，与 CO₂ 反应生成多一个碳的羧酸。",
-            conditions: "无水乙醚或 THF 溶剂，严格无水无氧。",
-            keywords: ["格氏试剂", "RMgX", "醇", "羧酸"],
-          },
-        ],
-      },
+        sections: [
+          {
+            id: "ORG-801",
       {
         chapter: "第九章 醇和醚",
         sections: [

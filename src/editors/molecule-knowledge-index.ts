@@ -619,13 +619,36 @@ class MoleculeKnowledgeIndexPanel {
       const meta = modal.contentEl.createDiv({ cls: "knowledge-detail-meta" });
       meta.createSpan({ text: `索引: ${item.id}`, cls: "detail-id" });
       meta.createSpan({ text: `书籍: ${item.bookName}`, cls: "detail-book" });
-      meta.createSpan({ text: `章节: 第 ${item.chapter} 章`, cls: "detail-chapter" });
+      meta.createSpan({ text: `章节: ${item.chapter}`, cls: "detail-chapter" });
       
-      modal.contentEl.createEl("h3", { text: "内容" });
+      // 详细内容
+      modal.contentEl.createEl("h3", { text: "📝 内容" });
       modal.contentEl.createEl("p", { text: item.content });
 
+      // 化学式
+      if (item.formula) {
+        modal.contentEl.createEl("h3", { text: "🧪 化学式" });
+        const formulaDiv = modal.contentEl.createDiv({ cls: "knowledge-formula" });
+        formulaDiv.createEl("code", { text: item.formula });
+      }
+
+      // 反应机理
+      if (item.mechanism) {
+        modal.contentEl.createEl("h3", { text: "⚙️ 反应机理" });
+        const mechanismDiv = modal.contentEl.createDiv({ cls: "knowledge-mechanism" });
+        mechanismDiv.createEl("p", { text: item.mechanism });
+      }
+
+      // 适用条件
+      if (item.conditions) {
+        modal.contentEl.createEl("h3", { text: "📋 适用条件" });
+        const conditionsDiv = modal.contentEl.createDiv({ cls: "knowledge-conditions" });
+        conditionsDiv.createEl("p", { text: item.conditions });
+      }
+
+      // 关键词
       if (item.keywords && item.keywords.length > 0) {
-        modal.contentEl.createEl("h3", { text: "关键词" });
+        modal.contentEl.createEl("h3", { text: "🏷️ 关键词" });
         const keywordsDiv = modal.contentEl.createDiv({ cls: "knowledge-keywords" });
         item.keywords.forEach((kw) => {
           keywordsDiv.createSpan({ text: kw, cls: "keyword-tag" });

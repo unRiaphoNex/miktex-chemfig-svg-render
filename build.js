@@ -66,6 +66,7 @@ const FILES = [
   "features/learning/knowledge-search-engine.ts", // 知识库搜索优化 (v17.2.0)
   "features/learning/smart-learning-recommender.ts", // 智能学习推荐 (v17.2.0)
   "features/learning/textbook-expansion-6.ts", // 知识库扩展 6 (v17.2.0)
+  "features/learning/textbook-expansion-7.ts", // 知识库扩展 7 - 有机化学深化 (v17.6.0)
   "features/learning/knowledge-importer.ts", // 知识点导入功能 (v17.2.0)
   "features/learning/knowledge-network-visualizer.ts", // 知识点网络可视化 (v17.2.0)
   "features/learning/learning-report-generator.ts", // 学习报告生成 (v17.2.0)

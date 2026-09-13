@@ -2060,6 +2060,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "血气分析：pH、PaCO₂、HCO₃⁻。酸中毒：pH<7.35；碱中毒：pH>7.45。",
             keywords: ["酸碱平衡", "缓冲系统", "血气分析", "酸中毒"],
           },
+          {
+            id: "BIO-1302",
+            title: "酸碱平衡紊乱",
+            content: "代谢性酸中毒、呼吸性酸中毒、代谢性碱中毒、呼吸性碱中毒。",
+            formula: "",
+            mechanism: "代谢性酸中毒：HCO₃⁻↓，pH↓。呼吸性酸中毒：PaCO₂↑，pH↓。代谢性碱中毒：HCO₃⁻↑，pH↑。呼吸性碱中毒：PaCO₂↓，pH↑。",
+            conditions: "代偿：呼吸代偿代谢紊乱，肾代偿呼吸紊乱。代偿公式：预期PaCO₂=1.5×HCO₃⁻+8。",
+            keywords: ["代谢性酸中毒", "呼吸性酸中毒", "代谢性碱中毒", "呼吸性碱中毒"],
+          },
         ],
       },
       {

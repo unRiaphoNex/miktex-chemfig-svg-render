@@ -993,10 +993,13 @@ class MoleculeKnowledgeIndexPanel {
       // 显示加载状态
       svgContainer.innerHTML = '<div style="color: #999; font-size: 14px;">正在渲染...</div>';
       
+      // 清理和规范化化学式代码
+      const cleanedCode = this.cleanChemfigCode(formulaCode);
+      
       // 优先使用 this.plugin.bridgeClient（直接渲染，返回 SVG 字符串）
       if (this.plugin && this.plugin.bridgeClient) {
         try {
-          const svg = await this.plugin.bridgeClient.render(formulaCode, "normal");
+          const svg = await this.plugin.bridgeClient.render(cleanedCode, "normal");
           if (svg && svg.includes("<svg")) {
             svgContainer.innerHTML = svg;
             return;
@@ -1012,7 +1015,7 @@ class MoleculeKnowledgeIndexPanel {
         const plugin = app.plugins.plugins["miktex-chemfig-svg-render"];
         if (plugin.bridgeClient) {
           try {
-            const svg = await plugin.bridgeClient.render(formulaCode, "normal");
+            const svg = await plugin.bridgeClient.render(cleanedCode, "normal");
             if (svg && svg.includes("<svg")) {
               svgContainer.innerHTML = svg;
               return;
@@ -1026,7 +1029,7 @@ class MoleculeKnowledgeIndexPanel {
       // 尝试通过全局 API 渲染
       if (window.chemfigAPI && window.chemfigAPI.renderChemfig) {
         try {
-          const result = await window.chemfigAPI.renderChemfig(formulaCode, {});
+          const result = await window.chemfigAPI.renderChemfig(cleanedCode, {});
           if (result && result.svg) {
             svgContainer.innerHTML = result.svg;
             return;
@@ -1042,6 +1045,46 @@ class MoleculeKnowledgeIndexPanel {
     } catch (e) {
       console.error("[KnowledgeIndex] renderFormulaToSvg error:", e);
     }
+  }
+
+  /**
+   * 清理和规范化 chemfig 代码
+   * - 如果代码中包含 \chemfig{}，提取第一个
+   * - 如果代码不是纯 chemfig，包装成 chemfig 环境
+   * - 去除 \xrightarrow 等非 chemfig 命令
+   */
+  cleanChemfigCode(code) {
+    if (!code || typeof code !== "string") return "";
+    
+    let cleaned = code.trim();
+    
+    // 如果已经是纯 \chemfig{...} 格式，直接返回
+    if (cleaned.startsWith("\\chemfig{")) {
+      const firstChemfigEnd = cleaned.indexOf("}", cleaned.indexOf("{"));
+      if (firstChemfigEnd > 0 && cleaned.slice(firstChemfigEnd + 1).trim() === "") {
+        return cleaned;
+      }
+    }
+    
+    // 提取第一个 \chemfig{...} 块
+    const match = cleaned.match(/\\chemfig\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/);
+    if (match) {
+      return "\\chemfig{" + match[1] + "}";
+    }
+    
+    // 如果没有 \chemfig，但是有化学式内容，包装成 \chemfig{}
+    // 去除 \xrightarrow 等命令
+    cleaned = cleaned.replace(/\\xrightarrow\{[^}]*\}/g, "→");
+    cleaned = cleaned.replace(/\\xleftarrow\{[^}]*\}/g, "←");
+    cleaned = cleaned.replace(/\\xrightarrow/g, "→");
+    cleaned = cleaned.replace(/\\xleftarrow/g, "←");
+    
+    // 如果清理后有内容，包装成 chemfig
+    if (cleaned && !cleaned.startsWith("\\")) {
+      return "\\chemfig{" + cleaned + "}";
+    }
+    
+    return cleaned;
   }
 
   /**

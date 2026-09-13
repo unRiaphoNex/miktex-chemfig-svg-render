@@ -508,6 +508,9 @@ class MoleculeKnowledgeIndexPanel {
       typeof TEXTBOOK_KNOWLEDGE_EXPANSION_4 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_4 : {},
       typeof TEXTBOOK_KNOWLEDGE_EXPANSION_5 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_5 : {},
       typeof TEXTBOOK_KNOWLEDGE_EXPANSION_6 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_6 : {},
+      typeof TEXTBOOK_EXPANSION_7 !== "undefined" ? TEXTBOOK_EXPANSION_7 : {},
+      typeof TEXTBOOK_EXPANSION_8 !== "undefined" ? TEXTBOOK_EXPANSION_8 : {},
+      typeof TEXTBOOK_COMPLETE !== "undefined" ? TEXTBOOK_COMPLETE : {},
     ];
 
     const results = [];

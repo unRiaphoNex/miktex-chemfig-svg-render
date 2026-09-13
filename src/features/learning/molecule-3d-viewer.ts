@@ -575,6 +575,13 @@ class Molecule3DModalViewer {
           cartoon: { color: "residue" },
         });
         break;
+
+      case "b-factor":
+        // 按 B-factor 着色（蛋白质热图）
+        this.viewer.setStyle({}, {
+          cartoon: { color: "b-factor" },
+        });
+        break;
     }
 
     this.viewer.render();

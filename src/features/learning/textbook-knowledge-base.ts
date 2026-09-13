@@ -823,8 +823,8 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "成盐：NaOH/Na₂CO₃；酰卤：SOCl₂/PCl₃；酯化：浓 H₂SO₄，回流；酰胺：氨，加热。",
             keywords: ["成盐", "酰卤", "酸酐", "酯化", "酰胺"],
           },
-        ],
-      },
+          {
+            id: "ORG-1106",
             title: "重氮盐",
             content: "芳香伯胺 + 亚硝酸 + 低温 → 重氮盐。重氮盐的取代反应和偶联反应。",
             formula: "\\chemfig{*6(-=-=-NH_2-)} + NaNO_2 + HCl \\xrightarrow{0-5^\\circ C} \\chemfig{*6(-=-=-N_2^+Cl^--)}",

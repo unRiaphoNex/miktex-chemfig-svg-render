@@ -381,6 +381,171 @@ class MoleculeKnowledgeIndexPanel {
         from { opacity: 0; }
         to { opacity: 1; }
       }
+
+      /* ========== 详情模态框样式（参考 galaxy 项目） ========== */
+      .modal-content .knowledge-detail-modal {
+        padding: 24px;
+        animation: detailSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      @keyframes detailSlideIn {
+        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      .modal-content h2 {
+        margin: 0 0 20px 0;
+        font-size: 22px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        padding-bottom: 12px;
+      }
+
+      .modal-content h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 2px;
+        animation: underlineGrow 0.6s ease-out;
+      }
+
+      @keyframes underlineGrow {
+        from { width: 0; }
+        to { width: 60px; }
+      }
+
+      .modal-content h3 {
+        margin: 20px 0 10px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .modal-content h3::before {
+        content: '';
+        width: 4px;
+        height: 16px;
+        background: linear-gradient(180deg, #667eea, #764ba2);
+        border-radius: 2px;
+      }
+
+      /* 元信息 */
+      .knowledge-detail-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .knowledge-detail-meta span {
+        padding: 6px 12px;
+        background: #f8f9ff;
+        border: 1px solid #e8e9ff;
+        border-radius: 8px;
+        font-size: 12px;
+        color: #667eea;
+        transition: all 0.3s ease;
+      }
+
+      .knowledge-detail-meta span:hover {
+        background: #f0f4ff;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+      }
+
+      /* 内容区域 */
+      .modal-content p {
+        line-height: 1.8;
+        color: #555;
+        font-size: 14px;
+      }
+
+      /* 化学式代码块 */
+      .knowledge-formula {
+        padding: 16px;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 12px;
+        margin: 12px 0;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .knowledge-formula::before {
+        content: '🧪 化学方程式';
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 11px;
+        color: #667eea;
+        opacity: 0.8;
+      }
+
+      .knowledge-formula code {
+        display: block;
+        color: #00ff88;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      /* 反应机理区域 */
+      .knowledge-mechanism {
+        padding: 16px;
+        background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+        border-left: 4px solid #667eea;
+        border-radius: 0 12px 12px 0;
+        margin: 12px 0;
+      }
+
+      .knowledge-mechanism p {
+        margin: 0;
+        color: #444;
+      }
+
+      /* 适用条件区域 */
+      .knowledge-conditions {
+        padding: 16px;
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+        border-left: 4px solid #ff6b6b;
+        border-radius: 0 12px 12px 0;
+        margin: 12px 0;
+      }
+
+      .knowledge-conditions p {
+        margin: 0;
+        color: #666;
+      }
+
+      /* 关键词标签（详情页） */
+      .modal-content .knowledge-keywords {
+        margin-top: 16px;
+      }
+
+      .modal-content .keyword-tag {
+        padding: 6px 14px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        border-radius: 20px;
+        font-size: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .modal-content .keyword-tag:hover {
+        transform: scale(1.08) rotate(-2deg);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
     `;
 
     document.head.appendChild(style);

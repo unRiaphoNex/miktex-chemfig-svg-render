@@ -67,18 +67,21 @@ class MoleculeKnowledgeIndexPanel {
       .knowledge-index-input {
         width: 100%;
         padding: 10px 16px 10px 40px;
-        border: 2px solid #e0e0e0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         font-size: 14px;
-        background: #fafafa;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         outline: none;
       }
 
       .knowledge-index-input:focus {
-        border-color: #667eea;
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        border-color: rgba(102, 126, 234, 0.5);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1),
+                    0 8px 32px rgba(31, 38, 135, 0.15);
         transform: translateY(-1px);
       }
 
@@ -171,8 +174,10 @@ class MoleculeKnowledgeIndexPanel {
       .knowledge-index-item {
         padding: 14px;
         margin-bottom: 10px;
-        background: #fff;
-        border: 1px solid #e8e8e8;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         animation: slideInRight 0.4s ease-out;
@@ -202,8 +207,9 @@ class MoleculeKnowledgeIndexPanel {
       }
 
       .knowledge-index-item:hover {
-        border-color: #667eea;
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12);
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
         transform: translateY(-2px);
       }
 

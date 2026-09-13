@@ -69,6 +69,7 @@ class KnowledgeSearchPanel {
       typeof TEXTBOOK_KNOWLEDGE_EXPANSION_6 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_6 : {},
       typeof TEXTBOOK_EXPANSION_7 !== "undefined" ? TEXTBOOK_EXPANSION_7 : {},
       typeof TEXTBOOK_EXPANSION_8 !== "undefined" ? TEXTBOOK_EXPANSION_8 : {},
+      typeof TEXTBOOK_COMPLETE !== "undefined" ? TEXTBOOK_COMPLETE : {},
     ];
 
     allDatabases.forEach((db) => {

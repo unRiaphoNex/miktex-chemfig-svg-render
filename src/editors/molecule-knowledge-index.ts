@@ -1000,17 +1000,24 @@ class MoleculeKnowledgeIndexPanel {
         // 完整反应式：直接显示格式化文本（chemfig 不支持反应箭头）
         // 注意：顺序很重要，先处理 \xrightarrow，再去掉 \chemfig 的括号
         let displayCode = formulaCode;
-        // 1. 先处理反应箭头
-        displayCode = displayCode.replace(/\\xrightarrow\{([^}]*)\}/g, " → $1 ");
-        displayCode = displayCode.replace(/\\xleftarrow\{([^}]*)\}/g, " ← $1 ");
+        
+        // 1. 先处理带条件的反应箭头（用 HTML 实现条件在箭头上方）
+        displayCode = displayCode.replace(/\\xrightarrow\{([^}]*)\}/g, 
+          '<span style="position: relative; display: inline-block; padding: 0 8px;">→<span style="position: absolute; top: -1.2em; left: 50%; transform: translateX(-50%); font-size: 0.85em; color: #666; white-space: nowrap;">$1</span></span>');
+        displayCode = displayCode.replace(/\\xleftarrow\{([^}]*)\}/g, 
+          '<span style="position: relative; display: inline-block; padding: 0 8px;">←<span style="position: absolute; top: -1.2em; left: 50%; transform: translateX(-50%); font-size: 0.85em; color: #666; white-space: nowrap;">$1</span></span>');
+        
+        // 2. 处理简单箭头
         displayCode = displayCode.replace(/\\to/g, " → ");
         displayCode = displayCode.replace(/\\rightarrow/g, " → ");
         displayCode = displayCode.replace(/\\leftarrow/g, " ← ");
-        // 2. 再去掉 \chemfig{...} 的括号
+        
+        // 3. 再去掉 \chemfig{...} 的括号
         displayCode = displayCode.replace(/\\chemfig\{/g, "");
         displayCode = displayCode.replace(/\\}/g, "");
         displayCode = displayCode.replace(/\}/g, "");
-        svgContainer.innerHTML = '<div style="font-family: monospace; font-size: 16px; text-align: center; color: #333; padding: 8px;">' + displayCode + '</div>';
+        
+        svgContainer.innerHTML = '<div style="font-family: monospace; font-size: 16px; text-align: center; color: #333; padding: 24px 8px 16px 8px;">' + displayCode + '</div>';
         return;
       }
       

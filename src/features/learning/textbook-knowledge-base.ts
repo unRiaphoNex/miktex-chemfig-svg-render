@@ -590,11 +590,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
         ],
       },
       {
-        chapter: "第九章 醇和酚",
-        sections: [
-          {
-            id: "ORG-801",
-      {
         chapter: "第九章 醇和醚",
         sections: [
           {

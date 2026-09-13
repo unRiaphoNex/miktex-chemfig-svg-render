@@ -698,7 +698,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-          },
           {
             id: "ORG-906",
             title: "羟醛缩合反应",

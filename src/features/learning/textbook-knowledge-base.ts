@@ -764,8 +764,8 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "NaBH₄：乙醇溶剂，室温；LiAlH₄：无水乙醚；Clemmensen：浓 HCl，回流。",
             keywords: ["还原", "NaBH4", "LiAlH4", "Clemmensen", "亚甲基"],
           },
-        ],
-      },
+          {
+            id: "ORG-1006",
             title: "羧酸衍生物",
             content: "酰卤、酸酐、酯、酰胺。水解活性：酰卤 > 酸酐 > 酯 > 酰胺。",
             formula: "",

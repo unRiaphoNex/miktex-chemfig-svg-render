@@ -2092,6 +2092,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "抑癌基因失活：缺失、突变、甲基化。p53突变见于50%以上肿瘤。",
             keywords: ["抑癌基因", "p53", "Rb", "PTEN"],
           },
+          {
+            id: "BIO-1403",
+            title: "肿瘤发生的分子机制",
+            content: "肿瘤：多基因突变累积、多阶段发展。",
+            formula: "",
+            mechanism: "肿瘤发生：原癌基因激活+抑癌基因失活+DNA修复基因缺陷。Knudson二次突变假说：需要两次突变才能失活抑癌基因。",
+            conditions: "肿瘤标志：AFP（肝癌）、CEA（结直肠癌）、PSA（前列腺癌）。肿瘤标志物用于筛查和监测。",
+            keywords: ["肿瘤", "分子机制", "Knudson假说", "肿瘤标志"],
+          },
         ],
       },
       {

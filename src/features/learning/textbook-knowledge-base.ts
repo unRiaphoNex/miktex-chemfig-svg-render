@@ -538,7 +538,7 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
         ],
       },
       {
-        chapter: "第七章 芳烃",
+        chapter: "第七章 卤代烃",
         sections: [
           {
             id: "ORG-601",

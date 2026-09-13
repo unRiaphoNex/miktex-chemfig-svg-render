@@ -1184,6 +1184,43 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
+      {
+        chapter: "第六章 氧化反应",
+        sections: [
+          {
+            id: "SYNTH-301",
+            title: "氧化反应概述",
+            content: "氧化反应：有机分子中加氧或去氢的反应。包括：醇氧化、醛氧化、烃氧化。",
+            formula: "",
+            mechanism: "醇氧化：伯醇→醛→羧酸，仲醇→酮，叔醇难氧化。常用氧化剂：KMnO₄、K₂Cr₂O₇、PCC、OsO₄。",
+            conditions: "KMnO₄/K₂Cr₂O₇：强氧化，酸性条件；PCC：温和氧化，伯醇停在醛。",
+            keywords: ["氧化反应", "醇氧化", "醛氧化", "氧化剂"],
+          },
+          {
+            id: "SYNTH-302",
+            title: "药物合成中的氧化反应",
+            content: "1. 羟基氧化：醇→醛/酮 2. 脱氢：醇→醛/酮 3. 芳烃氧化：苯→苯酚",
+            formula: "",
+            mechanism: "在药物合成中，氧化反应用于引入含氧官能团。如：可的松合成中的羟基氧化。",
+            conditions: "根据底物选择温和氧化剂，避免过度氧化。",
+            keywords: ["药物合成", "氧化反应", "羟基氧化"],
+          },
+        ],
+      },
+      {
+        chapter: "第七章 还原反应",
+        sections: [
+          {
+            id: "SYNTH-401",
+            title: "还原反应概述",
+            content: "还原反应：有机分子中加氢或去氧的反应。包括：催化加氢、化学还原。",
+            formula: "",
+            mechanism: "催化加氢：H₂/Pd、H₂/Pt、H₂/Ni。化学还原：NaBH₄、LiAlH₄、Clemmensen 还原。",
+            conditions: "NaBH₄：温和，只还原醛酮；LiAlH₄：强，还原醛酮羧酸酯；Clemmensen：Zn-Hg/HCl，羰基→亚甲基。",
+            keywords: ["还原反应", "催化加氢", "NaBH4", "LiAlH4"],
+          },
+        ],
+      },
     ],
   },
 

@@ -792,21 +792,44 @@ class MoleculeKnowledgeIndexPanel {
         );
       }
 
-      // 按关键词搜索
+      // 按关键词搜索（参考 Everything：多关键词 AND 搜索 + 通配符）
       if (query) {
+        // 解析搜索查询（支持多关键词 AND 搜索）
+        const keywords = query.split(/\s+/).filter(k => k.length > 0);
+        
         results = results.filter((item) => {
-          return (
-            item.id.toLowerCase().includes(query) ||
-            item.title.toLowerCase().includes(query) ||
-            item.content.toLowerCase().includes(query) ||
-            (item.keywords && item.keywords.some((k) => k.toLowerCase().includes(query)))
-          );
+          // 构建搜索文本
+          const searchText = [
+            item.id.toLowerCase(),
+            item.title.toLowerCase(),
+            item.content.toLowerCase(),
+            item.bookName.toLowerCase(),
+            item.chapter.toLowerCase(),
+            ...(item.keywords || []).map(k => k.toLowerCase())
+          ].join(" ");
+          
+          // 所有关键词都必须匹配（AND 逻辑）
+          return keywords.every(keyword => {
+            // 支持通配符 * 和 ?
+            if (keyword.includes("*") || keyword.includes("?")) {
+              // 通配符搜索
+              const regexPattern = keyword
+                .replace(/[.+^${}()|[\]\\]/g, '\\$&')  // 转义特殊字符
+                .replace(/\*/g, '.*')  // * 匹配任意字符
+                .replace(/\?/g, '.');   // ? 匹配单个字符
+              const regex = new RegExp(regexPattern);
+              return regex.test(searchText);
+            } else {
+              // 普通包含搜索
+              return searchText.includes(keyword);
+            }
+          });
         });
       }
 
       // 显示结果
       this.renderResults(results.slice(0, 50)); // 限制显示50条
-    }, 200);
+    }, 100);
   }
 
   /**

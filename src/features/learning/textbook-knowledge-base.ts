@@ -1997,7 +1997,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             keywords: ["抗贫血药", "铁剂", "叶酸", "维生素B12"],
           },
         ],
-      },
           {
             id: "DRUG-1703",
             title: "抗贫血药",

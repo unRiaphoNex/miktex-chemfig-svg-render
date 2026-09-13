@@ -104,10 +104,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-            keywords: ["自由基反应", "亲电反应", "亲核反应", "协同反应"],
-          },
-        ],
-      },
       {
         chapter: "第二章 烷烃和环烷烃",
         sections: [

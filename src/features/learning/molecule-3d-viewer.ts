@@ -581,7 +581,15 @@ class Molecule3DModalViewer {
         this.viewer.setStyle({}, {
           stick: { radius: 0.1 },
         });
-        this.viewer.addSurface($3Dmol.SurfaceType.VDW, {
+        // 根据选择的表面类型渲染
+        const surfaceType = this.options.surfaceType || "VDW";
+        const surfaceTypeMap = {
+          "VDW": $3Dmol.SurfaceType.VDW,
+          "SES": $3Dmol.SurfaceType.SES,
+          "SAS": $3Dmol.SurfaceType.SAS,
+          "MS": $3Dmol.SurfaceType.MS,
+        };
+        this.viewer.addSurface(surfaceTypeMap[surfaceType] || $3Dmol.SurfaceType.VDW, {
           opacity: 0.7,
           colorscheme: this.options.colorScheme,
         });
@@ -639,6 +647,15 @@ class Molecule3DModalViewer {
    */
   setModel(model) {
     this.options.model = model;
+    this.applyStyle();
+  }
+
+  /**
+   * 设置表面类型
+   * @param type VDW/SES/SAS/MS
+   */
+  setSurfaceType(type) {
+    this.options.surfaceType = type;
     this.applyStyle();
   }
 

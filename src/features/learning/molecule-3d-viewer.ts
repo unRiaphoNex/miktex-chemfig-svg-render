@@ -211,7 +211,7 @@ class Molecule3DModalViewer {
   }
 
   /**
-   * 根据分子大小自动调整显示样式
+   * 根据分子大小自动调整显示样式和性能设置
    */
   autoAdjustDisplay() {
     if (!this.currentMol) return;
@@ -219,13 +219,21 @@ class Molecule3DModalViewer {
     const atomCount = this.currentMol.numAtoms();
     this.atomCount = atomCount;
 
-    // 大分子自动切换为简化显示
-    if (atomCount > 5000) {
-      // 蛋白质/大分子：使用卡通模型
+    // 性能分级
+    if (atomCount > 10000) {
+      // 超大分子：最低性能模式
+      this.viewer.setStyle({}, {
+        cartoon: { color: "spectrum", opacity: 0.8 },
+      });
+      // 关闭阴影，提升性能
+      this.viewer.setNoZoom(false);
+      new Notice(`超大分子 (${atomCount} 原子)：已切换为性能模式`, 2500);
+    } else if (atomCount > 5000) {
+      // 大分子：使用卡通模型
       this.viewer.setStyle({}, {
         cartoon: { color: "spectrum" },
       });
-      new Notice("大分子已自动切换为卡通模型", 2000);
+      new Notice(`大分子 (${atomCount} 原子)：已切换为卡通模型`, 2000);
     } else if (atomCount > 1000) {
       // 中等分子：使用细棍模型
       this.viewer.setStyle({}, {

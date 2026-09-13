@@ -589,14 +589,8 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-            conditions: "E1：极性溶剂，高温；E2：强碱，高温。札伊采夫规则：消除产物以取代基多的烯烃为主。",
-            keywords: ["消除反应", "E1", "E2", "反式消除"],
-          },
-          {
-            id: "ORG-704",
-            title: "格氏试剂",
-            content: "卤代烷 + Mg → RMgX。与醛酮反应生成醇。与 CO2 反应生成羧酸。",
-            formula: "\\chemfig{R-X} + Mg \\xrightarrow{无水乙醚} \\chemfig{R-MgX}",
+      {
+        chapter: "第九章 醇和酚",
             mechanism: "格氏试剂是强亲核试剂和强碱。与醛反应生成伯醇，与酮反应生成仲醇，与 CO₂ 反应生成多一个碳的羧酸。",
             conditions: "无水乙醚或 THF 溶剂，严格无水无氧。",
             keywords: ["格氏试剂", "RMgX", "醇", "羧酸"],

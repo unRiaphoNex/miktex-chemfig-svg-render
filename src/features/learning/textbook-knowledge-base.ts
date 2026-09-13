@@ -2089,9 +2089,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-          },
-        ],
-      },
       {
         chapter: "第九章 消化系统药物",
         sections: [

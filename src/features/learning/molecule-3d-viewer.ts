@@ -681,6 +681,56 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 导出分子文件（PDB/SDF/MOL）
+   */
+  exportMolecule(format = "pdb") {
+    if (!this.viewer || !this.currentMol) {
+      new Notice("没有可导出的分子", 2000);
+      return;
+    }
+
+    try {
+      let content = "";
+      let filename = "";
+      let mimeType = "";
+
+      switch (format) {
+        case "pdb":
+          content = this.viewer.getModel().pdb;
+          filename = "molecule.pdb";
+          mimeType = "chemical/x-pdb";
+          break;
+        case "sdf":
+          content = this.viewer.getModel().sdf;
+          filename = "molecule.sdf";
+          mimeType = "chemical/x-mdl-sdfile";
+          break;
+        case "mol":
+          content = this.viewer.getModel().mol;
+          filename = "molecule.mol";
+          mimeType = "chemical/x-mdl-molfile";
+          break;
+        default:
+          content = this.viewer.getModel().pdb;
+          filename = "molecule.pdb";
+      }
+
+      // 创建下载
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      new Notice(`已导出: ${filename}`, 2000);
+    } catch (e) {
+      new Notice(`导出失败: ${e.message}`, 3000);
+    }
+  }
+
+  /**
    * 启用距离测量模式
    * 点击两个原子显示距离
    */

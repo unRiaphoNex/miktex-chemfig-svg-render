@@ -993,6 +993,36 @@ class MoleculeKnowledgeIndexPanel {
       // 显示加载状态
       svgContainer.innerHTML = '<div style="color: #999; font-size: 14px;">正在渲染...</div>';
       
+      // 优先使用 this.plugin.bridgeClient（直接渲染，返回 SVG 字符串）
+      if (this.plugin && this.plugin.bridgeClient) {
+        try {
+          const svg = await this.plugin.bridgeClient.render(formulaCode, "normal");
+          if (svg && svg.includes("<svg")) {
+            svgContainer.innerHTML = svg;
+            return;
+          }
+        } catch (e) {
+          console.warn("[KnowledgeIndex] bridgeClient 渲染失败:", e);
+        }
+      }
+      
+      // 尝试通过全局插件实例渲染
+      const app = window.app;
+      if (app && app.plugins && app.plugins.plugins["miktex-chemfig-svg-render"]) {
+        const plugin = app.plugins.plugins["miktex-chemfig-svg-render"];
+        if (plugin.bridgeClient) {
+          try {
+            const svg = await plugin.bridgeClient.render(formulaCode, "normal");
+            if (svg && svg.includes("<svg")) {
+              svgContainer.innerHTML = svg;
+              return;
+            }
+          } catch (e) {
+            console.warn("[KnowledgeIndex] 全局 bridgeClient 渲染失败:", e);
+          }
+        }
+      }
+      
       // 尝试通过全局 API 渲染
       if (window.chemfigAPI && window.chemfigAPI.renderChemfig) {
         try {
@@ -1003,23 +1033,6 @@ class MoleculeKnowledgeIndexPanel {
           }
         } catch (e) {
           console.warn("[KnowledgeIndex] chemfigAPI 渲染失败:", e);
-        }
-      }
-      
-      // 尝试通过 bridgeClient 渲染
-      const app = window.app || this.plugin?.app;
-      if (app && app.plugins) {
-        const plugin = app.plugins.plugins["miktex-chemfig-svg-render"];
-        if (plugin && plugin.bridgeClient) {
-          try {
-            const result = await plugin.bridgeClient.render(formulaCode, "normal");
-            if (result && result.svg) {
-              svgContainer.innerHTML = result.svg;
-              return;
-            }
-          } catch (e) {
-            console.warn("[KnowledgeIndex] bridgeClient 渲染失败:", e);
-          }
         }
       }
       

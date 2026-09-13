@@ -1885,6 +1885,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "原核生物：一种RNA聚合酶；真核生物：三种RNA聚合酶（I/II/III）。",
             keywords: ["转录", "RNA聚合酶", "启动子", "终止子"],
           },
+          {
+            id: "BIO-502",
+            title: "RNA转录后加工",
+            content: "真核生物mRNA转录后加工：5'帽、3'polyA尾、剪接。",
+            formula: "",
+            mechanism: "5'帽：7-甲基鸟苷酸帽。3'polyA尾：多聚腺苷酸尾。剪接：去除内含子，连接外显子。",
+            conditions: "snRNP参与剪接过程。选择性剪接：同一基因产生不同mRNA，导致不同蛋白质。",
+            keywords: ["RNA加工", "5'帽", "polyA尾", "剪接", "内含子"],
+          },
         ],
       },
       {

@@ -1370,38 +1370,7 @@ class MoleculeEditorModal extends Modal {
           }
         },
       },
-      {
-        icon: "🎮",
-        name: "配对游戏",
-        tooltip: "官能团配对游戏",
-        action: () => {
-          if (typeof MatchingGameModal !== "undefined") {
-            new MatchingGameModal(this.app).open();
-          } else {
-            new Notice("配对游戏未加载", 2000);
-          }
-        },
       },
-      {
-        icon: "✏️",
-        name: "默写练习",
-        tooltip: "开始结构式默写练习",
-        action: () => {
-          // 从 plugin 获取学习卡片数据
-          const plugin = (this.app.workspace as any).plugin || window.chemfigPlugin;
-          const cards = plugin?.learningCards || [];
-
-          if (cards.length === 0) {
-            new Notice("学习卡片为空, 请先导入或等待数据库加载", 3000);
-            return;
-          }
-
-          if (typeof QuizModal !== "undefined") {
-            new QuizModal(this.app, cards, "name_to_structure").open();
-          } else {
-            new Notice("默写练习模块未加载", 2000);
-          }
-        },
       },
     ];
 
@@ -2186,13 +2155,10 @@ class MoleculeEditorModal extends Modal {
       // 学习模块按钮
       const learningButtons = [
         { text: "📇 翻转卡片练习", icon: "📇", action: () => this.openFlashcardPractice() },
-        { text: "✏️ 默写练习", icon: "✏️", action: () => this.openQuizMode() },
-        { text: "🎯 每日一题", icon: "🎯", action: () => this.openDailyChallenge() },
-        { text: "🔬 反应式分步查看", icon: "🔬", action: () => this.openReactionStepsViewer() },
-        { text: "📖 反应条件速查", icon: "📖", action: () => this.openReactionConditionsGuide() },
+       { text: "🎯 每日一题", icon: "🎯", action: () => this.openDailyChallenge() },
+       { text: "📖 反应条件速查", icon: "📖", action: () => this.openReactionConditionsGuide() },
         { text: "🧠 官能团分析", icon: "🧠", action: () => this.openFunctionalGroupAnalysis() },
-        { text: "🔄 逆合成分析", icon: "🔄", action: () => this.openRetrosynthesis() },
-        { text: "🎮 配对游戏", icon: "🎮", action: () => this.openMatchingGame() },
+       { text: "🎮 配对游戏", icon: "🎮", action: () => this.openMatchingGame() },
         { text: "📚 知识库索引", icon: "📚", action: () => this.openKnowledgeIndex() },
       ];
 

@@ -632,6 +632,26 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 禁用距离测量模式
+   */
+  disableDistanceMeasurement() {
+    if (!this.viewer) return;
+
+    this.measureMode = false;
+    this.measurePoints = [];
+
+    // 移除所有距离标签
+    this.distanceLabels.forEach(label => label.remove());
+    this.distanceLabels = [];
+
+    // 清除点击事件
+    this.viewer.setClickable({}, false);
+
+    // 重置样式
+    this.viewer.render();
+  }
+
+  /**
    * 设置测量类型
    */
   setMeasureType(type) {

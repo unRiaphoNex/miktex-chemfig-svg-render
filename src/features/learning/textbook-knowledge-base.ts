@@ -1332,6 +1332,57 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
+      {
+        chapter: "第十章 DNA的生物合成",
+        sections: [
+          {
+            id: "BIO-401",
+            title: "DNA复制",
+            content: "DNA → DNA。半保留复制。需要：模板、原料、酶。",
+            formula: "",
+            mechanism: "半保留复制：DNA双链解开，每条链作为模板合成新链。关键酶：DNA聚合酶、解旋酶、引物酶、连接酶。",
+            conditions: "原核生物：DNA聚合酶I/II/III；真核生物：DNA聚合酶α/β/γ/δ/ε。",
+            keywords: ["DNA复制", "半保留复制", "DNA聚合酶", "中心法则"],
+          },
+          {
+            id: "BIO-402",
+            title: "逆转录",
+            content: "RNA → DNA。逆转录酶催化。",
+            formula: "",
+            mechanism: "逆转录：以RNA为模板合成DNA。逆转录酶具有三种活性：RNA指导的DNA聚合酶、RNA酶H、DNA指导的DNA聚合酶。",
+            conditions: "逆转录病毒（如HIV）感染宿主细胞时发生。是分子生物学研究的重要工具。",
+            keywords: ["逆转录", "RNA", "逆转录酶", "HIV"],
+          },
+        ],
+      },
+      {
+        chapter: "第十一章 RNA的生物合成",
+        sections: [
+          {
+            id: "BIO-501",
+            title: "转录",
+            content: "DNA → RNA。RNA聚合酶催化。",
+            formula: "",
+            mechanism: "转录分三步：起始（RNA聚合酶结合启动子）、延伸（RNA链延长）、终止（RNA聚合酶脱落）。",
+            conditions: "原核生物：一种RNA聚合酶；真核生物：三种RNA聚合酶（I/II/III）。",
+            keywords: ["转录", "RNA聚合酶", "启动子", "终止子"],
+          },
+        ],
+      },
+      {
+        chapter: "第十二章 蛋白质的生物合成",
+        sections: [
+          {
+            id: "BIO-601",
+            title: "翻译",
+            content: "mRNA → 蛋白质。核糖体催化。",
+            formula: "",
+            mechanism: "翻译分三步：起始（核糖体组装）、延伸（肽链延长）、终止（释放因子识别终止密码子）。遗传密码：mRNA上3个相邻碱基编码一个氨基酸。",
+            conditions: "原核生物：70S核糖体；真核生物：80S核糖体。需要mRNA、tRNA、rRNA、氨基酸、能量。",
+            keywords: ["翻译", "核糖体", "遗传密码", "mRNA", "tRNA"],
+          },
+        ],
+      },
     ],
   },
 };

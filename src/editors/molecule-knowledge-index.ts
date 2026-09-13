@@ -1017,6 +1017,14 @@ class MoleculeKnowledgeIndexPanel {
         displayCode = displayCode.replace(/\\}/g, "");
         displayCode = displayCode.replace(/\}/g, "");
         
+        // 4. 处理下标和上标
+        // 下标: X_1, X_{12} → X<sub>1</sub>, X<sub>12</sub>
+        displayCode = displayCode.replace(/_\{([^}]+)\}/g, '<sub>$1</sub>');
+        displayCode = displayCode.replace(/_(\d)/g, '<sub>$1</sub>');
+        // 上标: X^1, X^{12} → X<sup>1</sup>, X<sup>12</sup>
+        displayCode = displayCode.replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>');
+        displayCode = displayCode.replace(/\^(\d)/g, '<sup>$1</sup>');
+        
         svgContainer.innerHTML = '<div style="font-family: monospace; font-size: 16px; text-align: center; color: #333; padding: 24px 8px 16px 8px;">' + displayCode + '</div>';
         return;
       }

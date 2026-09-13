@@ -3099,3 +3099,159 @@
   color: var(--text-muted);
   font-family: var(--chemfig-font-mono);
 }
+
+/* ========== 次级功能页面统一样式（毛玻璃效果） ========== */
+
+/* 反应条件速查卡 */
+.reaction-conditions-modal {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reaction-conditions-modal h2 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.reaction-conditions-modal input[type="text"] {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.reaction-conditions-modal input[type="text"]:focus {
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1),
+              0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+.reaction-conditions-modal .condition-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.reaction-conditions-modal .condition-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  transform: translateY(-2px);
+}
+
+.reaction-conditions-modal .condition-category h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #667eea;
+  margin: 16px 0 8px 0;
+}
+
+/* 3D 查看器控制面板 */
+.mol3d-control-panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  z-index: 100;
+  min-width: 160px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 片段库面板 */
+.molecule-fragment-library {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.molecule-fragment-library .fragment-category {
+  margin-bottom: 16px;
+}
+
+.molecule-fragment-library .fragment-category h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.molecule-fragment-library .fragment-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.molecule-fragment-library .fragment-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 学习模块侧边栏 */
+.learning-module-sidebar {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.learning-module-sidebar .learning-card {
+  margin: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.learning-module-sidebar .learning-card:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  transform: translateY(-2px);
+}

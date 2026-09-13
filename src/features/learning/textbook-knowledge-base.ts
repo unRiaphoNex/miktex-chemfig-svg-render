@@ -1119,7 +1119,7 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             id: "DRUG-402",
             title: "对乙酰氨基酚",
             content: "扑热息痛。作用机制：抑制中枢 COX。临床：解热镇痛，抗炎作用弱。",
-            formula: "\\chemfig{*6(-NHCOCH_3-OH-=-=-)}",
+            formula: "\\chemfig{*6(-=-(-OH)-=-(-NHCOCH_3)-=)}",
             mechanism: "作用机制：主要抑制中枢神经系统的 COX，对外周 COX 抑制弱，故解热镇痛作用强，抗炎作用弱。过量可导致肝损伤。",
             conditions: "常规剂量安全；过量（>10g）导致肝坏死，解毒剂为 N-乙酰半胱氨酸。",
             keywords: ["对乙酰氨基酚", "扑热息痛", "解热镇痛"],

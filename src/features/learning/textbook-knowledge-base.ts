@@ -1600,6 +1600,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "Wagner-Meerwein：酸催化；Beckmann：酸催化（PCl₅）；Hofmann：Br₂/NaOH。",
             keywords: ["重排反应", "Wagner-Meerwein", "Beckmann", "Hofmann"],
           },
+          {
+            id: "SYNTH-502",
+            title: "Claisen重排",
+            content: "烯丙基芳基醚→邻烯丙基苯酚。[3,3]σ迁移。",
+            formula: "",
+            mechanism: "Claisen重排：协同反应，[3,3]-σ迁移。烯丙基芳基醚加热到200°C，生成邻烯丙基苯酚。",
+            conditions: "加热（200°C），协同反应。是制备酚类化合物的重要方法。",
+            keywords: ["Claisen重排", "烯丙基", "苯酚", "σ迁移"],
+          },
         ],
       },
       {

@@ -5069,12 +5069,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
       },
       {
         chapter: "第二十三章 核酸代谢",
-            keywords: ["高能化合物", "ATP", "磷酸肌酸", "能量货币"],
-          },
-        ],
-      },
-      {
-        chapter: "第二十三章 核酸代谢",
         sections: [
           {
             id: "BIO-1701",

@@ -1,4 +1,4 @@
-// ========== 知识库扩展 5 (v17.2.0) ==========
+﻿// ========== 知识库扩展 5 (v17.2.0) ==========
 // 更多知识点内容
 // 索引编号: ORG-xxx, DRUG-xxx, PHARM-xxx, SYNTH-xxx, BIO-xxx
 
@@ -312,3 +312,6 @@ const TEXTBOOK_KNOWLEDGE_EXPANSION_5 = {
 
 // 导出全局变量
 // TEXTBOOK_KNOWLEDGE_EXPANSION_5
+
+// 挂载到全局对象
+window.TEXTBOOK_KNOWLEDGE_EXPANSION_5 = TEXTBOOK_KNOWLEDGE_EXPANSION_5;

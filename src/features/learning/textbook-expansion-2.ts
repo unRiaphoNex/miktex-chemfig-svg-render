@@ -1,4 +1,4 @@
-// ========== 教材知识库二次扩展 (v17.2.0) ==========
+﻿// ========== 教材知识库二次扩展 (v17.2.0) ==========
 // 继续扩展：更多知识点，更详细的内容
 // 新增：
 // - 有机化学：更多反应机理细节
@@ -483,3 +483,6 @@ const TEXTBOOK_KNOWLEDGE_EXPANSION_2 = {
 
 // 导出全局变量
 // TEXTBOOK_KNOWLEDGE_EXPANSION_2
+
+// 挂载到全局对象
+window.TEXTBOOK_KNOWLEDGE_EXPANSION_2 = TEXTBOOK_KNOWLEDGE_EXPANSION_2;

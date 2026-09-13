@@ -60,9 +60,14 @@ class KnowledgeSearchPanel {
     
     // 从所有知识库中搜索
     const allDatabases = [
-      TEXTBOOK_KNOWLEDGE_BASE,
-      EXTENDED_TEXTBOOK_KNOWLEDGE,
-      TEXTBOOK_KNOWLEDGE_EXPANSION_2,
+      typeof TEXTBOOK_KNOWLEDGE_BASE !== "undefined" ? TEXTBOOK_KNOWLEDGE_BASE : {},
+      typeof EXTENDED_TEXTBOOK_KNOWLEDGE !== "undefined" ? EXTENDED_TEXTBOOK_KNOWLEDGE : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_2 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_2 : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_3 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_3 : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_4 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_4 : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_5 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_5 : {},
+      typeof TEXTBOOK_KNOWLEDGE_EXPANSION_6 !== "undefined" ? TEXTBOOK_KNOWLEDGE_EXPANSION_6 : {},
+      typeof TEXTBOOK_EXPANSION_7 !== "undefined" ? TEXTBOOK_EXPANSION_7 : {},
     ];
 
     allDatabases.forEach((db) => {

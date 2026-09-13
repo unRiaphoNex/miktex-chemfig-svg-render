@@ -1,4 +1,4 @@
-// ========== 知识库扩展 4 (v17.2.0) ==========
+﻿// ========== 知识库扩展 4 (v17.2.0) ==========
 // 从教材 PDF 中提取的更多知识点
 // 索引编号: ORG-xxx, DRUG-xxx, PHARM-xxx, SYNTH-xxx, BIO-xxx
 
@@ -496,3 +496,6 @@ const TEXTBOOK_KNOWLEDGE_EXPANSION_4 = {
 
 // 导出全局变量
 // TEXTBOOK_KNOWLEDGE_EXPANSION_4
+
+// 挂载到全局对象
+window.TEXTBOOK_KNOWLEDGE_EXPANSION_4 = TEXTBOOK_KNOWLEDGE_EXPANSION_4;

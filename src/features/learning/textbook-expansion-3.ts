@@ -1,4 +1,4 @@
-// ========== 教材知识库三次扩展 (v17.2.0) ==========
+﻿// ========== 教材知识库三次扩展 (v17.2.0) ==========
 // 继续扩展剩余章节的知识点
 
 const TEXTBOOK_KNOWLEDGE_EXPANSION_3 = {
@@ -280,3 +280,6 @@ const TEXTBOOK_KNOWLEDGE_EXPANSION_3 = {
 
 // 导出全局变量
 // TEXTBOOK_KNOWLEDGE_EXPANSION_3
+
+// 挂载到全局对象
+window.TEXTBOOK_KNOWLEDGE_EXPANSION_3 = TEXTBOOK_KNOWLEDGE_EXPANSION_3;

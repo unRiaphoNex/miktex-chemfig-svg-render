@@ -1,4 +1,4 @@
-// ========== 教材知识库扩展 (v17.2.0) ==========
+﻿// ========== 教材知识库扩展 (v17.2.0) ==========
 // 扩展章节：
 // 有机化学：13-16章
 // 药物化学：8-10, 13, 15-20章
@@ -796,3 +796,6 @@ const EXTENDED_TEXTBOOK_KNOWLEDGE = {
 
 // 导出全局变量
 // EXTENDED_TEXTBOOK_KNOWLEDGE
+
+// 挂载到全局对象
+window.EXTENDED_TEXTBOOK_KNOWLEDGE = EXTENDED_TEXTBOOK_KNOWLEDGE;

@@ -1,4 +1,4 @@
-// ========== 完整教材知识库 (v17.2.0) ==========
+﻿// ========== 完整教材知识库 (v17.2.0) ==========
 // 索引编号系统:
 // ORG-xxx: 有机化学（第六版）
 // DRUG-xxx: 药物化学（第三版）
@@ -928,3 +928,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
 
 // 导出全局变量
 // TEXTBOOK_KNOWLEDGE_BASE
+
+// 挂载到全局对象
+window.TEXTBOOK_KNOWLEDGE_BASE = TEXTBOOK_KNOWLEDGE_BASE;

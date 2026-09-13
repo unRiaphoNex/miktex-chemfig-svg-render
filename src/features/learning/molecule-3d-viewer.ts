@@ -16,6 +16,8 @@ class Molecule3DModalViewer {
     this.currentMol = null;
     this.atomCount = 0;
     this.loadingIndicator = null;
+    this.cache = new Map(); // 分子缓存
+    this.maxCacheSize = 20; // 最大缓存数量
   }
 
   /**
@@ -271,11 +273,21 @@ class Molecule3DModalViewer {
   }
 
   /**
-   * 渲染 SMILES 分子
+   * 渲染 SMILES 分子（带缓存）
    */
   renderSmiles(smiles) {
     if (!this.viewer) {
       throw new Error("Viewer 未初始化");
+    }
+
+    // 检查缓存
+    if (this.cache.has(smiles)) {
+      this.viewer.clear();
+      this.viewer.addModel(this.cache.get(smiles), "smi");
+      this.setDisplayStyle(this.options.model);
+      this.viewer.zoomTo();
+      this.viewer.render();
+      return;
     }
 
     this.viewer.clear();
@@ -285,6 +297,28 @@ class Molecule3DModalViewer {
     this.setDisplayStyle(this.options.model);
     this.viewer.zoomTo();
     this.viewer.render();
+
+    // 存入缓存
+    this.addToCache(smiles);
+  }
+
+  /**
+   * 添加到缓存
+   */
+  addToCache(key, data) {
+    // 缓存满了，删除最旧的
+    if (this.cache.size >= this.maxCacheSize) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+    this.cache.set(key, data || key);
+  }
+
+  /**
+   * 清空缓存
+   */
+  clearCache() {
+    this.cache.clear();
   }
 
   /**

@@ -106,10 +106,24 @@ class ChemfigSettingTab extends PluginSettingTab {
               new Notice(`❌ 桥接服务返回错误: HTTP ${r.status}`, 5000);
             }
           } catch (e) {
-            new Notice(`❌ 无法连接桥接服务\n错误: ${e.message}\n请确认桥接服务已启动`, 5000);
+            new Notice(`❌ 无法连接桥接服务\n错误: ${e.message}\n请运行 start.bat 启动服务`, 5000);
           }
         })
       );
+
+    // 启动桥接服务说明
+    const startGuide = containerEl.createEl("div");
+    startGuide.style.cssText =
+      "margin:8px 0;padding:12px;background:var(--background-secondary);border-radius:8px;font-size:12px;line-height:1.6;";
+    startGuide.innerHTML = `
+      <div style="font-weight:600;margin-bottom:8px;color:var(--text-normal);">🚀 启动桥接服务</div>
+      <div style="color:var(--text-muted);">
+        1. 打开文件资源管理器<br>
+        2. 进入目录: <code>D:\\code\\chem-studio\\miktex-bridge\\</code><br>
+        3. 双击运行 <code>start.bat</code><br>
+        4. 等待显示 "服务启动成功" 后回到此处点击"检查状态"
+      </div>
+    `;
 
     new Setting(containerEl)
       .setName("启用 SVG 缓存 enableCache")

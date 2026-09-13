@@ -1370,8 +1370,6 @@ class MoleculeEditorModal extends Modal {
           }
         },
       },
-      },
-      },
     ];
 
     // 创建按钮

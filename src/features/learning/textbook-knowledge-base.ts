@@ -605,7 +605,7 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
         ],
       },
       {
-        chapter: "第八章 卤代烃",
+        chapter: "第八章 有机化合物的波谱分析",
         sections: [
           {
             id: "ORG-701",

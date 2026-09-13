@@ -1,1466 +1,478 @@
 /* ============================================================
-   MikTeX Chemfig SVG Renderer v9.0.0 - 设计系统
+   Chemfig SVG Renderer - Design System v18.0
+   参考: Ant Design / Uiverse / CodeMyUI
    设计原则: 统一变量、清晰层级、克制动效、无障碍优先
    ============================================================ */
 
 /* ---------- 设计变量 ---------- */
 :root {
-  /* 颜色系统 */
+  /* 颜色系统 - 基于 Ant Design 色板 */
   --chemfig-primary: var(--interactive-accent, #7c3aed);
   --chemfig-primary-hover: var(--interactive-accent-hover, #6d28d9);
+  --chemfig-primary-light: color-mix(in srgb, var(--chemfig-primary) 10%, transparent);
+  --chemfig-primary-lighter: color-mix(in srgb, var(--chemfig-primary) 5%, transparent);
+  --chemfig-primary-dark: color-mix(in srgb, var(--chemfig-primary) 80%, black);
+
+  /* 语义色 */
   --chemfig-success: #10b981;
   --chemfig-warning: #f59e0b;
   --chemfig-error: #ef4444;
   --chemfig-info: #3b82f6;
 
-  /* 间距系统 (4px基准) */
-  --chemfig-space-xs: 4px;
-  --chemfig-space-sm: 8px;
-  --chemfig-space-md: 12px;
-  --chemfig-space-lg: 16px;
-  --chemfig-space-xl: 24px;
-  --chemfig-space-2xl: 32px;
+  /* 背景层级 */
+  --chemfig-bg-1: var(--background-primary);
+  --chemfig-bg-2: var(--background-secondary);
+  --chemfig-bg-3: var(--background-modifier-border);
+  --chemfig-bg-hover: var(--background-modifier-hover);
+
+  /* 文字层级 */
+  --chemfig-text-1: var(--text-normal);
+  --chemfig-text-2: var(--text-muted);
+  --chemfig-text-3: var(--text-faint);
+
+  /* 间距系统 (4px 基准) */
+  --chemfig-space-1: 4px;
+  --chemfig-space-2: 8px;
+  --chemfig-space-3: 12px;
+  --chemfig-space-4: 16px;
+  --chemfig-space-5: 20px;
+  --chemfig-space-6: 24px;
+  --chemfig-space-8: 32px;
+  --chemfig-space-10: 40px;
+  --chemfig-space-12: 48px;
 
   /* 圆角系统 */
+  --chemfig-radius-xs: 2px;
   --chemfig-radius-sm: 4px;
-  --chemfig-radius-md: 8px;
-  --chemfig-radius-lg: 12px;
-  --chemfig-radius-xl: 16px;
+  --chemfig-radius-md: 6px;
+  --chemfig-radius-lg: 8px;
+  --chemfig-radius-xl: 12px;
+  --chemfig-radius-2xl: 16px;
+  --chemfig-radius-full: 9999px;
 
   /* 阴影系统 */
-  --chemfig-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --chemfig-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-  --chemfig-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-  --chemfig-shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+  --chemfig-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --chemfig-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --chemfig-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --chemfig-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --chemfig-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --chemfig-shadow-primary: 0 0 0 3px color-mix(in srgb, var(--chemfig-primary) 15%, transparent);
 
   /* 字体系统 */
+  --chemfig-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --chemfig-font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
-  --chemfig-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  /* 过渡 */
-  --chemfig-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --chemfig-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* 字体大小 */
+  --chemfig-text-xs: 11px;
+  --chemfig-text-sm: 12px;
+  --chemfig-text-base: 13px;
+  --chemfig-text-md: 14px;
+  --chemfig-text-lg: 16px;
+  --chemfig-text-xl: 18px;
+  --chemfig-text-2xl: 20px;
+  --chemfig-text-3xl: 24px;
+
+  /* 行高 */
+  --chemfig-leading-tight: 1.25;
+  --chemfig-leading-normal: 1.5;
+  --chemfig-leading-relaxed: 1.75;
+
+  /* 过渡曲线 */
+  --chemfig-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --chemfig-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --chemfig-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --chemfig-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* 过渡时长 */
+  --chemfig-duration-fast: 100ms;
+  --chemfig-duration-normal: 200ms;
+  --chemfig-duration-slow: 300ms;
+
+  /* z-index 层级 */
+  --chemfig-z-dropdown: 1000;
+  --chemfig-z-sticky: 1020;
+  --chemfig-z-fixed: 1030;
+  --chemfig-z-modal-backdrop: 1040;
+  --chemfig-z-modal: 1050;
+  --chemfig-z-popover: 1060;
+  --chemfig-z-tooltip: 1070;
 }
 
-/* ---------- 图片容器 ---------- */
-.chemfig-png-wrapper {
-  display: block !important;
-  text-align: center !important;
-  margin: var(--chemfig-space-lg) auto !important;
-  width: 100%;
-  position: relative;
+/* ---------- 基础重置 ---------- */
+.chemfig-* {
+  box-sizing: border-box;
 }
-.chemfig-png-wrapper img {
-  display: inline-block !important;
-  margin: 0 auto !important;
-  float: none !important;
-  max-width: 500px;
-  width: 100%;
-  height: auto;
+
+/* ============================================================
+   1. 通用组件
+   ============================================================ */
+
+/* ---------- 按钮 ---------- */
+.chemfig-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--chemfig-space-2);
+  padding: var(--chemfig-space-2) var(--chemfig-space-3);
+  font-size: var(--chemfig-text-base);
+  font-weight: 500;
+  line-height: 1.5;
+  border: 1px solid transparent;
   border-radius: var(--chemfig-radius-md);
-  transition: transform var(--chemfig-transition-fast), box-shadow var(--chemfig-transition-fast);
+  cursor: pointer;
+  transition: all var(--chemfig-duration-normal) var(--chemfig-ease);
+  white-space: nowrap;
+  user-select: none;
 }
-.chemfig-png-wrapper img:hover {
-  transform: scale(1.01);
+
+.chemfig-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--chemfig-shadow-primary);
+}
+
+.chemfig-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 主要按钮 */
+.chemfig-btn-primary {
+  background: var(--chemfig-primary);
+  color: white;
+}
+
+.chemfig-btn-primary:hover:not(:disabled) {
+  background: var(--chemfig-primary-hover);
+  transform: translateY(-1px);
   box-shadow: var(--chemfig-shadow-md);
 }
 
-/* 阅读模式 SVG 容器 */
-.miktex-svg-container {
-  display: block;
-  margin: var(--chemfig-space-lg) auto;
-  text-align: center;
-  cursor: zoom-in;
-  border: 1px dashed transparent;
-  border-radius: var(--chemfig-radius-md);
-  padding: var(--chemfig-space-sm);
-  transition: border-color var(--chemfig-transition-fast), background var(--chemfig-transition-fast);
-}
-.miktex-svg-container:hover {
-  border-color: var(--chemfig-primary);
-  background: color-mix(in srgb, var(--chemfig-primary) 5%, transparent);
-}
-.miktex-svg-container svg {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-
-/* 暗色模式 SVG 反色 */
-.theme-dark .miktex-svg-container svg {
-  filter: invert(1) hue-rotate(180deg);
-}
-@media print {
-  .theme-dark .miktex-svg-container svg { filter: none; }
-}
-
-/* ---------- 旁侧浮动工具栏 ---------- */
-.chemfig-img-toolbar {
-  position: absolute;
-  top: var(--chemfig-space-xs);
-  right: var(--chemfig-space-xs);
-  display: flex;
-  gap: var(--chemfig-space-xs);
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity var(--chemfig-transition-fast), transform var(--chemfig-transition-fast);
-  z-index: 10;
-}
-.chemfig-png-wrapper:hover .chemfig-img-toolbar,
-.miktex-svg-container:hover .chemfig-img-toolbar {
-  opacity: 1;
+.chemfig-btn-primary:active:not(:disabled) {
   transform: translateY(0);
 }
-.chemfig-img-toolbar button {
+
+/* 次要按钮 */
+.chemfig-btn-secondary {
+  background: var(--chemfig-bg-1);
+  border-color: var(--chemfig-bg-3);
+  color: var(--chemfig-text-1);
+}
+
+.chemfig-btn-secondary:hover:not(:disabled) {
+  background: var(--chemfig-bg-hover);
+  border-color: var(--chemfig-primary);
+  color: var(--chemfig-primary);
+}
+
+/* 文字按钮 */
+.chemfig-btn-ghost {
+  background: transparent;
+  color: var(--chemfig-text-2);
+}
+
+.chemfig-btn-ghost:hover:not(:disabled) {
+  background: var(--chemfig-primary-light);
+  color: var(--chemfig-primary);
+}
+
+/* 危险按钮 */
+.chemfig-btn-danger {
+  background: var(--chemfig-error);
+  color: white;
+}
+
+.chemfig-btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--chemfig-error) 85%, black);
+}
+
+/* 按钮尺寸 */
+.chemfig-btn-sm {
+  padding: var(--chemfig-space-1) var(--chemfig-space-2);
+  font-size: var(--chemfig-text-sm);
+  border-radius: var(--chemfig-radius-sm);
+}
+
+.chemfig-btn-lg {
+  padding: var(--chemfig-space-3) var(--chemfig-space-5);
+  font-size: var(--chemfig-text-md);
+}
+
+/* 图标按钮 */
+.chemfig-btn-icon {
+  padding: var(--chemfig-space-2);
+  width: 32px;
+  height: 32px;
+}
+
+.chemfig-btn-icon-sm {
   width: 28px;
   height: 28px;
+  padding: var(--chemfig-space-1);
+}
+
+/* ---------- 卡片 ---------- */
+.chemfig-card {
+  background: var(--chemfig-bg-1);
+  border: 1px solid var(--chemfig-bg-3);
+  border-radius: var(--chemfig-radius-lg);
+  overflow: hidden;
+  transition: all var(--chemfig-duration-normal) var(--chemfig-ease);
+}
+
+.chemfig-card:hover {
+  border-color: color-mix(in srgb, var(--chemfig-primary) 30%, var(--chemfig-bg-3));
+  box-shadow: var(--chemfig-shadow-md);
+}
+
+.chemfig-card-header {
+  padding: var(--chemfig-space-4);
+  border-bottom: 1px solid var(--chemfig-bg-3);
+}
+
+.chemfig-card-body {
+  padding: var(--chemfig-space-4);
+}
+
+.chemfig-card-footer {
+  padding: var(--chemfig-space-4);
+  border-top: 1px solid var(--chemfig-bg-3);
+  background: var(--chemfig-bg-2);
+}
+
+/* ---------- 输入框 ---------- */
+.chemfig-input {
+  display: block;
+  width: 100%;
+  padding: var(--chemfig-space-2) var(--chemfig-space-3);
+  font-size: var(--chemfig-text-base);
+  line-height: 1.5;
+  color: var(--chemfig-text-1);
+  background: var(--chemfig-bg-1);
+  border: 1px solid var(--chemfig-bg-3);
+  border-radius: var(--chemfig-radius-md);
+  transition: all var(--chemfig-duration-normal) var(--chemfig-ease);
+}
+
+.chemfig-input:focus {
+  outline: none;
+  border-color: var(--chemfig-primary);
+  box-shadow: var(--chemfig-shadow-primary);
+}
+
+.chemfig-input::placeholder {
+  color: var(--chemfig-text-3);
+}
+
+/* ---------- 标签/徽章 ---------- */
+.chemfig-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--chemfig-space-1);
+  padding: var(--chemfig-space-1) var(--chemfig-space-2);
+  font-size: var(--chemfig-text-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: var(--chemfig-radius-sm);
+  background: var(--chemfig-primary-light);
+  color: var(--chemfig-primary);
+}
+
+.chemfig-tag-success {
+  background: color-mix(in srgb, var(--chemfig-success) 10%, transparent);
+  color: var(--chemfig-success);
+}
+
+.chemfig-tag-warning {
+  background: color-mix(in srgb, var(--chemfig-warning) 10%, transparent);
+  color: var(--chemfig-warning);
+}
+
+.chemfig-tag-error {
+  background: color-mix(in srgb, var(--chemfig-error) 10%, transparent);
+  color: var(--chemfig-error);
+}
+
+/* ---------- 工具提示 ---------- */
+.chemfig-tooltip {
+  position: relative;
+}
+
+.chemfig-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: var(--chemfig-space-1) var(--chemfig-space-2);
+  font-size: var(--chemfig-text-xs);
+  white-space: nowrap;
+  background: var(--chemfig-bg-1);
+  border: 1px solid var(--chemfig-bg-3);
+  border-radius: var(--chemfig-radius-sm);
+  box-shadow: var(--chemfig-shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--chemfig-duration-normal) var(--chemfig-ease);
+  z-index: var(--chemfig-z-tooltip);
+  pointer-events: none;
+}
+
+.chemfig-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+/* ============================================================
+   2. 布局组件
+   ============================================================ */
+
+/* ---------- 弹窗 ---------- */
+.chemfig-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--chemfig-z-modal);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-sm);
-  background: var(--background-primary);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 14px;
-  padding: 0;
-  transition: all var(--chemfig-transition-fast);
-  box-shadow: var(--chemfig-shadow-sm);
-}
-.chemfig-img-toolbar button:hover {
-  background: var(--chemfig-primary);
-  color: white;
-  border-color: var(--chemfig-primary);
-  transform: scale(1.1);
 }
 
-/* ---------- 编辑模态框 ---------- */
-/* v10.15.x 修复: .chemfig-edit-modal 直接加在 contentEl(= .modal-content) 上,
-   不存在内部的 .modal-content 后代, 故选择器改为自身, 恢复 80vh 高度与 flex 布局 */
-.chemfig-edit-modal {
-  overflow: hidden;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  height: 80vh;
-  max-height: 800px;
-  box-sizing: border-box;
+.chemfig-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  animation: chemfig-fade-in var(--chemfig-duration-normal) var(--chemfig-ease);
 }
+
+.chemfig-modal-content {
+  position: relative;
+  width: 90vw;
+  max-width: 1200px;
+  max-height: 90vh;
+  background: var(--chemfig-bg-1);
+  border-radius: var(--chemfig-radius-xl);
+  box-shadow: var(--chemfig-shadow-xl);
+  animation: chemfig-slide-up var(--chemfig-duration-slow) var(--chemfig-ease-out);
+  overflow: hidden;
+}
+
 .chemfig-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--chemfig-space-md) var(--chemfig-space-lg);
-  border-bottom: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
+  padding: var(--chemfig-space-4) var(--chemfig-space-6);
+  border-bottom: 1px solid var(--chemfig-bg-3);
 }
-.chemfig-modal-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-normal);
-  display: flex;
-  align-items: center;
-  gap: var(--chemfig-space-sm);
-}
-.chemfig-modal-title .chemfig-mode-badge {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--chemfig-primary);
-  color: white;
-  font-weight: 500;
-}
+
 .chemfig-modal-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
+  padding: var(--chemfig-space-6);
+  overflow-y: auto;
 }
-.chemfig-editor-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--background-modifier-border);
-  min-width: 0;
-}
-.chemfig-preview-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: var(--background-primary);
-  min-width: 0;
-}
-.chemfig-panel-header {
-  padding: var(--chemfig-space-sm) var(--chemfig-space-md);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.chemfig-code-area {
-  flex: 1;
-  padding: var(--chemfig-space-md);
-  overflow: auto;
-}
-.chemfig-code-area textarea {
-  width: 100%;
-  height: 100%;
-  min-height: 200px;
-  resize: none;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-md);
-  padding: var(--chemfig-space-md);
-  font-family: var(--chemfig-font-mono);
-  font-size: 13px;
-  line-height: 1.6;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  tab-size: 2;
-  transition: border-color var(--chemfig-transition-fast), box-shadow var(--chemfig-transition-fast);
-}
-.chemfig-code-area textarea:focus {
-  outline: none;
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chemfig-primary) 20%, transparent);
-}
-.chemfig-preview-area {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--chemfig-space-lg);
-  overflow: auto;
-  background: var(--background-primary);
-}
-.chemfig-preview-area img,
-.chemfig-preview-area svg {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
+
 .chemfig-modal-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--chemfig-space-md) var(--chemfig-space-lg);
-  border-top: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
-  gap: var(--chemfig-space-md);
-}
-.chemfig-modal-footer .chemfig-actions {
-  display: flex;
-  gap: var(--chemfig-space-sm);
-}
-.chemfig-btn {
-  padding: 6px 14px;
-  border-radius: var(--chemfig-radius-sm);
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all var(--chemfig-transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.chemfig-btn:hover {
-  background: var(--background-modifier-hover);
-  border-color: var(--background-modifier-border-hover);
-}
-.chemfig-btn-primary {
-  background: var(--chemfig-primary);
-  border-color: var(--chemfig-primary);
-  color: white;
-}
-.chemfig-btn-primary:hover {
-  background: var(--chemfig-primary-hover);
-  border-color: var(--chemfig-primary-hover);
-}
-.chemfig-btn-danger {
-  color: var(--chemfig-error);
-  border-color: color-mix(in srgb, var(--chemfig-error) 30%, transparent);
-}
-.chemfig-btn-danger:hover {
-  background: color-mix(in srgb, var(--chemfig-error) 10%, transparent);
+  justify-content: flex-end;
+  gap: var(--chemfig-space-3);
+  padding: var(--chemfig-space-4) var(--chemfig-space-6);
+  border-top: 1px solid var(--chemfig-bg-3);
+  background: var(--chemfig-bg-2);
 }
 
-/* ---------- 模式切换栏 ---------- */
-.chemfig-mode-bar {
-  display: flex;
-  gap: var(--chemfig-space-xs);
-  padding: var(--chemfig-space-xs);
-  background: var(--background-secondary);
-  border-radius: var(--chemfig-radius-md);
-}
-.chemfig-mode-bar button {
-  padding: 4px 12px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: var(--chemfig-radius-sm);
-  cursor: pointer;
-  transition: all var(--chemfig-transition-fast);
-}
-.chemfig-mode-bar button:hover {
-  color: var(--text-normal);
-  background: var(--background-modifier-hover);
-}
-.chemfig-mode-bar button.active {
-  background: var(--chemfig-primary);
-  color: white;
-}
-
-/* ---------- 模板库面板 ---------- */
-.chemfig-template-panel {
-  width: 240px;
-  border-right: 1px solid var(--background-modifier-border);
+/* ---------- 侧边栏 ---------- */
+.chemfig-sidebar {
   display: flex;
   flex-direction: column;
-  background: var(--background-secondary);
-}
-.chemfig-template-search {
-  padding: var(--chemfig-space-md);
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-.chemfig-template-search input {
-  width: 100%;
-  padding: 6px 10px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-sm);
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-}
-.chemfig-template-search input:focus {
-  outline: none;
-  border-color: var(--chemfig-primary);
-}
-.chemfig-template-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: var(--chemfig-space-xs);
-  padding: 6px 10px;
-  font-size: 11px;
-  color: var(--text-muted);
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-sm);
-  margin: 4px 8px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-  scrollbar-width: thin;
-  min-height: 28px;
-}
-.chemfig-template-breadcrumb::-webkit-scrollbar {
-  height: 4px;
-}
-.chemfig-template-breadcrumb::-webkit-scrollbar-track {
-  background: transparent;
-}
-.chemfig-template-breadcrumb::-webkit-scrollbar-thumb {
-  background: var(--background-modifier-border);
-  border-radius: 2px;
-}
-.chemfig-template-breadcrumb span {
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: var(--chemfig-radius-sm);
-  transition: background var(--chemfig-transition-fast);
-}
-.chemfig-template-breadcrumb span:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-.chemfig-template-breadcrumb .separator {
-  cursor: default;
-  padding: 0;
-  color: var(--text-faint);
-}
-.chemfig-template-breadcrumb .separator:hover {
-  background: transparent;
-}
-.chemfig-template-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--chemfig-space-xs);
-}
-.chemfig-template-item {
-  padding: 8px 10px;
-  border-radius: var(--chemfig-radius-sm);
-  cursor: pointer;
-  transition: background var(--chemfig-transition-fast);
-  margin-bottom: 2px;
-}
-.chemfig-template-item:hover {
-  background: var(--background-modifier-hover);
-}
-.chemfig-template-item .chemfig-template-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-normal);
-}
-.chemfig-template-item .chemfig-template-code {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-family: var(--chemfig-font-mono);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ---------- 组分调整模态框 ---------- */
-.group-layout-modal .modal-content {
-  padding: 0;
-  overflow: hidden;
-  height: 85vh;
-  max-height: 900px;
-  display: flex;
-  flex-direction: column;
-}
-.chemfig-canvas-container {
-  position: relative;
-  overflow: hidden;
-  background: var(--background-primary);
-  background-image:
-    linear-gradient(var(--background-modifier-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--background-modifier-border) 1px, transparent 1px);
-  background-size: 20px 20px;
-  border-radius: 8px;
-  margin: 0 16px;
-}
-.chemfig-canvas-container canvas {
-  display: block;
-  margin: 8px auto;
-}
-.chemfig-component-controls {
-  position: absolute;
-  top: var(--chemfig-space-md);
-  right: var(--chemfig-space-md);
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-md);
-  padding: var(--chemfig-space-md);
-  box-shadow: var(--chemfig-shadow-lg);
-  min-width: 200px;
-  z-index: 10;
-}
-.chemfig-component-control-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--chemfig-space-sm);
-  gap: var(--chemfig-space-sm);
-}
-.chemfig-component-control-row label {
-  font-size: 12px;
-  color: var(--text-muted);
-  min-width: 50px;
-}
-.chemfig-component-control-row input[type="range"] {
-  flex: 1;
-  height: 4px;
-  -webkit-appearance: none;
-  background: var(--background-modifier-border);
-  border-radius: 2px;
-  outline: none;
-}
-.chemfig-component-control-row input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--chemfig-primary);
-  cursor: pointer;
-  transition: transform var(--chemfig-transition-fast);
-}
-.chemfig-component-control-row input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-.chemfig-component-control-row .chemfig-value {
-  font-size: 11px;
-  color: var(--text-normal);
-  font-family: var(--chemfig-font-mono);
-  min-width: 40px;
-  text-align: right;
-}
-
-/* ---------- 放大预览模态框 ---------- */
-.chemfig-zoom-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
   height: 100%;
-  z-index: 999999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: zoom-out;
-}
-.chemfig-zoom-container {
-  max-width: 90vw;
-  max-height: 90vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--chemfig-space-md);
-}
-.chemfig-zoom-image-wrapper {
-  position: relative;
-  max-width: 100%;
-  max-height: 80vh;
-  overflow: hidden;
-  border-radius: var(--chemfig-radius-lg);
-  box-shadow: var(--chemfig-shadow-xl);
-  background: white;
-  padding: var(--chemfig-space-lg);
-}
-.chemfig-zoom-image-wrapper img,
-.chemfig-zoom-image-wrapper svg {
-  max-width: 100%;
-  max-height: 75vh;
-  object-fit: contain;
-  display: block;
-  transition: transform var(--chemfig-transition-fast);
-  cursor: grab;
-}
-.chemfig-zoom-image-wrapper img:active,
-.chemfig-zoom-image-wrapper svg:active {
-  cursor: grabbing;
-}
-.chemfig-zoom-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--chemfig-space-sm);
-  padding: var(--chemfig-space-sm) var(--chemfig-space-md);
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
-  border-radius: 999px;
-  box-shadow: var(--chemfig-shadow-lg);
-}
-.chemfig-zoom-toolbar button {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background var(--chemfig-transition-fast), transform var(--chemfig-transition-fast);
-}
-.chemfig-zoom-toolbar button:hover {
-  background: rgba(255,255,255,0.2);
-  transform: scale(1.1);
-}
-.chemfig-zoom-scale {
-  color: white;
-  font-size: 13px;
-  font-weight: 500;
-  min-width: 50px;
-  text-align: center;
-  font-family: var(--chemfig-font-mono);
-}
-.chemfig-zoom-bg-switcher {
-  display: flex;
-  gap: var(--chemfig-space-xs);
-}
-.chemfig-zoom-bg-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.3);
-  cursor: pointer;
-  transition: border-color var(--chemfig-transition-fast), transform var(--chemfig-transition-fast);
-}
-.chemfig-zoom-bg-btn:hover {
-  transform: scale(1.15);
-}
-.chemfig-zoom-bg-btn.active {
-  border-color: white;
-  transform: scale(1.15);
+  background: var(--chemfig-bg-1);
+  border-right: 1px solid var(--chemfig-bg-3);
 }
 
-/* ---------- 错误提示 ---------- */
-.chemfig-error-box {
-  padding: var(--chemfig-space-md);
-  background: color-mix(in srgb, var(--chemfig-error) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--chemfig-error) 30%, transparent);
-  border-radius: var(--chemfig-radius-md);
-  margin: var(--chemfig-space-md) 0;
-}
-.chemfig-error-title {
-  color: var(--chemfig-error);
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: var(--chemfig-space-xs);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.chemfig-error-content {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-family: var(--chemfig-font-mono);
-  white-space: pre-wrap;
-  max-height: 150px;
-  overflow: auto;
-  background: var(--background-primary);
-  padding: var(--chemfig-space-sm);
-  border-radius: var(--chemfig-radius-sm);
+.chemfig-sidebar-header {
+  padding: var(--chemfig-space-4);
+  border-bottom: 1px solid var(--chemfig-bg-3);
 }
 
-/* ---------- 状态徽章 ---------- */
-.chemfig-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 500;
-}
-.chemfig-status-badge.success {
-  background: color-mix(in srgb, var(--chemfig-success) 15%, transparent);
-  color: var(--chemfig-success);
-}
-.chemfig-status-badge.warning {
-  background: color-mix(in srgb, var(--chemfig-warning) 15%, transparent);
-  color: var(--chemfig-warning);
-}
-.chemfig-status-badge.error {
-  background: color-mix(in srgb, var(--chemfig-error) 15%, transparent);
-  color: var(--chemfig-error);
-}
-.chemfig-status-badge.info {
-  background: color-mix(in srgb, var(--chemfig-info) 15%, transparent);
-  color: var(--chemfig-info);
-}
-
-/* ---------- 全局图片放大拦截 ---------- */
-.markdown-source-view img,
-.markdown-source-view svg,
-.markdown-source-view canvas,
-.markdown-preview-view img,
-.markdown-preview-view svg,
-.markdown-preview-view canvas {
-  pointer-events: none !important;
-  -webkit-user-drag: none !important;
-  user-select: none !important;
-}
-
-/* 排除: 插件自身模态框和编辑器中的图片恢复事件 */
-.chemfig-edit-modal img,
-.chemfig-edit-modal svg,
-.chemfig-edit-modal canvas,
-.modal-container img,
-.modal-container svg,
-.modal-container canvas,
-.group-layout-modal img,
-.group-layout-modal svg,
-.group-layout-modal canvas,
-.chemfig-img-toolbar img,
-.chemfig-img-toolbar svg,
-.chemfig-img-toolbar canvas,
-.chemfig-zoom-overlay img,
-.chemfig-zoom-overlay svg,
-.chemfig-zoom-overlay canvas {
-  pointer-events: auto !important;
-}
-
-/* ---------- 编辑模式下图片居中 ---------- */
-.markdown-source-view .image-embed[src*="png_out/"],
-.markdown-source-view .image-embed[src*="svg_out/"],
-.markdown-preview-view .image-embed[src*="png_out/"],
-.markdown-preview-view .image-embed[src*="svg_out/"] {
-  display: block !important;
-  margin: var(--chemfig-space-lg) auto !important;
-  text-align: center !important;
-}
-
-/* 隐藏 Obsidian 原生图片工具栏 */
-.markdown-source-view .image-embed[src*="png_out/"] ~ .image-embed-controls,
-.markdown-source-view .image-embed[src*="svg_out/"] ~ .image-embed-controls,
-.chemfig-img-wrapper .image-embed-controls,
-.chemfig-png-wrapper .image-embed-controls {
-  display: none !important;
-}
-
-/* ---------- 加载动画 ---------- */
-.chemfig-loading {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--chemfig-space-sm);
-  color: var(--text-muted);
-  font-size: 13px;
-}
-.chemfig-loading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--background-modifier-border);
-  border-top-color: var(--chemfig-primary);
-  border-radius: 50%;
-  animation: chemfig-spin 0.8s linear infinite;
-}
-@keyframes chemfig-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ---------- 滚动条美化 ---------- */
-.chemfig-template-list::-webkit-scrollbar,
-.chemfig-code-area textarea::-webkit-scrollbar,
-.chemfig-preview-area::-webkit-scrollbar {
-  width: 6px;
-}
-.chemfig-template-list::-webkit-scrollbar-track,
-.chemfig-code-area textarea::-webkit-scrollbar-track,
-.chemfig-preview-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-.chemfig-template-list::-webkit-scrollbar-thumb,
-.chemfig-code-area textarea::-webkit-scrollbar-thumb,
-.chemfig-preview-area::-webkit-scrollbar-thumb {
-  background: var(--background-modifier-border);
-  border-radius: 3px;
-}
-.chemfig-template-list::-webkit-scrollbar-thumb:hover,
-.chemfig-code-area textarea::-webkit-scrollbar-thumb:hover,
-.chemfig-preview-area::-webkit-scrollbar-thumb:hover {
-  background: var(--text-faint);
-}
-
-/* ---------- 响应式 ---------- */
-@media (max-width: 768px) {
-  .chemfig-modal-body {
-    flex-direction: column;
-  }
-  .chemfig-editor-panel {
-    border-right: none;
-    border-bottom: 1px solid var(--background-modifier-border);
-    max-height: 40%;
-  }
-  .chemfig-template-panel {
-    width: 100%;
-    max-height: 150px;
-    border-right: none;
-    border-bottom: 1px solid var(--background-modifier-border);
-  }
-}
-
-/* ============================================================
-   分子画布编辑器 (OpenChemLib CanvasEditor, v10.15.0)
-   ============================================================ */
-.molecule-editor-modal .molecule-editor-canvas {
-  height: 520px;
-  min-height: 400px;
-  width: 100%;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  margin-bottom: 10px;
-  overflow: hidden;
-  flex-shrink: 0;
-  /* v10.15.9: 井字格背景 */
-  background-color: #fafafa;
-  background-image: 
-    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-.molecule-editor-modal .molecule-editor-status {
-  min-height: 1.4em;
-  margin-bottom: 10px;
-  font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
-}
-.molecule-editor-modal .molecule-editor-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-}
-.molecule-editor-modal .molecule-editor-search {
-  margin-top: 12px;
-}
-.molecule-editor-modal .molecule-editor-help {
-  margin-top: 12px;
-  padding: 8px 10px;
-  font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
-  background: var(--background-secondary);
-  border-radius: 6px;
-}
-
-/* smiles 代码块与化学式搜索 (v10.15.0) */
-.chemfig-hint {
-  padding: 8px;
-  color: var(--text-muted);
-  font-size: 12px;
-  border: 1px dashed var(--background-modifier-border);
-  border-radius: 4px;
-}
-.smiles-render-wrapper svg {
-  max-width: 100%;
-  height: auto;
-}
-.smiles-search-modal .smiles-search-actions {
-  margin-top: 6px;
-}
-
-/* 分子编辑器面包屑导航 + 面板 (v0.1.0) */
-.molecule-editor-breadcrumb {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 2px;
-  padding: 6px 8px;
-  margin-bottom: 8px;
-  background: var(--background-secondary);
-  border-radius: 6px;
-  font-size: 13px;
-}
-.molecule-editor-crumb {
-  cursor: pointer;
-  color: var(--text-accent);
-  padding: 3px 8px;
-  border-radius: 5px;
-}
-.molecule-editor-crumb:hover { background: var(--background-modifier-hover); }
-.molecule-editor-crumb.active {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  font-weight: 600;
-}
-.molecule-editor-hint {
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-.molecule-editor-lib-cat {
-  margin: 10px 0 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-normal);
-}
-.molecule-editor-lib-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.molecule-editor-lib-btn {
-  padding: 6px 12px;
-  font-size: 12.5px;
-  cursor: pointer;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 5px;
-}
-.molecule-editor-lib-btn:hover { background: var(--background-modifier-hover); }
-
-/* 分子编辑器: 画布界面内联片段库/搜索/示例 (v0.4.0) */
-.molecule-editor-modal .molecule-editor-section-title {
-  margin: 14px 0 6px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-normal);
-}
-.molecule-editor-modal .molecule-editor-lib-cat {
-  margin: 8px 0 4px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-.molecule-editor-examples {
-  margin-top: 14px;
-  padding: 8px 10px;
-  background: var(--background-secondary);
-  border-radius: 6px;
-  border: 1px solid var(--background-modifier-border);
-}
-.molecule-editor-examples summary {
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-accent);
-}
-.molecule-editor-examples-body {
-  margin-top: 8px;
-  font-size: 12.5px;
-  color: var(--text-normal);
-}
-.molecule-editor-examples-body p { margin: 6px 0; }
-.molecule-editor-example-btn {
-  padding: 6px 12px;
-  font-size: 12.5px;
-  cursor: pointer;
-  background: var(--interactive-normal);
-  color: var(--text-normal);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 5px;
-}
-.molecule-editor-example-btn:hover { background: var(--interactive-hover); }
-
-/* 分子编辑器: 两栏布局 (左画布工作区 + 右片段库) 与命名模块 */
-.molecule-editor-modal .molecule-editor-columns {
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-  height: 78vh;
-}
-.molecule-editor-modal .molecule-editor-main {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 4px;
-}
-.molecule-editor-modal .molecule-editor-sidebar {
-  flex: 0 0 260px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 6px 8px;
-  background: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-}
-/* v10.15.2: 片段库列表独立滚动 */
-.molecule-editor-sidebar .molecule-lib-list {
+.chemfig-sidebar-body {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding: 4px;
 }
-.molecule-editor-modal .molecule-editor-sidebar .molecule-editor-lib-grid {
+
+.chemfig-sidebar-footer {
+  padding: var(--chemfig-space-3);
+  border-top: 1px solid var(--chemfig-bg-3);
+}
+
+/* ---------- 工具栏 ---------- */
+.chemfig-toolbar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-.molecule-editor-modal .molecule-editor-sidebar .molecule-editor-lib-btn {
-  padding: 5px 9px;
-  font-size: 12px;
-  flex: 0 1 auto;
-  white-space: nowrap;
-}
-.molecule-editor-modal .molecule-editor-name-bar {
-  display: flex;
-  gap: 8px;
   align-items: center;
-  margin: 6px 0 8px;
-}
-.molecule-editor-modal .molecule-editor-name-bar select {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.molecule-editor-modal .molecule-editor-name-result {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-accent);
-  min-height: 18px;
-  margin-bottom: 4px;
+  gap: var(--chemfig-space-2);
+  padding: var(--chemfig-space-2) var(--chemfig-space-3);
+  background: var(--chemfig-bg-1);
+  border-bottom: 1px solid var(--chemfig-bg-3);
 }
 
-/* ============================================================
-   v10.15.0: 参考 cssbuttons.io / codemyui.com 的现代动画效果
-   ============================================================ */
-
-/* ---------- 关键帧动画 ---------- */
-
-/* 渐变流动 */
-@keyframes chemfig-gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* 霓虹呼吸 */
-@keyframes chemfig-neon-pulse {
-  0%, 100% { box-shadow: 0 0 5px var(--chemfig-primary), 0 0 10px var(--chemfig-primary); }
-  50% { box-shadow: 0 0 15px var(--chemfig-primary), 0 0 30px var(--chemfig-primary); }
-}
-
-/* 波纹扩散 */
-@keyframes chemfig-ripple {
-  0% { transform: scale(0); opacity: 0.6; }
-  100% { transform: scale(4); opacity: 0; }
-}
-
-/* 浮动 */
-@keyframes chemfig-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-/* 淡入上滑 */
-@keyframes chemfig-fade-in-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 加载旋转 */
-@keyframes chemfig-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* 边框流光 */
-@keyframes chemfig-border-glow {
-  0%, 100% { border-color: var(--chemfig-primary); }
-  50% { border-color: var(--interactive-accent-hover); }
-}
-
-/* ---------- 侧边栏按钮增强（参考cssbuttons.io） ---------- */
-
-/* 模板按钮：霓虹发光 + 微上浮 */
-.chemfig-sidebar-template-btn {
-  position: relative;
-  overflow: hidden;
-  transition: all var(--chemfig-transition-fast);
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
-  border-radius: var(--chemfig-radius-sm);
-}
-.chemfig-sidebar-template-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: var(--chemfig-primary);
-  opacity: 0.15;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s ease, height 0.3s ease;
-}
-.chemfig-sidebar-template-btn:hover {
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.2);
-  transform: translateY(-1px);
-}
-.chemfig-sidebar-template-btn:hover::before {
-  width: 120px;
-  height: 120px;
-}
-.chemfig-sidebar-template-btn:active {
-  transform: translateY(0) scale(0.98);
-  transition-duration: 50ms;
-}
-
-/* 二级分类按钮：玻璃态 + 渐变 */
-.chemfig-sidebar-subcat-btn {
-  position: relative;
-  overflow: hidden;
-  transition: all var(--chemfig-transition-normal);
-  backdrop-filter: blur(8px);
-  background: linear-gradient(135deg, 
-    var(--background-secondary) 0%, 
-    var(--background-primary) 100%);
-  background-size: 200% 200%;
-}
-.chemfig-sidebar-subcat-btn:hover {
-  background-position: 100% 50%;
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
-  transform: translateY(-2px);
-}
-.chemfig-sidebar-subcat-btn:active {
-  transform: translateY(0) scale(0.97);
-}
-
-/* 操作按钮：3D按压效果 */
-.chemfig-sidebar-action-btn {
-  position: relative;
-  overflow: hidden;
-  transition: all var(--chemfig-transition-fast);
-  border-radius: var(--chemfig-radius-md);
-}
-.chemfig-sidebar-action-btn:hover {
-  box-shadow: var(--chemfig-shadow-md);
-  transform: translateY(-1px);
-}
-.chemfig-sidebar-action-btn:active {
-  transform: translateY(1px);
-  box-shadow: var(--chemfig-shadow-sm);
-  transition-duration: 50ms;
-}
-
-/* ---------- 面包屑导航增强 ---------- */
-.chemfig-breadcrumb-item {
-  transition: all var(--chemfig-transition-fast);
-  position: relative;
-}
-.chemfig-breadcrumb-item:hover {
-  background: var(--background-modifier-hover);
-  padding: 2px 10px;
-}
-
-/* ---------- 搜索框增强 ---------- */
-.chemfig-sidebar-search-input {
-  transition: all var(--chemfig-transition-fast);
-}
-.chemfig-sidebar-search-input:focus {
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-  outline: none;
-}
-
-/* ---------- 模态框/编辑器淡入动画 ---------- */
-.chemfig-editor-modal,
-.chemfig-group-layout-modal,
-.chemfig-zoom-overlay {
-  animation: chemfig-fade-in-up 0.2s ease-out;
-}
-
-/* ---------- 加载动画 ---------- */
-.chemfig-loading-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--background-modifier-border);
-  border-top-color: var(--chemfig-primary);
-  border-radius: 50%;
-  animation: chemfig-spin 0.8s linear infinite;
-}
-
-/* ---------- 组分调整组件动画 ---------- */
-.chemfig-group-component {
-  transition: all var(--chemfig-transition-fast);
-}
-.chemfig-group-component:hover {
-  box-shadow: 0 0 0 2px var(--chemfig-primary);
-}
-
-/* ---------- 成功/错误提示动画 ---------- */
-@keyframes chemfig-slide-in-right {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-/* ---------- 编译成功发光效果 ---------- */
-.chemfig-compile-success {
-  animation: chemfig-neon-pulse 2s ease-in-out infinite;
-}
-
-/* ---------- 减少动画偏好适配 ---------- */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ============================================================
-   v10.15.1: 分子编辑器片段库 - 面包屑+列表展开模式
-   ============================================================ */
-
-/* 搜索框 */
-.molecule-lib-search {
-  width: 100%;
-  padding: 6px 10px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-sm);
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-  margin-bottom: 8px;
-  box-sizing: border-box;
-  transition: all var(--chemfig-transition-fast);
-}
-.molecule-lib-search:focus {
-  outline: none;
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
-}
-
-/* 面包屑导航 */
-.molecule-lib-breadcrumb {
+.chemfig-toolbar-group {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 2px;
-  font-size: 11px;
-  margin-bottom: 8px;
-  padding: 4px 6px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-sm);
-  min-height: 22px;
+  gap: var(--chemfig-space-1);
+  padding-right: var(--chemfig-space-3);
+  border-right: 1px solid var(--chemfig-bg-3);
 }
 
-/* 列表容器 */
-.molecule-lib-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 4px;
+.chemfig-toolbar-group:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+/* ---------- 面包屑导航 ---------- */
+.chemfig-breadcrumb {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-/* 分类按钮（一级） */
-.molecule-lib-list button {
-  transition: all var(--chemfig-transition-fast);
-}
-.molecule-lib-list button:hover {
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 1px 4px rgba(124, 58, 237, 0.1);
-}
-
-/* ============================================================
-   v10.15.6 现代化美化 - 参考 codemyui.com / cssbuttons.io
-   设计风格: 玻璃拟态 + 渐变按钮 + 微交互动效
-   ============================================================ */
-
-/* ---------- 增强设计变量 ---------- */
-:root {
-  /* 玻璃拟态 */
-  --chemfig-glass-bg: rgba(255, 255, 255, 0.08);
-  --chemfig-glass-border: rgba(255, 255, 255, 0.12);
-  --chemfig-glass-blur: 12px;
-
-  /* 渐变按钮 */
-  --chemfig-gradient-primary: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
-  --chemfig-gradient-primary-hover: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
-  --chemfig-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --chemfig-gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-
-  /* 动效曲线 */
-  --chemfig-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --chemfig-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* 增强阴影 */
-  --chemfig-shadow-glow: 0 0 20px rgba(124, 58, 237, 0.3);
-  --chemfig-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-/* ---------- 按钮现代化美化 (参考 cssbuttons.io) ---------- */
-.chemfig-btn {
-  position: relative;
-  overflow: hidden;
-  transition: all var(--chemfig-transition-normal);
-  transform: translateY(0);
-}
-
-.chemfig-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.chemfig-btn:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.chemfig-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--chemfig-shadow-md);
-}
-
-.chemfig-btn:active {
-  transform: translateY(0);
-  transition: all 0.1s;
-}
-
-.chemfig-btn-primary {
-  background: var(--chemfig-gradient-primary);
-  border: none;
-  color: white;
-  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.3);
-}
-
-.chemfig-btn-primary:hover {
-  background: var(--chemfig-gradient-primary-hover);
-  box-shadow: var(--chemfig-shadow-glow);
-  transform: translateY(-2px);
-}
-
-.chemfig-btn-danger {
-  background: var(--chemfig-gradient-danger);
-  border: none;
-  color: white;
-}
-
-/* ---------- 卡片/面板玻璃拟态美化 ---------- */
-.chemfig-sidebar-view,
-.chemfig-edit-modal {
-  backdrop-filter: blur(var(--chemfig-glass-blur));
-  -webkit-backdrop-filter: blur(var(--chemfig-glass-blur));
-}
-
-.chemfig-sidebar-header,
-.chemfig-modal-header {
-  background: var(--chemfig-glass-bg);
-  border-bottom: 1px solid var(--chemfig-glass-border);
-}
-
-/* ---------- 模板卡片美化 ---------- */
-.chemfig-template-item,
-.chemfig-sidebar-subcat-btn,
-.molecule-lib-list button {
-  transition: all var(--chemfig-transition-normal);
-  position: relative;
-  overflow: hidden;
-}
-
-.chemfig-template-item:hover,
-.chemfig-sidebar-subcat-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--chemfig-shadow-card);
-  border-color: var(--chemfig-primary);
-}
-
-.chemfig-template-item:active,
-.chemfig-sidebar-subcat-btn:active {
-  transform: translateY(0);
-}
-
-/* ---------- 模式切换按钮美化 ---------- */
-.chemfig-mode-bar button {
-  transition: all var(--chemfig-transition-normal);
-  position: relative;
-}
-
-.chemfig-mode-bar button.active {
-  background: var(--chemfig-gradient-primary);
-  color: white;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
-  transform: scale(1.02);
-}
-
-/* ---------- 侧边栏操作按钮美化 ---------- */
-.chemfig-sidebar-action-btn {
-  transition: all var(--chemfig-transition-normal);
-  position: relative;
-  overflow: hidden;
-}
-
-.chemfig-sidebar-action-btn:hover {
-  transform: translateX(2px);
-  border-color: var(--chemfig-primary);
-  background: var(--chemfig-glass-bg);
-}
-
-/* ---------- 图片容器美化 ---------- */
-.chemfig-png-wrapper,
-.miktex-svg-container {
-  transition: all var(--chemfig-transition-normal);
-}
-
-.chemfig-png-wrapper:hover,
-.miktex-svg-container:hover {
-  transform: scale(1.01);
-  box-shadow: var(--chemfig-shadow-card);
-}
-
-/* ---------- 浮动工具栏美化 ---------- */
-.chemfig-img-toolbar {
-  backdrop-filter: blur(var(--chemfig-glass-blur));
-  -webkit-backdrop-filter: blur(var(--chemfig-glass-blur));
-  background: var(--chemfig-glass-bg);
-  border: 1px solid var(--chemfig-glass-border);
-  box-shadow: var(--chemfig-shadow-md);
-}
-
-.chemfig-img-toolbar button {
-  transition: all var(--chemfig-transition-fast);
-}
-
-.chemfig-img-toolbar button:hover {
-  transform: scale(1.1);
-  background: var(--chemfig-primary);
-  color: white;
-}
-
-/* ---------- 面包屑导航美化 ---------- */
-.chemfig-sidebar-breadcrumb {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 2px;
-  padding: 6px 0;
-  margin-bottom: 8px;
-  font-size: 12px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-  scrollbar-width: thin;
-}
-.chemfig-sidebar-breadcrumb::-webkit-scrollbar {
-  height: 4px;
-}
-.chemfig-sidebar-breadcrumb::-webkit-scrollbar-thumb {
-  background: var(--background-modifier-border);
-  border-radius: 2px;
+  align-items: center;
+  gap: var(--chemfig-space-2);
+  padding: var(--chemfig-space-2) var(--chemfig-space-3);
+  font-size: var(--chemfig-text-sm);
+  color: var(--chemfig-text-2);
 }
 
 .chemfig-breadcrumb-item {
-  transition: all var(--chemfig-transition-fast);
-  border-radius: var(--chemfig-radius-sm);
-  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  gap: var(--chemfig-space-1);
+  cursor: pointer;
+  transition: color var(--chemfig-duration-fast) var(--chemfig-ease);
 }
 
 .chemfig-breadcrumb-item:hover {
-  background: var(--chemfig-primary);
-  color: white;
-  transform: translateY(-1px);
+  color: var(--chemfig-primary);
 }
 
-/* ---------- 搜索框美化 ---------- */
-.chemfig-template-search input,
-.chemfig-sidebar-search-input {
-  transition: all var(--chemfig-transition-normal);
+.chemfig-breadcrumb-item.active {
+  color: var(--chemfig-primary);
+  font-weight: 500;
 }
 
-.chemfig-template-search input:focus,
-.chemfig-sidebar-search-input:focus {
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
-  outline: none;
+.chemfig-breadcrumb-separator {
+  color: var(--chemfig-text-3);
 }
 
-/* ---------- 模态框动画 ---------- */
-.chemfig-edit-modal .modal-bg {
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  animation: chemfig-fadeIn 0.2s ease;
-}
+/* ============================================================
+   3. 动画效果
+   ============================================================ */
 
-.chemfig-edit-modal .modal {
-  animation: chemfig-slideUp 0.3s var(--chemfig-ease-smooth);
-}
-
-@keyframes chemfig-fadeIn {
+@keyframes chemfig-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes chemfig-slideUp {
+@keyframes chemfig-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes chemfig-slide-up {
   from {
     opacity: 0;
     transform: translateY(20px) scale(0.98);
@@ -1471,9 +483,26 @@
   }
 }
 
-/* ---------- 加载动画 ---------- */
-.chemfig-loading-spinner {
-  animation: chemfig-spin 1s linear infinite;
+@keyframes chemfig-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chemfig-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes chemfig-spin {
@@ -1481,1621 +510,291 @@
   to { transform: rotate(360deg); }
 }
 
-/* ---------- 预览区域美化 ---------- */
-.chemfig-preview-area {
-  background: var(--chemfig-glass-bg);
-  border: 1px solid var(--chemfig-glass-border);
-  transition: all var(--chemfig-transition-normal);
-}
-
-.chemfig-preview-area:hover {
-  box-shadow: inset 0 0 20px rgba(124, 58, 237, 0.05);
-}
-
-/* ---------- 暗色模式适配 ---------- */
-.theme-dark :root {
-  --chemfig-glass-bg: rgba(0, 0, 0, 0.2);
-  --chemfig-glass-border: rgba(255, 255, 255, 0.08);
-  --chemfig-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* ---------- 滚动条美化 ---------- */
-.chemfig-sidebar-view ::-webkit-scrollbar,
-.chemfig-template-panel ::-webkit-scrollbar {
-  width: 6px;
-}
-
-.chemfig-sidebar-view ::-webkit-scrollbar-track,
-.chemfig-template-panel ::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.chemfig-sidebar-view ::-webkit-scrollbar-thumb,
-.chemfig-template-panel ::-webkit-scrollbar-thumb {
-  background: var(--background-modifier-border);
-  border-radius: 3px;
-}
-
-.chemfig-sidebar-view ::-webkit-scrollbar-thumb:hover,
-.chemfig-template-panel ::-webkit-scrollbar-thumb:hover {
-  background: var(--chemfig-primary);
-}
-
-/* ---------- 组分调整画布美化 ---------- */
-.group-layout-modal canvas {
-  border-radius: var(--chemfig-radius-md);
-  box-shadow: var(--chemfig-shadow-card);
-  transition: box-shadow var(--chemfig-transition-normal);
-}
-
-.group-layout-modal canvas:hover {
-  box-shadow: var(--chemfig-shadow-glow);
-}
-
-/* ---------- 状态徽章美化 ---------- */
-.chemfig-status-badge {
-  transition: all var(--chemfig-transition-fast);
-  backdrop-filter: blur(var(--chemfig-glass-blur));
-}
-
-.chemfig-status-badge:hover {
-  transform: scale(1.05);
-}
-
-/* ---------- 可访问性: 减少动效 ---------- */
-@media (prefers-reduced-motion: reduce) {
-  .chemfig-btn,
-  .chemfig-template-item,
-  .chemfig-sidebar-action-btn,
-  .chemfig-png-wrapper,
-  .miktex-svg-container,
-  .chemfig-mode-bar button {
-    transition: none !important;
-    transform: none !important;
-  }
-
-  .chemfig-edit-modal .modal-bg,
-  .chemfig-edit-modal .modal {
-    animation: none !important;
-  }
-}
-
-/* ============================================================
-   v10.15.1: OCL 分子编辑器工具栏优化
-   ============================================================ */
-
-/* 工具栏整体容器 */
-.molecule-editor-canvas .ocl-editor__toolbar,
-.molecule-editor-canvas [class*="toolbar"] {
-  background: var(--background-secondary) !important;
-  border-right: 1px solid var(--background-modifier-border) !important;
-  padding: 8px 4px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 4px !important;
-}
-
-/* 工具栏按钮 */
-.molecule-editor-canvas .ocl-editor__toolbar button,
-.molecule-editor-canvas [class*="toolbar"] button,
-.molecule-editor-canvas [class*="toolbar"] [class*="tool"] {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: var(--chemfig-radius-sm) !important;
-  border: 1px solid transparent !important;
-  background: transparent !important;
-  transition: all var(--chemfig-transition-fast) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  padding: 4px !important;
-}
-
-/* 工具栏按钮悬停 */
-.molecule-editor-canvas .ocl-editor__toolbar button:hover,
-.molecule-editor-canvas [class*="toolbar"] button:hover,
-.molecule-editor-canvas [class*="toolbar"] [class*="tool"]:hover {
-  background: var(--background-modifier-hover) !important;
-  border-color: var(--chemfig-primary) !important;
-  transform: scale(1.05) !important;
-}
-
-/* 工具栏按钮选中状态 */
-.molecule-editor-canvas .ocl-editor__toolbar button.active,
-.molecule-editor-canvas [class*="toolbar"] button.active,
-.molecule-editor-canvas [class*="toolbar"] [class*="tool"].active,
-.molecule-editor-canvas [class*="toolbar"] [class*="tool"][class*="selected"] {
-  background: var(--chemfig-primary) !important;
-  border-color: var(--chemfig-primary-hover) !important;
-  color: white !important;
-  box-shadow: 0 0 8px rgba(124, 58, 237, 0.3) !important;
-}
-
-/* 工具栏分组分隔 */
-.molecule-editor-canvas .ocl-editor__toolbar [class*="separator"],
-.molecule-editor-canvas [class*="toolbar"] [class*="separator"] {
-  width: 80% !important;
-  height: 1px !important;
-  background: var(--background-modifier-border) !important;
-  margin: 4px auto !important;
-}
-
-/* ========== v10.15.11: 新增动画效果 ========== */
-
-/* 模态框淡入动画 */
-.modal.chemfig-modal {
-  animation: chemfig-modal-fade-in 0.25s ease-out;
-}
-
-@keyframes chemfig-modal-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* 按钮点击波纹效果 */
-.chemfig-btn-ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.chemfig-btn-ripple::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.4s, height 0.4s;
-}
-
-.chemfig-btn-ripple:active::after {
-  width: 200px;
-  height: 200px;
-}
-
-/* 卡片悬浮效果 */
-.chemfig-card {
-  transition: all 0.2s ease;
-}
-
-.chemfig-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* 加载旋转动画 */
-.chemfig-spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--background-modifier-border);
-  border-top-color: var(--chemfig-primary);
-  border-radius: 50%;
-  animation: chemfig-spin 0.8s linear infinite;
-}
-
-@keyframes chemfig-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* 片段库条目进入动画 */
-.molecule-lib-list > div,
-.molecule-lib-list > button {
-  animation: chemfig-slide-in 0.2s ease-out;
-}
-
-@keyframes chemfig-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* 面包屑导航激活状态 */
-.chemfig-breadcrumb-item.active {
-  color: var(--text-normal);
-  font-weight: 600;
-}
-
-/* 工具栏 tooltip 动画 */
-.chemfig-tooltip {
-  animation: chemfig-tooltip-fade 0.15s ease-out;
-}
-
-@keyframes chemfig-tooltip-fade {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 命名索引管理面板动画 */
-.chemfig-name-index-manager > div {
-  animation: chemfig-fade-in 0.2s ease-out;
-}
-
-@keyframes chemfig-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* 命名索引条目收藏星标动画 */
-.chemfig-fav-star {
-  transition: transform 0.2s ease;
-}
-
-.chemfig-fav-star:hover {
-  transform: scale(1.2);
-}
-
-.chemfig-fav-star.active {
-  color: #f59e0b;
-  animation: chemfig-star-pop 0.3s ease-out;
-}
-
-@keyframes chemfig-star-pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-/* 全局图片放大模态框动画 */
-.chemfig-zoom-modal {
-  animation: chemfig-zoom-fade 0.2s ease-out;
-}
-
-@keyframes chemfig-zoom-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.chemfig-zoom-img {
-  animation: chemfig-zoom-in 0.25s ease-out;
-}
-
-@keyframes chemfig-zoom-in {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* 侧边栏面板切换动画 */
-.chemfig-sidebar-view {
-  animation: chemfig-sidebar-slide 0.2s ease-out;
-}
-
-@keyframes chemfig-sidebar-slide {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* ========== v10.15.12: 更多动画效果 ========== */
-
-/* 片段库按钮悬停效果 */
-.molecule-lib-list button {
-  transition: all 0.15s ease;
-}
-
-.molecule-lib-list button:hover {
-  transform: translateX(2px);
-  border-color: var(--interactive-accent);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-/* 工具栏按钮激活效果 */
-.chemfig-toolbar-btn.active {
-  box-shadow: 0 0 0 2px var(--interactive-accent);
-}
-
-/* 代码编译区边框动画 */
-.chemfig-code-editor:focus-within {
-  border-color: var(--interactive-accent) !important;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
-}
-
-/* 命名索引条目进入动画 */
-.chemfig-name-index-item {
-  animation: chemfig-item-slide-in 0.2s ease-out;
-}
-
-@keyframes chemfig-item-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 搜索框聚焦效果 */
-.chemfig-search-input:focus {
-  border-color: var(--interactive-accent);
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
-}
-
-/* 模式切换按钮过渡 */
-.chemfig-mode-btn {
-  transition: all 0.2s ease;
-}
-
-.chemfig-mode-btn.active {
-  transform: scale(1.05);
-}
-
-/* 画布加载动画 */
-.chemfig-canvas-loading {
-  animation: chemfig-pulse 1.5s ease-in-out infinite;
-}
-
 @keyframes chemfig-pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
-/* 成功提示动画 */
-.chemfig-success-toast {
-  animation: chemfig-toast-in 0.3s ease-out;
+@keyframes chemfig-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-@keyframes chemfig-toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* 动画工具类 */
+.chemfig-animate-fade-in { animation: chemfig-fade-in var(--chemfig-duration-normal) var(--chemfig-ease); }
+.chemfig-animate-slide-up { animation: chemfig-slide-up var(--chemfig-duration-slow) var(--chemfig-ease-out); }
+.chemfig-animate-scale-in { animation: chemfig-scale-in var(--chemfig-duration-normal) var(--chemfig-ease); }
 
-/* 错误提示动画 */
-.chemfig-error-toast {
-  animation: chemfig-shake 0.4s ease-in-out;
-}
+/* ============================================================
+   4. 加载状态
+   ============================================================ */
 
-@keyframes chemfig-shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
-/* 面包屑导航分隔符 */
-.chemfig-breadcrumb-sep {
-  color: var(--text-faint);
-  margin: 0 4px;
-}
-
-/* 滚动条美化 */
-.chemfig-scrollable::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.chemfig-scrollable::-webkit-scrollbar-track {
-  background: var(--background-secondary);
-  border-radius: 4px;
-}
-
-.chemfig-scrollable::-webkit-scrollbar-thumb {
-  background: var(--background-modifier-border);
-  border-radius: 4px;
-}
-
-.chemfig-scrollable::-webkit-scrollbar-thumb:hover {
-  background: var(--text-faint);
-}
-
-/* ============================================
-   v10.15.13: 自动补全下拉动画
-   ============================================ */
-
-/* 自动补全下拉容器 */
-.molecule-autocomplete {
-  animation: autocomplete-slide-down 0.15s ease-out;
-}
-
-@keyframes autocomplete-slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 自动补全条目 hover 效果 */
-.molecule-autocomplete > div {
-  transition: all 0.15s ease;
-}
-
-/* 搜索框聚焦效果 */
-.molecule-lib-search:focus {
-  outline: none;
-  border-color: var(--interactive-accent);
-  box-shadow: 0 0 0 2px var(--interactive-accent-hover);
-}
-
-/* ============================================
-   v10.15.13: 片段库进入动画
-   ============================================ */
-
-.molecule-lib-list > div,
-.molecule-lib-list button {
-  animation: fragment-item-fade-in 0.2s ease-out backwards;
-}
-
-@keyframes fragment-item-fade-in {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* 片段条目悬停效果增强 */
-.molecule-lib-list button:hover {
-  transform: translateX(4px);
-  border-color: var(--interactive-accent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* ============================================
-   v10.15.13: 按钮波纹效果
-   ============================================ */
-
-.molecule-lib-import-btn {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-.molecule-lib-import-btn:hover {
-  background: var(--background-modifier-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.molecule-lib-import-btn:active {
-  transform: translateY(0);
-}
-
-/* ============================================
-   v10.15.13: 命名索引管理面板动画
-   ============================================ */
-
-.name-index-manager .search-input:focus {
-  outline: none;
-  border-color: var(--interactive-accent);
-  box-shadow: 0 0 0 2px var(--interactive-accent-hover);
-}
-
-.name-index-item {
-  animation: name-item-fade-in 0.25s ease-out backwards;
-}
-
-@keyframes name-item-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ============================================
-   v10.15.13: 模态框动画增强
-   ============================================ */
-
-.chemfig-modal {
-  animation: chemfig-modal-zoom-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes chemfig-modal-zoom-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* 模态框背景淡入 */
-.chemfig-modal-backdrop {
-  animation: chemfig-backdrop-fade-in 0.15s ease-out;
-}
-
-@keyframes chemfig-backdrop-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* ============================================
-   v10.15.13: 加载状态动画
-   ============================================ */
-
-.chemfig-loading-spinner {
-  animation: chemfig-spin 1s linear infinite;
-}
-
-@keyframes chemfig-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 画布加载脉冲效果 */
-.molecule-canvas-loading {
-  animation: canvas-pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes canvas-pulse {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* ============================================
-   v10.15.15: 通用 UI 组件 CSS 类
-   ============================================ */
-
-/* ==== 卡片样式 ==== */
-.card {
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-}
-
-.card-selected {
-  border-color: var(--interactive-accent);
-  box-shadow: 0 0 0 2px var(--interactive-accent);
-}
-
-/* ==== 徽章/标签 ==== */
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 10px;
-  line-height: 1.4;
-}
-
-.badge-primary {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-}
-
-.badge-success {
-  background: var(--green);
-  color: var(--text-on-accent);
-}
-
-.badge-warning {
-  background: var(--yellow);
-  color: var(--text-on-accent);
-}
-
-.badge-danger {
-  background: var(--red);
-  color: var(--text-on-accent);
-}
-
-.badge-muted {
-  background: var(--background-modifier-border);
-  color: var(--text-muted);
-}
-
-/* ==== 按钮变体 ==== */
-.btn-primary {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: 6px;
-  padding: 6px 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-primary:hover {
-  background: var(--interactive-accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn-secondary {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  padding: 6px 16px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-secondary:hover {
-  background: var(--background-modifier-border-hover);
-}
-
-.btn-danger {
-  background: var(--red);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: 6px;
-  padding: 6px 16px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-danger:hover {
-  background: var(--red-rgb, 255, 0, 0);
-  filter: brightness(1.1);
-}
-
-.btn-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.btn-icon:hover {
-  background: var(--background-modifier-hover);
-}
-
-.btn-sm {
-  padding: 4px 10px;
-  font-size: 12px;
-}
-
-/* ==== 布局工具类 ==== */
-.flex {
-  display: flex;
-}
-
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.flex-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.flex-1 {
-  flex: 1;
-}
-
-.gap-2 { gap: 8px; }
-.gap-3 { gap: 12px; }
-.gap-4 { gap: 16px; }
-
-.mb-2 { margin-bottom: 8px; }
-.mb-3 { margin-bottom: 12px; }
-.mb-4 { margin-bottom: 16px; }
-
-.mt-2 { margin-top: 8px; }
-.mt-3 { margin-top: 12px; }
-.mt-4 { margin-top: 16px; }
-
-/* ==== 分隔线 ==== */
-.divider {
-  width: 1px;
+.chemfig-spinner {
+  width: 24px;
   height: 24px;
-  background: var(--background-modifier-border);
-}
-
-.divider-horizontal {
-  height: 1px;
-  width: 100%;
-  background: var(--background-modifier-border);
-  margin: 12px 0;
-}
-
-/* ==== 动画类 ==== */
-.fade-in {
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.slide-up {
-  animation: slideUp 0.25s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.scale-in {
-  animation: scaleIn 0.2s ease-out;
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-.bounce {
-  animation: bounce 0.3s ease;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-}
-
-/* ==== 加载状态 ==== */
-.spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--background-modifier-border);
-  border-top-color: var(--interactive-accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ==== 空状态 ==== */
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-muted);
-}
-
-.empty-state-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  opacity: 0.5;
-}
-
-.empty-state-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--text-normal);
-}
-
-.empty-state-hint {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* ==== 工具提示 ==== */
-.tooltip {
-  position: relative;
-}
-
-.tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 4px 8px;
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-  font-size: 12px;
-  border-radius: 4px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-  z-index: 1000;
-}
-
-.tooltip:hover::after {
-  opacity: 1;
-}
-
-/* ==== 表单类 ==== */
-.form-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.form-hint {
-  font-size: 11px;
-  color: var(--text-faint);
-  margin-top: 4px;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.input-group > input {
-  border-radius: 4px 0 0 4px;
-  border-right: none;
-}
-
-.input-group > button {
-  border-radius: 0 4px 4px 0;
-}
-
-/* ==== 标签页 ==== */
-.tabs {
-  display: flex;
-  border-bottom: 1px solid var(--background-modifier-border);
-  margin-bottom: 12px;
-}
-
-.tab {
-  padding: 8px 16px;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s ease;
-  color: var(--text-muted);
-}
-
-.tab:hover {
-  color: var(--text-normal);
-}
-
-.tab-active {
-  color: var(--interactive-accent);
-  border-bottom-color: var(--interactive-accent);
-}
-
-/* ========== v12.0.0: 预设化合物列表 ========== */
-.preset-molecules-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 12px;
-}
-.preset-molecule-item {
-  padding: 12px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.preset-molecule-item:hover {
-  border-color: var(--interactive-accent);
-  background: var(--background-modifier-hover);
-}
-.preset-name {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.preset-smiles {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-family: monospace;
-}
-
-/* ========== v15.3.0: 侧边栏快捷功能按钮组 ========== */
-.chemfig-sidebar-quick-actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin: 12px 0;
-  padding: 10px;
-  background: var(--background-secondary);
-  border-radius: 8px;
-}
-
-.chemfig-quick-action-btn {
-  padding: 8px 10px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-}
-
-.chemfig-quick-action-btn:hover {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.chemfig-quick-action-btn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-/* ========== v15.8.0: 高级动画效果 (学习自 Xtend UI / UI FX Kit) ========== */
-
-/* 卡片翻转动画 (学习自 Carden) */
-.chemfig-flashcard {
-  perspective: 1000px;
-  cursor: pointer;
-}
-
-.chemfig-flashcard-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.chemfig-flashcard.flipped .chemfig-flashcard-inner {
-  transform: rotateY(180deg);
-}
-
-.chemfig-flashcard-front,
-.chemfig-flashcard-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.chemfig-flashcard-front {
-  background: var(--background-secondary);
-  border: 2px solid var(--background-modifier-border);
-}
-
-.chemfig-flashcard-back {
-  background: var(--background-secondary);
-  border: 2px solid var(--interactive-accent);
-  transform: rotateY(180deg);
-}
-
-/* 按钮悬停效果增强 */
-.chemfig-btn-enhanced {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.chemfig-btn-enhanced::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
-}
-
-.chemfig-btn-enhanced:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.chemfig-btn-enhanced:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.chemfig-btn-enhanced:active {
-  transform: translateY(0);
-}
-
-/* 模态框过渡动画增强 */
-.chemfig-modal-enhanced {
-  animation: chemfig-modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes chemfig-modal-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* 片段卡片入场动画 */
-.chemfig-fragment-card-enter {
-  animation: chemfig-card-fade-in-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-@keyframes chemfig-card-fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 加载动画 (学习自 UI FX Kit) */
-.chemfig-loading-dots {
-  display: inline-flex;
-  gap: 4px;
-}
-
-.chemfig-loading-dots span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--interactive-accent);
-  animation: chemfig-bounce 1.4s ease-in-out infinite both;
-}
-
-.chemfig-loading-dots span:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.chemfig-loading-dots span:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes chemfig-bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-
-/* 进度条动画 */
-.chemfig-progress-bar {
-  width: 100%;
-  height: 6px;
-  background: var(--background-modifier-border);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.chemfig-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--interactive-accent), var(--interactive-accent-hover));
-  border-radius: 3px;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.chemfig-progress-fill::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  animation: chemfig-progress-shine 1.5s infinite;
-}
-
-@keyframes chemfig-progress-shine {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-
-/* 悬停发光效果 */
-.chemfig-glow-hover {
-  transition: all 0.3s ease;
-}
-
-.chemfig-glow-hover:hover {
-  box-shadow: 0 0 20px rgba(var(--interactive-accent-rgb, 99, 102, 241), 0.3);
-}
-
-/* 呼吸动画 (用于重要提示) */
-.chemfig-breathe {
-  animation: chemfig-breathe 2s ease-in-out infinite;
-}
-
-@keyframes chemfig-breathe {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-/* 滚动淡入效果 */
-.chemfig-scroll-reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.chemfig-scroll-reveal.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ============================================================
-   v17.1.0 UI 优化 - 学习自 codemyui.com 和 cssbuttons.io
-   ============================================================ */
-
-/* ---------- 高级按钮效果 ---------- */
-
-/* 按钮波纹效果 */
-.chemfig-btn-ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.chemfig-btn-ripple::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
-}
-
-.chemfig-btn-ripple:active::after {
-  width: 300px;
-  height: 300px;
-  opacity: 0;
-}
-
-/* 按钮渐变效果 */
-.chemfig-btn-gradient {
-  background: linear-gradient(135deg, var(--chemfig-primary), #a855f7);
-  border: none;
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.chemfig-btn-gradient:hover {
-  background: linear-gradient(135deg, var(--chemfig-primary-hover), #9333ea);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
-}
-
-.chemfig-btn-gradient:active {
-  transform: translateY(0);
-}
-
-/* 卡片悬停效果 */
-.chemfig-card {
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-lg);
-  padding: var(--chemfig-space-lg);
-  transition: all 0.3s ease;
-}
-
-.chemfig-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--chemfig-shadow-lg);
-  border-color: var(--chemfig-primary);
-}
-
-/* 输入框聚焦效果 */
-.chemfig-input {
-  background: var(--background-primary);
-  border: 2px solid var(--background-modifier-border);
-  border-radius: var(--chemfig-radius-md);
-  padding: var(--chemfig-space-sm) var(--chemfig-space-md);
-  transition: all 0.3s ease;
-}
-
-.chemfig-input:focus {
-  border-color: var(--chemfig-primary);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-  outline: none;
-}
-
-/* 三点加载动画 */
-.chemfig-loading-dots {
-  display: inline-flex;
-  gap: 4px;
-}
-
-.chemfig-loading-dots span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--chemfig-primary);
-  animation: chemfig-bounce 1.4s ease-in-out infinite both;
-}
-
-.chemfig-loading-dots span:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.chemfig-loading-dots span:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes chemfig-bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-
-/* 模态框淡入效果 */
-.chemfig-modal-fade-in {
-  animation: chemfig-fade-in 0.3s ease;
-}
-
-@keyframes chemfig-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* 卡片翻转效果 */
-.chemfig-flip-card {
-  perspective: 1000px;
-}
-
-.chemfig-flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-}
-
-.chemfig-flip-card.flipped .chemfig-flip-card-inner {
-  transform: rotateY(180deg);
-}
-
-.chemfig-flip-card-front,
-.chemfig-flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.chemfig-flip-card-back {
-  transform: rotateY(180deg);
-}
-
-/* 成就徽章效果 */
-.chemfig-achievement-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-  transition: all 0.3s ease;
-}
-
-.chemfig-achievement-badge:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-}
-
-/* 配对正确效果 */
-.chemfig-game-correct {
-  animation: chemfig-correct-pop 0.5s ease;
-}
-
-@keyframes chemfig-correct-pop {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* 配对错误效果 */
-.chemfig-game-wrong {
-  animation: chemfig-wrong-shake 0.5s ease;
-}
-
-@keyframes chemfig-wrong-shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
-
-/* 自定义滚动条 */
-.chemfig-custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.chemfig-custom-scrollbar::-webkit-scrollbar-track {
-  background: var(--background-modifier-border);
-  border-radius: 4px;
-}
-
-.chemfig-custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--chemfig-primary);
-  border-radius: 4px;
-}
-
-.chemfig-custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--chemfig-primary-hover);
-}
-
-/* ============================================================
-   3D 分子查看器 - 加载进度条 (v17.1.0)
-   ============================================================ */
-
-/* 3D 加载容器 */
-.mol3d-loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  min-height: 200px;
-}
-
-/* 加载旋转动画 */
-.mol3d-loading-spinner {
-  margin-bottom: 20px;
-}
-
-.spinner-ring {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--background-modifier-border);
+  border: 2px solid var(--chemfig-bg-3);
   border-top-color: var(--chemfig-primary);
   border-radius: 50%;
   animation: chemfig-spin 0.8s linear infinite;
 }
 
-/* 加载文字 */
-.mol3d-loading-text {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  text-align: center;
+.chemfig-spinner-sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
 }
 
-/* 进度条容器 */
-.mol3d-progress-bar-container {
-  width: 100%;
-  max-width: 300px;
-  height: 8px;
-  background: var(--background-modifier-border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-
-/* 进度条填充 */
-.mol3d-progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--chemfig-primary), #06b6d4);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-  position: relative;
-}
-
-/* 进度条光泽效果 */
-.mol3d-progress-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.chemfig-skeleton {
   background: linear-gradient(
     90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
+    var(--chemfig-bg-2) 25%,
+    var(--chemfig-bg-hover) 50%,
+    var(--chemfig-bg-2) 75%
   );
-  animation: progress-shine 1.5s infinite;
+  background-size: 200% 100%;
+  animation: chemfig-shimmer 1.5s infinite;
+  border-radius: var(--chemfig-radius-sm);
 }
 
-@keyframes progress-shine {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(100%);
-  }
+/* ============================================================
+   5. 分子编辑器特定样式
+   ============================================================ */
+
+/* ---------- 编辑器模态框 ---------- */
+.molecule-editor-modal .modal-content {
+  padding: 0 !important;
+  border-radius: var(--chemfig-radius-xl) !important;
+  overflow: hidden;
 }
 
-/* 进度百分比 */
-.mol3d-progress-percent {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 600;
+.molecule-editor-modal .modal-container {
+  border-radius: var(--chemfig-radius-xl) !important;
 }
 
-/* 3D 错误信息 */
-.mol3d-error {
-  padding: 20px;
-  background: color-mix(in srgb, var(--text-error) 5%, transparent);
-  border: 1px solid var(--text-error);
+/* 编辑器布局 */
+.molecule-editor-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 240px;
+  height: calc(90vh - 60px);
+  overflow: hidden;
+}
+
+/* 左侧片段库 */
+.molecule-editor-sidebar-left {
+  border-right: 1px solid var(--chemfig-bg-3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.molecule-editor-sidebar-left .sidebar-header {
+  padding: var(--chemfig-space-3);
+  border-bottom: 1px solid var(--chemfig-bg-3);
+}
+
+.molecule-editor-sidebar-left .sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--chemfig-space-2);
+}
+
+/* 中间画布区域 */
+.molecule-editor-canvas {
+  position: relative;
+  background: var(--chemfig-bg-2);
+  overflow: hidden;
+}
+
+/* 右侧属性面板 */
+.molecule-editor-sidebar-right {
+  border-left: 1px solid var(--chemfig-bg-3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.molecule-editor-sidebar-right .sidebar-header {
+  padding: var(--chemfig-space-3);
+  border-bottom: 1px solid var(--chemfig-bg-3);
+}
+
+.molecule-editor-sidebar-right .sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--chemfig-space-3);
+}
+
+/* ---------- 片段库卡片 ---------- */
+.fragment-item {
+  padding: var(--chemfig-space-2);
   border-radius: var(--chemfig-radius-md);
-  color: var(--text-normal);
-  font-size: 13px;
-  line-height: 1.6;
+  cursor: pointer;
+  transition: all var(--chemfig-duration-fast) var(--chemfig-ease);
+  border: 1px solid transparent;
 }
 
-/* 原子信息弹窗 */
-.mol3d-atom-info {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
+.fragment-item:hover {
+  background: var(--chemfig-bg-hover);
+  border-color: var(--chemfig-primary);
+}
+
+.fragment-item.active {
+  background: var(--chemfig-primary-light);
+  border-color: var(--chemfig-primary);
+}
+
+.fragment-item-preview {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--chemfig-bg-1);
+  border-radius: var(--chemfig-radius-sm);
+  margin-bottom: var(--chemfig-space-2);
+  overflow: hidden;
+}
+
+.fragment-item-preview svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.fragment-item-name {
+  font-size: var(--chemfig-text-sm);
+  font-weight: 500;
+  text-align: center;
+  color: var(--chemfig-text-1);
+}
+
+/* ============================================================
+   6. 3D 查看器样式
+   ============================================================ */
+
+.molecule-3d-modal .modal-content {
+  padding: 0 !important;
+  border-radius: var(--chemfig-radius-xl) !important;
+}
+
+.molecule-3d-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--chemfig-space-3) var(--chemfig-space-4);
+  background: var(--chemfig-primary);
+  color: white;
+}
+
+.molecule-3d-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--chemfig-space-2);
+  padding: var(--chemfig-space-2) var(--chemfig-space-3);
+  background: var(--chemfig-bg-2);
+  border-bottom: 1px solid var(--chemfig-bg-3);
+  flex-wrap: wrap;
+}
+
+.molecule-3d-viewer-container {
+  flex: 1;
+  min-height: 400px;
+  background: var(--chemfig-bg-2);
+}
+
+.molecule-3d-status-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--chemfig-space-4);
+  padding: var(--chemfig-space-2) var(--chemfig-space-3);
+  background: var(--chemfig-bg-2);
+  border-top: 1px solid var(--chemfig-bg-3);
+  font-size: var(--chemfig-text-sm);
+  color: var(--chemfig-text-2);
+}
+
+/* ============================================================
+   7. 阅读模式样式
+   ============================================================ */
+
+/* 化学公式渲染容器 */
+.chemfig-render-container {
+  display: block;
+  margin: var(--chemfig-space-4) auto;
+  text-align: center;
+  cursor: zoom-in;
   border-radius: var(--chemfig-radius-md);
-  padding: 12px;
-  box-shadow: var(--chemfig-shadow-md);
-  z-index: 100;
-  min-width: 150px;
+  padding: var(--chemfig-space-2);
+  transition: all var(--chemfig-duration-fast) var(--chemfig-ease);
+  border: 1px dashed transparent;
 }
 
-.atom-info-title {
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 4px;
-  color: var(--chemfig-primary);
+.chemfig-render-container:hover {
+  border-color: var(--chemfig-primary);
+  background: var(--chemfig-primary-lighter);
 }
 
-.atom-info-coords {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-family: var(--chemfig-font-mono);
+.chemfig-render-container svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 暗色模式 SVG 反色 */
+.theme-dark .chemfig-render-container svg {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* ============================================================
+   8. 响应式调整
+   ============================================================ */
+
+@media (max-width: 1200px) {
+  .molecule-editor-layout {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .molecule-editor-sidebar-right {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .molecule-editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .molecule-editor-sidebar-left {
+    display: none;
+  }
+
+  .chemfig-modal-content {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+}
+
+/* ============================================================
+   9. 无障碍支持
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 焦点可见性 */
+.chemfig-btn:focus-visible,
+.chemfig-input:focus-visible,
+.chemfig-card:focus-visible {
+  outline: 2px solid var(--chemfig-primary);
+  outline-offset: 2px;
 }

@@ -811,6 +811,34 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 复制测量结果到剪贴板
+   */
+  copyMeasurementsToClipboard() {
+    if (!this.measurements || this.measurements.length === 0) {
+      new Notice("没有测量结果可复制", 2000);
+      return;
+    }
+
+    try {
+      // 生成文本内容
+      let text = "测量结果\n";
+      text += "类型\t原子编号\t数值\t单位\n";
+      this.measurements.forEach((m) => {
+        text += `${m.type}\t${m.atoms.join("-")}\t${m.value}\t${m.unit}\n`;
+      });
+
+      // 复制到剪贴板
+      navigator.clipboard.writeText(text).then(() => {
+        new Notice(`已复制 ${this.measurements.length} 条测量结果`, 2000);
+      }).catch((e) => {
+        new Notice(`复制失败: ${e.message}`, 3000);
+      });
+    } catch (e) {
+      new Notice(`复制失败: ${e.message}`, 3000);
+    }
+  }
+
+  /**
    * 启用距离测量模式
    * 点击两个原子显示距离
    */

@@ -4581,6 +4581,48 @@ class MoleculeEditorModal extends Modal {
             { reagent: "Ac2O", reaction: "羟基保护", product: "AcO-R", note: "水解脱保护" },
           ],
         },
+        {
+          category: "重排反应",
+          reagents: ["H+", "光/热", "碱", "过氧化物"],
+          examples: [
+            { reagent: "H+", reaction: "Pinacol重排", product: "酮", note: "邻二醇重排，基团迁移" },
+            { reagent: "光/热", reaction: "Claisen重排", product: "邻烯丙基酚", note: "烯丙基芳基醚重排" },
+            { reagent: "光/热", reaction: "Cope重排", product: "1,5-二烯", note: "3,3-σ迁移" },
+            { reagent: "碱", reaction: "Wolff重排", product: "烯酮→羧酸", note: "α-重氮酮重排" },
+            { reagent: "过氧化物", reaction: "Baeyer-Villiger氧化", product: "酯/内酯", note: "酮→酯，迁移能力H>叔>仲>苄>伯>甲基" },
+          ],
+        },
+        {
+          category: "卤化反应",
+          reagents: ["Br2/PBr3", "SOCl2", "PCl3", "PCl5", "NBS", "NaBr/H2SO4"],
+          examples: [
+            { reagent: "Br2/PBr3", reaction: "Hell-Volhard-Zelinsky", product: "α-溴代酸", note: "羧酸α-溴代" },
+            { reagent: "SOCl2", reaction: "醇→氯代烷", product: "R-Cl", note: "构型翻转，亚硫酰氯" },
+            { reagent: "PCl3", reaction: "醇→氯代烷", product: "R-Cl", note: "三氯化磷" },
+            { reagent: "PCl5", reaction: "醇→氯代烷", product: "R-Cl", note: "五氯化磷" },
+            { reagent: "NBS", reaction: "烯丙位溴代", product: "烯丙基溴", note: "N-溴代丁二酰亚胺" },
+          ],
+        },
+        {
+          category: "消除反应",
+          reagents: ["KOH/EtOH", "t-BuOK", "H2SO4/Δ", "Al2O3/Δ"],
+          examples: [
+            { reagent: "KOH/EtOH", reaction: "E2消除", product: "烯烃", note: "札伊采夫规则，主要产物为取代多的烯烃" },
+            { reagent: "t-BuOK", reaction: "E2消除", product: "烯烃", note: "霍夫曼规则，主要产物为取代少的烯烃" },
+            { reagent: "H2SO4/Δ", reaction: "醇脱水", product: "烯烃", note: "E1机理，重排可能" },
+            { reagent: "Al2O3/Δ", reaction: "醇脱水", product: "烯烃", note: "气相脱水，无重排" },
+          ],
+        },
+        {
+          category: "金属有机",
+          reagents: ["Mg/Et2O", "n-BuLi", "Gilman试剂", "格氏试剂"],
+          examples: [
+            { reagent: "Mg/Et2O", reaction: "格氏试剂制备", product: "RMgX", note: "无水乙醚溶剂" },
+            { reagent: "n-BuLi", reaction: "锂试剂制备", product: "RLi", note: "无水己烷溶剂" },
+            { reagent: "Gilman试剂", reaction: "二烷基铜锂", product: "R2CuLi", note: "与卤代烃偶联" },
+            { reagent: "格氏试剂", reaction: "与醛酮加成", product: "醇", note: "甲醛→伯醇，醛→仲醇，酮→叔醇" },
+          ],
+        },
       ];
 
       // 搜索框

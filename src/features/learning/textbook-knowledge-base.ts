@@ -1270,6 +1270,29 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
+      {
+        chapter: "第七章 心血管系统药理",
+        sections: [
+          {
+            id: "PHARM-601",
+            title: "抗高血压药",
+            content: "利尿药、ACEI、ARB、β受体阻滞剂、钙通道阻滞剂。",
+            formula: "",
+            mechanism: "利尿药：减少血容量；ACEI：抑制ACE；ARB：阻断AT1受体；β受体阻滞剂：阻断β受体；CCB：阻断钙通道。",
+            conditions: "一线降压药：ACEI/ARB、CCB、利尿剂。联合用药：ACEI+CCB、ACEI+利尿剂。",
+            keywords: ["心血管", "高血压", "ACEI", "CCB", "利尿剂"],
+          },
+          {
+            id: "PHARM-602",
+            title: "抗心律失常药",
+            content: "I类（钠通道阻滞剂）、II类（β受体阻滞剂）、III类（钾通道阻滞剂）、IV类（钙通道阻滞剂）。",
+            formula: "",
+            mechanism: "I类：阻滞钠通道（奎尼丁、利多卡因）；II类：β受体阻滞剂（普萘洛尔）；III类：延长动作电位时程（胺碘酮）；IV类：钙通道阻滞剂（维拉帕米）。",
+            conditions: "利多卡因：室性心律失常；胺碘酮：广谱抗心律失常；维拉帕米：室上性心律失常。",
+            keywords: ["心血管", "心律失常", "奎尼丁", "胺碘酮", "维拉帕米"],
+          },
+        ],
+      },
     ],
   },
 

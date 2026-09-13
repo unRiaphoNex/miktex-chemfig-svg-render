@@ -1244,6 +1244,34 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
+      {
+        chapter: "第八章 重排反应",
+        sections: [
+          {
+            id: "SYNTH-501",
+            title: "重排反应概述",
+            content: "重排反应：分子内原子或基团重新排列的反应。",
+            formula: "",
+            mechanism: "常见重排：Wagner-Meerwein重排（碳正离子重排）、Beckmann重排（肟→酰胺）、Hofmann重排（酰胺→胺）。",
+            conditions: "Wagner-Meerwein：酸催化；Beckmann：酸催化（PCl₅）；Hofmann：Br₂/NaOH。",
+            keywords: ["重排反应", "Wagner-Meerwein", "Beckmann", "Hofmann"],
+          },
+        ],
+      },
+      {
+        chapter: "第九章 环合反应",
+        sections: [
+          {
+            id: "SYNTH-601",
+            title: "环合反应概述",
+            content: "环合反应：形成环状化合物的反应。",
+            formula: "",
+            mechanism: "常见环合：Diels-Alder反应（[4+2]环加成）、Friedel-Crafts环合、分子内亲核取代环合。",
+            conditions: "Diels-Alder：加热，协同反应；Friedel-Crafts：AlCl₃催化。",
+            keywords: ["环合反应", "Diels-Alder", "环加成", "成环"],
+          },
+        ],
+      },
     ],
   },
 

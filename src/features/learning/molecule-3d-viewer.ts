@@ -607,6 +607,17 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 设置背景透明度
+   * @param opacity 0-1
+   */
+  setBackgroundOpacity(opacity) {
+    if (this.container) {
+      // 通过 CSS 控制背景透明度
+      this.container.style.background = `rgba(255, 255, 255, ${opacity})`;
+    }
+  }
+
+  /**
    * 旋转动画
    */
   spin(on = true) {

@@ -18,6 +18,7 @@ class Molecule3DModalViewer {
     this.loadingIndicator = null;
     this.cache = new Map(); // 分子缓存
     this.maxCacheSize = 20; // 最大缓存数量
+    this.measurements = []; // 测量结果存储
   }
 
   /**
@@ -751,6 +752,37 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 导出测量结果（CSV）
+   */
+  exportMeasurements() {
+    if (!this.measurements || this.measurements.length === 0) {
+      new Notice("没有测量结果可导出", 2000);
+      return;
+    }
+
+    try {
+      // 生成 CSV 内容
+      let csv = "类型,原子编号,数值,单位\n";
+      this.measurements.forEach((m, i) => {
+        csv += `${m.type},"${m.atoms.join("-")}",${m.value},${m.unit}\n`;
+      });
+
+      // 创建下载
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "measurements.csv";
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      new Notice(`已导出 ${this.measurements.length} 条测量结果`, 2000);
+    } catch (e) {
+      new Notice(`导出失败: ${e.message}`, 3000);
+    }
+  }
+
+  /**
    * 启用距离测量模式
    * 点击两个原子显示距离
    */
@@ -835,6 +867,14 @@ class Molecule3DModalViewer {
     });
     this.distanceLabels.push(label);
 
+    // 保存测量结果
+    this.measurements.push({
+      type: "距离",
+      atoms: [atom1.index, atom2.index],
+      value: distance.toFixed(2),
+      unit: "Å",
+    });
+
     // 绘制距离线
     this.viewer.addLine({
       start: { x: atom1.x, y: atom1.y, z: atom1.z },
@@ -851,7 +891,15 @@ class Molecule3DModalViewer {
    */
   calculateAndDrawAngle(atom1, atom2, atom3) {
     const angle = this.calculateAngle(atom1, atom2, atom3);
-    
+
+    // 保存测量结果
+    this.measurements.push({
+      type: "角度",
+      atoms: [atom1.index, atom2.index, atom3.index],
+      value: angle.toFixed(1),
+      unit: "°",
+    });
+
     // 在中间原子处显示角度标签
     const label = this.viewer.addLabel(`${angle.toFixed(1)}°`, {
       position: { x: atom2.x, y: atom2.y, z: atom2.z },
@@ -884,7 +932,15 @@ class Molecule3DModalViewer {
    */
   calculateAndDrawDihedral(atom1, atom2, atom3, atom4) {
     const dihedral = this.calculateDihedral(atom1, atom2, atom3, atom4);
-    
+
+    // 保存测量结果
+    this.measurements.push({
+      type: "二面角",
+      atoms: [atom1.index, atom2.index, atom3.index, atom4.index],
+      value: dihedral.toFixed(1),
+      unit: "°",
+    });
+
     // 在中间位置显示二面角标签
     const midX = (atom2.x + atom3.x) / 2;
     const midY = (atom2.y + atom3.y) / 2;

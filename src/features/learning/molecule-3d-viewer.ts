@@ -150,6 +150,26 @@ class Molecule3DModalViewer {
         font-weight: 600;
         color: var(--text-normal);
       }
+
+      /* 原子信息面板 */
+      .atom-info-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 12px;
+        background: var(--background-primary);
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.6;
+        z-index: 100;
+        min-width: 180px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .atom-info-panel div {
+        margin: 2px 0;
+      }
     `;
 
     document.head.appendChild(style);
@@ -175,6 +195,33 @@ class Molecule3DModalViewer {
     }
 
     this.viewer = $3Dmol.createViewer(this.container, viewerConfig);
+
+    // 绑定原子点击事件（非测量模式下显示原子信息）
+    this.viewer.setClickable({}, true, (atom) => {
+      // 如果在测量模式下，不处理（测量模式会覆盖）
+      if (this.measureMode) return;
+
+      // 显示原子信息
+      this.showAtomInfo(atom);
+    });
+  }
+
+  /**
+   * 显示原子信息
+   */
+  showAtomInfo(atom) {
+    // 原子信息面板由 Modal 类管理，这里通过回调通知
+    if (this.onAtomClick) {
+      this.onAtomClick({
+        index: atom.index,
+        element: atom.elem,
+        x: atom.x.toFixed(3),
+        y: atom.y.toFixed(3),
+        z: atom.z.toFixed(3),
+        residue: atom.resn || "-",
+        chain: atom.chain || "-",
+      });
+    }
   }
 
   /**
@@ -1367,6 +1414,18 @@ class Molecule3DModal extends Modal {
     // 初始化 viewer - 使用新版 Molecule3DModalViewer
     this.viewer = new Molecule3DModalViewer(this.viewerContainer);
     await this.viewer.init();
+
+    // 设置原子点击回调
+    this.viewer.onAtomClick = (atom) => {
+      this.infoPanel.show();
+      this.infoPanel.innerHTML = `
+        <div><strong>原子编号:</strong> ${atom.index}</div>
+        <div><strong>元素:</strong> ${atom.element}</div>
+        <div><strong>坐标:</strong> (${atom.x}, ${atom.y}, ${atom.z}) Å</div>
+        <div><strong>残基:</strong> ${atom.residue}</div>
+        <div><strong>链:</strong> ${atom.chain}</div>
+      `;
+    };
 
     // 文件拖拽加载支持
     this.setupDragAndDrop(this.viewerContainer);

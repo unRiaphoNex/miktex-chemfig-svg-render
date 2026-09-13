@@ -1573,6 +1573,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "Diels-Alder：加热，协同反应；Friedel-Crafts：AlCl₃催化。",
             keywords: ["环合反应", "Diels-Alder", "环加成", "成环"],
           },
+          {
+            id: "SYNTH-602",
+            title: "杂环化合物合成",
+            content: "杂环化合物：含杂原子的环状化合物。",
+            formula: "",
+            mechanism: "常见杂环合成：Paal-Knorr合成吡咯、Fischer吲哚合成、Hantzsch吡啶合成。",
+            conditions: "Paal-Knorr：1,4-二酮+胺；Fischer：苯肼+酮；Hantzsch：β-酮酯+醛+氨。",
+            keywords: ["杂环", "Paal-Knorr", "Fischer吲哚", "Hantzsch"],
+          },
         ],
       },
       {

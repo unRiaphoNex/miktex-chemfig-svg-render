@@ -95,7 +95,8 @@ const FILES = [
   "features/update/update-service.ts", // 在线更新服务
   "integrations/ocl-tooltips.ts",     // OpenChemLib 工具栏图标 -> 工具名映射
   "integrations/ocl.bundle.js",       // OpenChemLib (IIFE 全局, 生成产物, 原样拷贝)
-  "integrations/ocl-global-map.js",  // 将 OpenChemLib 映射到 OCL 全局变量
+  "integrations/ocl-global-map.js",
+  "integrations/3dmol-min.js",        // 3Dmol.js (IIFE 全局, 原样拷贝, 不依赖网络)  // 将 OpenChemLib 映射到 OCL 全局变量
   "editors/chemfig-parser.ts",        // 手写 chemfig → 分子图 解析器
   "editors/molecule-editor/css.ts",  // 分子编辑器 CSS 样式
   "editors/molecule-knowledge-index.ts", // 分子编辑器知识库索引面板 (v17.2.0)
@@ -158,3 +159,4 @@ if (process.argv.includes("--watch")) {
 } else {
   buildOnce();
 }
+

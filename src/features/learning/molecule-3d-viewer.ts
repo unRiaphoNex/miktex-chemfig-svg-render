@@ -253,11 +253,9 @@ class Molecule3DModalViewer {
         return;
       }
 
-      const script = document.createElement("script");
-      script.src = "https://3Dmol.org/build/3Dmol-min.js";
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
+      // 3Dmol.js 已内置在 main.js 中，不依赖网络
+      // 如果未加载，可能是合并顺序问题
+      reject(new Error("3Dmol.js 未正确加载"));
     });
   }
 

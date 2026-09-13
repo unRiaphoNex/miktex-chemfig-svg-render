@@ -1003,6 +1003,9 @@ class MoleculeKnowledgeIndexPanel {
         // 1. 先处理反应箭头
         displayCode = displayCode.replace(/\\xrightarrow\{([^}]*)\}/g, " → $1 ");
         displayCode = displayCode.replace(/\\xleftarrow\{([^}]*)\}/g, " ← $1 ");
+        displayCode = displayCode.replace(/\\to/g, " → ");
+        displayCode = displayCode.replace(/\\rightarrow/g, " → ");
+        displayCode = displayCode.replace(/\\leftarrow/g, " ← ");
         // 2. 再去掉 \chemfig{...} 的括号
         displayCode = displayCode.replace(/\\chemfig\{/g, "");
         displayCode = displayCode.replace(/\\}/g, "");

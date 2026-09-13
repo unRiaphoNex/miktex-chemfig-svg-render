@@ -968,8 +968,8 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "乙醇钠催化，加热。",
             keywords: ["丙二酸二乙酯", "烷基化", "合成中间体"],
           },
-        ],
-      },
+          {
+            id: "ORG-1306",
             title: "喹啉和异喹啉",
             content: "苯并吡啶。喹啉：氮在1位；异喹啉：氮在2位。",
             formula: "\\chemfig{*6(-N-=-=-*6(=-=-=-))}",

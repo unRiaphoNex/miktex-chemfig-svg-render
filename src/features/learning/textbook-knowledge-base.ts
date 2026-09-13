@@ -882,8 +882,8 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "低温控制可停在酮阶段，通常生成叔醇。",
             keywords: ["酰卤", "格氏试剂", "酮", "叔醇"],
           },
-        ],
-      },
+          {
+            id: "ORG-1206",
             title: "Cannizzaro 反应",
             content: "无α-H的醛 + 浓碱 → 醇 + 羧酸。歧化反应。",
             formula: "2 \\chemfig{HCHO} + NaOH \\to \\chemfig{CH_3OH} + \\chemfig{HCOONa}",
@@ -892,7 +892,7 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             keywords: ["Cannizzaro", "歧化", "无α-H醛", "甲醛", "苯甲醛"],
           },
           {
-            id: "ORG-1206",
+            id: "ORG-1207",
             title: "Baeyer-Villiger 氧化",
             content: "酮 + 过氧酸 → 酯/内酯。氧原子插入羰基与α-碳之间。",
             formula: "\\chemfig{R-CO-R'} + m-CPBA \\to \\chemfig{R-COO-R'}",

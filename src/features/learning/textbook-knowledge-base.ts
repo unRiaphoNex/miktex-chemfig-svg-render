@@ -1554,6 +1554,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "根据底物选择温和氧化剂，避免过度氧化。",
             keywords: ["药物合成", "氧化反应", "羟基氧化"],
           },
+          {
+            id: "SYNTH-303",
+            title: "Baeyer-Villiger氧化",
+            content: "酮→酯/内酯。过氧酸氧化。",
+            formula: "",
+            mechanism: "酮与过氧酸（m-CPBA）反应，氧原子插入羰基与α-碳之间，生成酯或内酯。迁移倾向：叔烷基>仲烷基>芳基>伯烷基>甲基。",
+            conditions: "常用过氧酸：m-CPBA、过氧乙酸。CH₂Cl₂溶剂，室温。",
+            keywords: ["Baeyer-Villiger", "酮", "酯", "过氧酸"],
+          },
         ],
       },
       {

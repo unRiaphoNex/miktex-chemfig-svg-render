@@ -963,6 +963,13 @@ class MoleculeKnowledgeIndexPanel {
       
       // 创建详情模态框
       const modal = new Modal(app);
+      
+      // 设置小布局样式
+      modal.contentEl.style.maxWidth = "600px";
+      modal.contentEl.style.maxHeight = "70vh";
+      modal.contentEl.style.overflowY = "auto";
+      modal.contentEl.style.padding = "20px";
+      
       modal.contentEl.createEl("h2", { text: item.title });
       
       const meta = modal.contentEl.createDiv({ cls: "knowledge-detail-meta" });

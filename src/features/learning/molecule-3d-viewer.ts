@@ -96,6 +96,11 @@ class Molecule3DViewer {
       throw new Error("3Dmol.js 未加载");
     }
 
+    // 设置容器尺寸
+    this.container.style.width = "100%";
+    this.container.style.height = "400px";
+    this.container.style.position = "relative";
+
     this.viewer = $3Dmol.createViewer(this.container, {
       backgroundColor: "white",
     });

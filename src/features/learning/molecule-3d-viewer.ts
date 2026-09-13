@@ -87,6 +87,11 @@ class Molecule3DViewer {
   // ========== 初始化 ==========
 
   async init() {
+    // 兼容：3Dmol.js 暴露的全局变量是 3Dmol，不是 $3Dmol
+    if (typeof $3Dmol === "undefined" && typeof window.3Dmol !== "undefined") {
+      window.$3Dmol = window.3Dmol;
+    }
+    
     if (typeof $3Dmol === "undefined") {
       throw new Error("3Dmol.js 未加载");
     }

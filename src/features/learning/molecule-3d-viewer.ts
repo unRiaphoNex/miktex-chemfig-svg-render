@@ -658,6 +658,24 @@ class Molecule3DModalViewer {
   }
 
   /**
+   * 设置表面透明度
+   * @param opacity 0-1
+   */
+  setSurfaceOpacity(opacity) {
+    if (this.viewer && this.options.model === "surface") {
+      // 重新渲染表面，更新透明度
+      this.viewer.setStyle({}, {
+        stick: { radius: 0.1 },
+      });
+      this.viewer.addSurface($3Dmol.SurfaceType.VDW, {
+        opacity: opacity,
+        colorscheme: this.options.colorScheme,
+      });
+      this.viewer.render();
+    }
+  }
+
+  /**
    * 显示/隐藏网格
    */
   showGrid(show = true) {

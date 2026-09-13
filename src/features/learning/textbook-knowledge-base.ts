@@ -380,13 +380,8 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-            content: "共轭二烯烃与亲双烯体（烯烃/炔烃）反应生成环己烯。协同反应，顺式加成。",
-            formula: "\\chemfig{CH_2=CH-CH=CH_2} + \\chemfig{CH_2=CH_2} \\to \\chemfig{*6(-=-=-=)}",
-            mechanism: "协同反应：旧键断裂和新键形成同时进行，经过一个环状过渡态。顺式加成：亲双烯体的构型保持不变。",
-            conditions: "加热，通常无催化剂。吸电子基团取代的亲双烯体反应更快。",
-            keywords: ["Diels-Alder", "双烯合成", "协同反应", "环己烯"],
-          },
-        ],
+      {
+        chapter: "第五章 芳烃 芳香性",
       },
       {
         chapter: "第五章 脂环烃",

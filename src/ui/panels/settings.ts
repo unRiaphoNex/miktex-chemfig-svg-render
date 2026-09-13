@@ -74,6 +74,30 @@ class ChemfigSettingTab extends PluginSettingTab {
           })
       );
 
+    // 桥接服务状态检查
+    new Setting(containerEl)
+      .setName("桥接服务状态检查")
+      .setDesc("检查桥接服务是否正常运行 (默认端口 9123)")
+      .addButton((btn) =>
+        btn.setButtonText("检查状态").onClick(async () => {
+          try {
+            const bridgeUrl = this.plugin.bridgeUrl || "http://127.0.0.1:9123";
+            const r = await requestUrl({
+              url: bridgeUrl + "/api/health",
+              method: "GET",
+            });
+            if (r.status === 200) {
+              const data = JSON.parse(r.text);
+              new Notice(`✅ 桥接服务正常运行\n版本: ${data.version || "未知"}`, 5000);
+            } else {
+              new Notice(`❌ 桥接服务返回错误: HTTP ${r.status}`, 5000);
+            }
+          } catch (e) {
+            new Notice(`❌ 无法连接桥接服务\n错误: ${e.message}\n请确认桥接服务已启动`, 5000);
+          }
+        })
+      );
+
     new Setting(containerEl)
       .setName("启用 SVG 缓存 enableCache")
       .setDesc("以 chemfig 源码 SHA256 作为 key 缓存 SVG, 源码不变直接读缓存跳过编译")

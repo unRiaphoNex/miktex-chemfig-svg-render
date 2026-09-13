@@ -281,52 +281,64 @@ class Molecule3DViewer {
   // ========== 加载分子 ==========
 
   async loadFromSmiles(smiles) {
-    // 检查缓存
-    if (this.cache.has(smiles)) {
-      this.viewer.clear();
-      this.viewer.addModel(this.cache.get(smiles), "smi");
+    try {
+      this.showLoadingProgress("正在加载分子结构...");
+      // 检查缓存
+      if (this.cache.has(smiles)) {
+        this.viewer.clear();
+        this.viewer.addModel(this.cache.get(smiles), "smi");
+        this.applyStyle();
+        this.viewer.zoomTo();
+        this.viewer.render();
+        this.hideLoadingProgress();
+        return;
+      }
+
+    this.viewer.clear();
+      this.viewer.addModel(smiles, "smi");
       this.applyStyle();
       this.viewer.zoomTo();
       this.viewer.render();
-      return;
+
+      this.addToCache(smiles);
+      const model = this.viewer.getModel();
+      this.atomCount = model ? model.numAtoms() : 0;
+      this.autoAdjustDisplay();
+      this.hideLoadingProgress();
+    } catch (error) {
+      this.hideLoadingProgress();
+      console.error("加载 SMILES 失败:", error);
+      throw new Error(`无法解析 SMILES: ${smiles}`);
     }
-
-    this.viewer.clear();
-    this.viewer.addModel(smiles, "smi");
-    this.applyStyle();
-    this.viewer.zoomTo();
-    this.viewer.render();
-
-    this.addToCache(smiles);
-    const model = this.viewer.getModel();
-    this.atomCount = model ? model.numAtoms() : 0;
-    this.autoAdjustDisplay();
   }
 
   async loadFromPDB(pdbId) {
-    // 显示加载进度条
-    this.showLoadingProgress(`正在加载 PDB: ${pdbId.toUpperCase()}`);
-    
-    const url = `https://files.rcsb.org/view/${pdbId.toUpperCase()}.pdb`;
-    const response = await fetch(url);
-    if (!response.ok) {
+    try {
+      this.showLoadingProgress(`正在加载 PDB: ${pdbId.toUpperCase()}`);
+      
+      const url = `https://files.rcsb.org/view/${pdbId.toUpperCase()}.pdb`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`PDB ID 未找到: ${pdbId}`);
+      }
+
+      const pdbText = await response.text();
+      this.viewer.clear();
+      this.viewer.addModel(pdbText, "pdb");
+      this.viewer.setStyle({}, { cartoon: { color: "spectrum" } });
+      this.viewer.zoomTo();
+      this.viewer.render();
+
+      this.currentMol = pdbText;
+      const model = this.viewer.getModel();
+      this.atomCount = model ? model.numAtoms() : 0;
+      
       this.hideLoadingProgress();
-      throw new Error(`PDB ID 未找到: ${pdbId}`);
+    } catch (error) {
+      this.hideLoadingProgress();
+      console.error("加载 PDB 失败:", error);
+      throw error;
     }
-
-    const pdbText = await response.text();
-    this.viewer.clear();
-    this.viewer.addModel(pdbText, "pdb");
-    this.viewer.setStyle({}, { cartoon: { color: "spectrum" } });
-    this.viewer.zoomTo();
-    this.viewer.render();
-
-    this.currentMol = pdbText;
-    const model = this.viewer.getModel();
-    this.atomCount = model ? model.numAtoms() : 0;
-    
-    // 隐藏加载进度条
-    this.hideLoadingProgress();
   }
 
   loadFromText(text, format = "mol") {

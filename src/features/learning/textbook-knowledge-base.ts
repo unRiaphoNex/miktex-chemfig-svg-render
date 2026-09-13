@@ -1539,10 +1539,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-            keywords: ["NSAIDs", "布洛芬", "萘普生", "COX-2"],
-          },
-        ],
-      },
       {
         chapter: "第六章 镇痛药",
         sections: [

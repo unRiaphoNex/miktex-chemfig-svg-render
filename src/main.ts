@@ -1201,15 +1201,25 @@ module.exports = class ChemfigSvgPlugin extends Plugin {
         // 服务未运行，继续启动
       }
 
-      // 启动桥接服务
+      // 启动桥接服务（从插件目录启动）
       const { execFile } = require("child_process");
-      const bridgePath = "D:\\code\\chem-studio\\miktex-bridge\\server.js";
+      const adapter = this.app.vault.adapter;
+      const pluginDir = adapter.getBasePath() + "\\.obsidian\\plugins\\miktex-chemfig-svg-render";
+      const bridgePath = pluginDir + "\\bridge-server.js";
       
+      // 检查桥接服务文件是否存在
+      const fs = require("fs");
+      if (!fs.existsSync(bridgePath)) {
+        console.warn("[Chemfig-SVG] 桥接服务文件不存在:", bridgePath);
+        new Notice("⚠️ 桥接服务文件不存在，请检查插件安装", 5000);
+        return;
+      }
+
       this.bridgeProcess = execFile(
         "node",
         [bridgePath],
         {
-          cwd: "D:\\code\\chem-studio\\miktex-bridge",
+          cwd: pluginDir,
           windowsHide: true,
           env: { ...process.env, PORT: port }
         }

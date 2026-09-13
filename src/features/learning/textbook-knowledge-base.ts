@@ -648,9 +648,8 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-          },
           {
-            id: "ORG-806",
+            id: "ORG-807",
             title: "醇的氧化反应",
             content: "伯醇 → 醛 → 羧酸 仲醇 → 酮 叔醇：难氧化（条件剧烈时断裂）",
             formula: "\\chemfig{R-CH_2OH} \\xrightarrow{KMnO_4, H^+} \\chemfig{R-CHO} \\xrightarrow{KMnO_4, H^+} \\chemfig{R-COOH}",

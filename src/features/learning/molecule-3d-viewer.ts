@@ -118,6 +118,13 @@ class Molecule3DModalViewer {
         50% { width: 60%; margin-left: 20%; }
         100% { width: 0%; margin-left: 100%; }
       }
+
+      /* 拖拽加载样式 */
+      .3d-viewer-container.drag-over {
+        outline: 3px dashed var(--interactive-accent);
+        outline-offset: -10px;
+        background: var(--background-modifier-hover);
+      }
     `;
 
     document.head.appendChild(style);
@@ -1111,6 +1118,9 @@ class Molecule3DModal extends Modal {
     this.viewer = new Molecule3DModalViewer(this.viewerContainer);
     await this.viewer.init();
 
+    // 文件拖拽加载支持
+    this.setupDragAndDrop(this.viewerContainer);
+
     // 初始化轨迹播放器
     this.trajectoryPlayer = new window.TrajectoryPlayer(this.viewer);
 
@@ -1336,6 +1346,59 @@ class Molecule3DModal extends Modal {
 
     // 快捷键支持
     this.registerShortcuts(smilesInput, loadBtn, spinBtn, resetBtn, exportBtn, measureBtn, propsBtn);
+  }
+
+  /**
+   * 设置文件拖拽加载
+   */
+  setupDragAndDrop(container) {
+    // 拖拽进入
+    container.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      container.addClass("drag-over");
+    });
+
+    // 拖拽经过
+    container.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    // 拖拽离开
+    container.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      container.removeClass("drag-over");
+    });
+
+    // 拖拽释放
+    container.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      container.removeClass("drag-over");
+
+      const files = e.dataTransfer.files;
+      if (files.length === 0) return;
+
+      const file = files[0];
+      const text = await file.text();
+      const ext = file.name.split(".").pop().toLowerCase();
+
+      // 根据文件类型确定格式
+      let format = "mol";
+      if (ext === "pdb") format = "pdb";
+      else if (ext === "xyz") format = "xyz";
+      else if (ext === "sdf") format = "sdf";
+      else if (ext === "cif") format = "cif";
+
+      try {
+        this.viewer.loadFromText(text, format);
+        new Notice(`已加载: ${file.name}`, 2000);
+      } catch (err) {
+        new Notice(`文件加载失败: ${err.message}`, 3000);
+      }
+    });
   }
 
   /**

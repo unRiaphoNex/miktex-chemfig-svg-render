@@ -4948,7 +4948,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
-      },
       {
         chapter: "第十九章 酸碱平衡",
         sections: [

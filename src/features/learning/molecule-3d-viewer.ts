@@ -100,6 +100,177 @@ class Molecule3DViewer {
       if (this.measureMode) return;
       this.onAtomClick?.(this.formatAtomInfo(atom));
     });
+    
+    // 创建控制面板
+    this.createControlPanel();
+  }
+
+  // ========== 控制面板 UI ==========
+
+  createControlPanel() {
+    // 创建控制面板容器
+    const panel = document.createElement("div");
+    panel.style.cssText = `
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      min-width: 160px;
+      backdrop-filter: blur(8px);
+    `;
+    
+    // 模型选择
+    const modelLabel = document.createElement("div");
+    modelLabel.textContent = "模型样式";
+    modelLabel.style.cssText = `
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    `;
+    
+    const modelSelect = document.createElement("select");
+    modelSelect.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      background: #fff;
+      cursor: pointer;
+    `;
+    
+    const models = ["stick", "sphere", "line", "cartoon", "ribbon", "chain", "residue", "b-factor", "surface"];
+    const modelNames = {
+      "stick": "球棍模型",
+      "sphere": "空间填充",
+      "line": "线框模型",
+      "cartoon": "卡通模型",
+      "ribbon": "丝带模型",
+      "chain": "链状模型",
+      "residue": "残基着色",
+      "b-factor": "B因子着色",
+      "surface": "表面模型",
+    };
+    
+    models.forEach(m => {
+      const option = document.createElement("option");
+      option.value = m;
+      option.textContent = modelNames[m] || m;
+      if (m === this.options.model) option.selected = true;
+      modelSelect.appendChild(option);
+    });
+    
+    modelSelect.onchange = () => {
+      this.setModel(modelSelect.value);
+    };
+    
+    // 颜色方案
+    const colorLabel = document.createElement("div");
+    colorLabel.textContent = "颜色方案";
+    colorLabel.style.cssText = `
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    `;
+    
+    const colorSelect = document.createElement("select");
+    colorSelect.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      background: #fff;
+      cursor: pointer;
+    `;
+    
+    const schemes = ["default", "Jmol", "Rasmol", "shapely", "cyanCarbon", "greenCarbon", "magentaCarbon", "orangeCarbon", "whiteCarbon", "yellowCarbon"];
+    const schemeNames = {
+      "default": "默认",
+      "Jmol": "Jmol",
+      "Rasmol": "Rasmol",
+      "shapely": "Shapely",
+      "cyanCarbon": "青色碳",
+      "greenCarbon": "绿色碳",
+      "magentaCarbon": "品红碳",
+      "orangeCarbon": "橙色碳",
+      "whiteCarbon": "白色碳",
+      "yellowCarbon": "黄色碳",
+    };
+    
+    schemes.forEach(s => {
+      const option = document.createElement("option");
+      option.value = s;
+      option.textContent = schemeNames[s] || s;
+      if (s === this.options.colorScheme) option.selected = true;
+      colorSelect.appendChild(option);
+    });
+    
+    colorSelect.onchange = () => {
+      this.setColorScheme(colorSelect.value);
+    };
+    
+    // 旋转按钮
+    const spinBtn = document.createElement("button");
+    spinBtn.textContent = "🔄 旋转";
+    spinBtn.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      background: #f0f4ff;
+      color: #667eea;
+      transition: all 0.3s ease;
+    `;
+    
+    let spinning = false;
+    spinBtn.onclick = () => {
+      spinning = !spinning;
+      this.spin(spinning);
+      spinBtn.style.background = spinning ? "#667eea" : "#f0f4ff";
+      spinBtn.style.color = spinning ? "#fff" : "#667eea";
+    };
+    
+    // 重置视图按钮
+    const resetBtn = document.createElement("button");
+    resetBtn.textContent = "🔍 重置视图";
+    resetBtn.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      background: #f5f5f5;
+      color: #666;
+      transition: all 0.3s ease;
+    `;
+    
+    resetBtn.onclick = () => {
+      this.resetView();
+    };
+    
+    // 组装控制面板
+    panel.appendChild(modelLabel);
+    panel.appendChild(modelSelect);
+    panel.appendChild(colorLabel);
+    panel.appendChild(colorSelect);
+    panel.appendChild(spinBtn);
+    panel.appendChild(resetBtn);
+    
+    this.container.appendChild(panel);
+    this.controlPanel = panel;
   }
 
   // ========== 加载分子 ==========

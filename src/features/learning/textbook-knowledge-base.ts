@@ -1318,6 +1318,29 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
+      {
+        chapter: "第十章 催化反应",
+        sections: [
+          {
+            id: "SYNTH-701",
+            title: "催化氢化反应",
+            content: "催化加氢：H₂/Pd、H₂/Pt、H₂/Ni。",
+            formula: "",
+            mechanism: "多相催化：吸附→活化→反应→解吸。选择性：双键>三键>芳环。",
+            conditions: "Pd/C：最常用，活性高；Ni：Raney Ni，活性中等；Pt：活性最高，价格贵。",
+            keywords: ["催化反应", "催化氢化", "Pd/C", "加氢"],
+          },
+          {
+            id: "SYNTH-702",
+            title: "相转移催化",
+            content: "相转移催化剂（PTC）：季铵盐、冠醚。",
+            formula: "",
+            mechanism: "PTC将水相中的反应物转移到有机相，加速反应。不需要无水条件，操作简便。",
+            conditions: "常用PTC：四丁基溴化铵（TBAB）、三乙基苄基氯化铵（TEBA）、18-冠-6。",
+            keywords: ["相转移催化", "PTC", "季铵盐", "冠醚"],
+          },
+        ],
+      },
     ],
   },
 

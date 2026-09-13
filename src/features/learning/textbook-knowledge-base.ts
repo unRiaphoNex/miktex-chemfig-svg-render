@@ -646,8 +646,6 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "分子内脱水：浓 H₂SO₄，高温（170°C）；分子间脱水：浓 H₂SO₄，低温（140°C）。",
             keywords: ["脱水", "烯烃", "醚", "分子内", "分子间"],
           },
-        ],
-      },
           {
             id: "ORG-807",
             title: "醇的氧化反应",
@@ -658,7 +656,7 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             keywords: ["氧化", "伯醇", "仲醇", "叔醇", "醛", "酮", "羧酸"],
           },
           {
-            id: "ORG-807",
+            id: "ORG-808",
             title: "醚的结构和性质",
             content: "醚：C-O-C。性质稳定，常用溶剂。醚键的断裂：HI 或 HBr。",
             formula: "\\chemfig{R-O-R'}",

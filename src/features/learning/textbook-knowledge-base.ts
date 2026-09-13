@@ -1922,6 +1922,52 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
+      {
+        chapter: "第二十章 癌基因与抑癌基因",
+        sections: [
+          {
+            id: "BIO-1401",
+            title: "癌基因",
+            content: "癌基因：促进细胞增殖的基因。原癌基因：正常细胞中存在的癌基因同源序列。",
+            formula: "",
+            mechanism: "原癌基因：参与细胞增殖调控。突变后变为癌基因：Ras、Myc、Src。",
+            conditions: "癌基因激活机制：点突变、基因扩增、染色体易位。",
+            keywords: ["癌基因", "原癌基因", "Ras", "Myc"],
+          },
+          {
+            id: "BIO-1402",
+            title: "抑癌基因",
+            content: "抑癌基因：抑制细胞增殖的基因。",
+            formula: "",
+            mechanism: "抑癌基因：p53、Rb、PTEN。p53：基因组卫士，DNA损伤时诱导凋亡。Rb：细胞周期检查点。",
+            conditions: "抑癌基因失活：缺失、突变、甲基化。p53突变见于50%以上肿瘤。",
+            keywords: ["抑癌基因", "p53", "Rb", "PTEN"],
+          },
+        ],
+      },
+      {
+        chapter: "第二十一章 基因诊断与基因治疗",
+        sections: [
+          {
+            id: "BIO-1501",
+            title: "基因诊断",
+            content: "基因诊断：检测基因异常进行诊断。",
+            formula: "",
+            mechanism: "技术：PCR、DNA测序、基因芯片。应用：遗传病诊断、肿瘤诊断、感染性疾病诊断。",
+            conditions: "PCR：最常用，快速灵敏。DNA测序：金标准。基因芯片：高通量。",
+            keywords: ["基因诊断", "PCR", "DNA测序", "基因芯片"],
+          },
+          {
+            id: "BIO-1502",
+            title: "基因治疗",
+            content: "基因治疗：将正常基因导入患者体内治疗疾病。",
+            formula: "",
+            mechanism: "策略：基因替代、基因修复、基因增强、基因失活。载体：病毒载体（逆转录病毒、腺病毒）、非病毒载体。",
+            conditions: "临床应用：遗传病（ADA缺乏症）、肿瘤、心血管疾病。挑战：安全性、有效性、伦理。",
+            keywords: ["基因治疗", "病毒载体", "基因替代"],
+          },
+        ],
+      },
     ],
   },
 };

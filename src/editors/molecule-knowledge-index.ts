@@ -943,6 +943,9 @@ class MoleculeKnowledgeIndexPanel {
         modal.contentEl.createEl("h3", { text: "🧪 化学式" });
         const formulaDiv = modal.contentEl.createDiv({ cls: "knowledge-formula" });
         formulaDiv.createEl("code", { text: item.formula });
+        
+        // 尝试渲染 chemfig 为 SVG
+        this.renderFormulaToSvg(item.formula, formulaDiv);
       }
 
       // 反应机理
@@ -975,6 +978,56 @@ class MoleculeKnowledgeIndexPanel {
         const Notice = require("obsidian").Notice;
         new Notice("打开详情失败: " + e.message, 3000);
       } catch (_) {}
+    }
+  }
+
+  /**
+   * 将 chemfig 代码渲染为 SVG
+   */
+  async renderFormulaToSvg(formulaCode, container) {
+    try {
+      // 创建渲染容器
+      const svgContainer = container.createDiv({ cls: "formula-svg-container" });
+      svgContainer.style.cssText = "display: flex; justify-content: center; padding: 16px; background: #f8f9fa; border-radius: 8px; margin-top: 8px; min-height: 100px; align-items: center;";
+      
+      // 显示加载状态
+      svgContainer.innerHTML = '<div style="color: #999; font-size: 14px;">正在渲染...</div>';
+      
+      // 尝试通过全局 API 渲染
+      if (window.chemfigAPI && window.chemfigAPI.renderChemfig) {
+        try {
+          const result = await window.chemfigAPI.renderChemfig(formulaCode, {});
+          if (result && result.svg) {
+            svgContainer.innerHTML = result.svg;
+            return;
+          }
+        } catch (e) {
+          console.warn("[KnowledgeIndex] chemfigAPI 渲染失败:", e);
+        }
+      }
+      
+      // 尝试通过 bridgeClient 渲染
+      const app = window.app || this.plugin?.app;
+      if (app && app.plugins) {
+        const plugin = app.plugins.plugins["miktex-chemfig-svg-render"];
+        if (plugin && plugin.bridgeClient) {
+          try {
+            const result = await plugin.bridgeClient.render(formulaCode, "normal");
+            if (result && result.svg) {
+              svgContainer.innerHTML = result.svg;
+              return;
+            }
+          } catch (e) {
+            console.warn("[KnowledgeIndex] bridgeClient 渲染失败:", e);
+          }
+        }
+      }
+      
+      // 降级：显示渲染提示
+      svgContainer.innerHTML = '<div style="color: #999; font-size: 12px; text-align: center;">⚠️ 渲染服务未启动，请使用 MiKTeX 编译模式查看完整结构式</div>';
+      
+    } catch (e) {
+      console.error("[KnowledgeIndex] renderFormulaToSvg error:", e);
     }
   }
 

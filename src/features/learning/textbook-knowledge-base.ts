@@ -1476,6 +1476,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             conditions: "卤加成：CCl₄ 溶剂，低温；卤取代：光照或 FeBr₃ 催化。",
             keywords: ["卤化反应", "卤素", "卤加成", "卤取代"],
           },
+          {
+            id: "SYNTH-002",
+            title: "芳香环卤代",
+            content: "芳香环上的亲电卤代反应。",
+            formula: "",
+            mechanism: "芳香环卤代：亲电取代机理。Lewis酸催化（FeBr₃、AlCl₃）使卤素分子极化，产生亲电试剂X⁺。",
+            conditions: "FeBr₃或AlCl₃催化，CCl₄溶剂。定位规则：邻对位定位基（-OH、-NH₂、-R），间位定位基（-NO₂、-COOH）。",
+            keywords: ["芳香卤代", "亲电取代", "定位规则", "FeBr3"],
+          },
         ],
       },
       {

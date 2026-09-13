@@ -1462,6 +1462,52 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
           },
         ],
       },
+      {
+        chapter: "第十五章 血液生物化学",
+        sections: [
+          {
+            id: "BIO-901",
+            title: "血浆蛋白质",
+            content: "血浆蛋白：白蛋白、球蛋白、纤维蛋白原。",
+            formula: "",
+            mechanism: "白蛋白：维持血浆胶体渗透压，运输营养物质；球蛋白：免疫功能；纤维蛋白原：凝血功能。",
+            conditions: "白蛋白/球蛋白比值（A/G）：正常1.5-2.5。慢性肝病时A/G下降甚至倒置。",
+            keywords: ["血液", "血浆蛋白", "白蛋白", "球蛋白"],
+          },
+          {
+            id: "BIO-902",
+            title: "血液凝固",
+            content: "凝血因子：14种。凝血过程：外源性、内源性、共同通路。",
+            formula: "",
+            mechanism: "凝血三阶段：凝血酶原激活物形成→凝血酶形成→纤维蛋白形成。抗凝系统：抗凝血酶III、蛋白C系统。",
+            conditions: "维生素K依赖的凝血因子：II、VII、IX、X。血友病：VIII因子缺乏（血友病A）、IX因子缺乏（血友病B）。",
+            keywords: ["血液凝固", "凝血因子", "凝血酶", "纤维蛋白"],
+          },
+        ],
+      },
+      {
+        chapter: "第十六章 维生素与微量元素",
+        sections: [
+          {
+            id: "BIO-1001",
+            title: "脂溶性维生素",
+            content: "维生素A、D、E、K。",
+            formula: "",
+            mechanism: "维生素A：视觉、上皮分化；维生素D：钙磷代谢；维生素E：抗氧化；维生素K：凝血。",
+            conditions: "维生素A缺乏：夜盲症、干眼病；维生素D缺乏：佝偻病（儿童）、骨软化症（成人）。",
+            keywords: ["维生素", "脂溶性", "维生素A", "维生素D"],
+          },
+          {
+            id: "BIO-1002",
+            title: "水溶性维生素",
+            content: "维生素B族、维生素C。",
+            formula: "",
+            mechanism: "维生素B1：TPP辅酶，缺乏→脚气病；维生素B2：FAD/FMN辅酶；维生素PP：NAD/NADP辅酶；维生素C：抗氧化、羟化。",
+            conditions: "维生素C缺乏：坏血病。维生素B1缺乏：脚气病。",
+            keywords: ["维生素", "水溶性", "维生素B", "维生素C"],
+          },
+        ],
+      },
     ],
   },
 };

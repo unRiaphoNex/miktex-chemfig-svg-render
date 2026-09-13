@@ -56,7 +56,8 @@ class Molecule3DViewer {
     this.viewer.render();
 
     this.addToCache(smiles);
-    this.atomCount = this.viewer.getModel().numAtoms();
+    const model = this.viewer.getModel();
+    this.atomCount = model ? model.numAtoms() : 0;
     this.autoAdjustDisplay();
   }
 
@@ -73,7 +74,8 @@ class Molecule3DViewer {
     this.viewer.render();
 
     this.currentMol = pdbText;
-    this.atomCount = this.viewer.getModel().numAtoms();
+    const model = this.viewer.getModel();
+    this.atomCount = model ? model.numAtoms() : 0;
   }
 
   loadFromText(text, format = "mol") {
@@ -82,7 +84,8 @@ class Molecule3DViewer {
     this.applyStyle();
     this.viewer.zoomTo();
     this.viewer.render();
-    this.atomCount = this.viewer.getModel().numAtoms();
+    const model = this.viewer.getModel();
+    this.atomCount = model ? model.numAtoms() : 0;
     this.autoAdjustDisplay();
   }
 

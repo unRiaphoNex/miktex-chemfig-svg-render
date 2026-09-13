@@ -17,6 +17,19 @@ class ChemfigSettingTab extends PluginSettingTab {
     // ========== V2.0-iter: 渲染后端 / 缓存 / OCL ==========
     containerEl.createEl("h3", { text: "渲染后端 (V2.0)" });
 
+    // 启用桥接代理开关
+    new Setting(containerEl)
+      .setName("启用桥接代理")
+      .setDesc("开启后，使用外部 Node 桥接服务进行编译渲染（推荐）\n关闭后，使用本地 MiKTeX 直接编译（需安装 MiKTeX）")
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.renderBackend === "bridge").onChange(async (value) => {
+          this.plugin.renderBackend = value ? "bridge" : "local";
+          await this.plugin.saveData({ renderBackend: this.plugin.renderBackend });
+          if (typeof syncLocalWarn === "function") syncLocalWarn();
+          new Notice(value ? "桥接代理已启用" : "本地编译模式已启用", 3000);
+        })
+      );
+
     // SVG 渲染确认选项
     new Setting(containerEl)
       .setName("SVG 渲染确认")

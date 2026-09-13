@@ -1640,7 +1640,7 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
         ],
       },
       {
-        chapter: "第十一章 抗生素",
+        chapter: "第十五章 抗生素",
         sections: [
           {
             id: "DRUG-701",
@@ -1677,6 +1677,15 @@ const TEXTBOOK_KNOWLEDGE_BASE = {
             mechanism: "作用机制：与细菌核糖体 30S 亚基结合，抑制氨酰-tRNA 进入 A 位，阻止蛋白质合成。",
             conditions: "影响骨骼和牙齿发育（与钙螯合），孕妇和 8 岁以下儿童禁用。",
             keywords: ["四环素", "多西环素", "蛋白质合成"],
+          },
+          {
+            id: "DRUG-705",
+            title: "其他抗生素",
+            content: "氯霉素、林可霉素、万古霉素。",
+            formula: "",
+            mechanism: "氯霉素：与 50S 亚基结合，抑制蛋白质合成，骨髓抑制为主要副作用。林可霉素：与 50S 亚基结合，对厌氧菌有效。万古霉素：抑制细胞壁合成，耐甲氧西林金黄色葡萄球菌（MRSA）首选。",
+            conditions: "氯霉素：再生障碍性贫血风险。万古霉素：MRSA 感染，需监测血药浓度。",
+            keywords: ["氯霉素", "林可霉素", "万古霉素", "MRSA"],
           },
         ],
       },
